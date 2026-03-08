@@ -1,0 +1,1717 @@
+{
+  "input": "C:\\Users\\parip\\Downloads\\CEDT hack\\computed-tomography-images-for-intracranial-hemorrhage-detection-and-segmentation-1.3.1\\ct_scans\\049.nii",
+  "weights": "C:\\Users\\parip\\Downloads\\CEDT hack\\q-sentinel-mesh\\weights\\high_acc_b4.pth",
+  "n_slices": 39,
+  "n_tta": 5,
+  "volume": {
+    "epidural": {
+      "prob": 0.22789493203163147,
+      "positive": true,
+      "threshold": 0.13
+    },
+    "intraparenchymal": {
+      "prob": 0.27779194712638855,
+      "positive": true,
+      "threshold": 0.11
+    },
+    "intraventricular": {
+      "prob": 0.15687917172908783,
+      "positive": true,
+      "threshold": 0.09
+    },
+    "subarachnoid": {
+      "prob": 0.16446179151535034,
+      "positive": true,
+      "threshold": 0.05
+    },
+    "subdural": {
+      "prob": 0.18363672494888306,
+      "positive": false,
+      "threshold": 0.5
+    },
+    "any": {
+      "prob": 0.3623962998390198,
+      "positive": true,
+      "threshold": 0.15
+    }
+  },
+  "slices": [
+    {
+      "slice_idx": 0,
+      "probs": {
+        "epidural": 0.059542812407016754,
+        "intraparenchymal": 0.04863438755273819,
+        "intraventricular": 0.0294429250061512,
+        "subarachnoid": 0.01852918043732643,
+        "subdural": 0.03337419033050537,
+        "any": 0.07204023748636246
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.059542812407016754,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.04863438755273819,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.0294429250061512,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.01852918043732643,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.03337419033050537,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.07204023748636246,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 1,
+      "probs": {
+        "epidural": 0.03171809762716293,
+        "intraparenchymal": 0.02823895774781704,
+        "intraventricular": 0.013333180919289589,
+        "subarachnoid": 0.007163832429796457,
+        "subdural": 0.014310498721897602,
+        "any": 0.03227487951517105
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.03171809762716293,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.02823895774781704,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.013333180919289589,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.007163832429796457,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.014310498721897602,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.03227487951517105,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 2,
+      "probs": {
+        "epidural": 0.0629165917634964,
+        "intraparenchymal": 0.056992851197719574,
+        "intraventricular": 0.030508290976285934,
+        "subarachnoid": 0.017010590061545372,
+        "subdural": 0.033642418682575226,
+        "any": 0.0695975199341774
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.0629165917634964,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.056992851197719574,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.030508290976285934,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.017010590061545372,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.033642418682575226,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.0695975199341774,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 3,
+      "probs": {
+        "epidural": 0.04642992466688156,
+        "intraparenchymal": 0.04159357398748398,
+        "intraventricular": 0.022519521415233612,
+        "subarachnoid": 0.01398013997823,
+        "subdural": 0.026056602597236633,
+        "any": 0.056547485291957855
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.04642992466688156,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.04159357398748398,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.022519521415233612,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.01398013997823,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.026056602597236633,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.056547485291957855,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 4,
+      "probs": {
+        "epidural": 0.05739409849047661,
+        "intraparenchymal": 0.06499006599187851,
+        "intraventricular": 0.037871938198804855,
+        "subarachnoid": 0.024762239307165146,
+        "subdural": 0.03558293730020523,
+        "any": 0.08403906226158142
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.05739409849047661,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.06499006599187851,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.037871938198804855,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.024762239307165146,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.03558293730020523,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.08403906226158142,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 5,
+      "probs": {
+        "epidural": 0.07244812697172165,
+        "intraparenchymal": 0.08016053587198257,
+        "intraventricular": 0.04593370109796524,
+        "subarachnoid": 0.03164512291550636,
+        "subdural": 0.04243766888976097,
+        "any": 0.09845872968435287
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.07244812697172165,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.08016053587198257,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.04593370109796524,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.03164512291550636,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.04243766888976097,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.09845872968435287,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 6,
+      "probs": {
+        "epidural": 0.05296109989285469,
+        "intraparenchymal": 0.07596887648105621,
+        "intraventricular": 0.04214698076248169,
+        "subarachnoid": 0.03080383501946926,
+        "subdural": 0.03321629762649536,
+        "any": 0.07541703432798386
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.05296109989285469,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.07596887648105621,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.04214698076248169,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.03080383501946926,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.03321629762649536,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.07541703432798386,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 7,
+      "probs": {
+        "epidural": 0.06339745968580246,
+        "intraparenchymal": 0.0881480947136879,
+        "intraventricular": 0.04750881344079971,
+        "subarachnoid": 0.03523973375558853,
+        "subdural": 0.04228160157799721,
+        "any": 0.08529435843229294
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.06339745968580246,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.0881480947136879,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.04750881344079971,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.03523973375558853,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.04228160157799721,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.08529435843229294,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 8,
+      "probs": {
+        "epidural": 0.06450052559375763,
+        "intraparenchymal": 0.08857211470603943,
+        "intraventricular": 0.04164958372712135,
+        "subarachnoid": 0.029919615015387535,
+        "subdural": 0.04319024831056595,
+        "any": 0.09163343906402588
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.06450052559375763,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.08857211470603943,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.04164958372712135,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.029919615015387535,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.04319024831056595,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.09163343906402588,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 9,
+      "probs": {
+        "epidural": 0.06320469081401825,
+        "intraparenchymal": 0.09413082152605057,
+        "intraventricular": 0.044908713549375534,
+        "subarachnoid": 0.0330628976225853,
+        "subdural": 0.04609433189034462,
+        "any": 0.09615340083837509
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.06320469081401825,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.09413082152605057,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.044908713549375534,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.0330628976225853,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.04609433189034462,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.09615340083837509,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 10,
+      "probs": {
+        "epidural": 0.054442279040813446,
+        "intraparenchymal": 0.08611190319061279,
+        "intraventricular": 0.046477094292640686,
+        "subarachnoid": 0.029847552999854088,
+        "subdural": 0.04470586031675339,
+        "any": 0.0812605768442154
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.054442279040813446,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.08611190319061279,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.046477094292640686,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.029847552999854088,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.04470586031675339,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.0812605768442154,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 11,
+      "probs": {
+        "epidural": 0.08869464695453644,
+        "intraparenchymal": 0.1193794459104538,
+        "intraventricular": 0.06686953455209732,
+        "subarachnoid": 0.050076842308044434,
+        "subdural": 0.06274330615997314,
+        "any": 0.12405576556921005
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.08869464695453644,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.1193794459104538,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.06686953455209732,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.050076842308044434,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.06274330615997314,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.12405576556921005,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 12,
+      "probs": {
+        "epidural": 0.11006013303995132,
+        "intraparenchymal": 0.1742641031742096,
+        "intraventricular": 0.0974942222237587,
+        "subarachnoid": 0.08611278235912323,
+        "subdural": 0.09261931478977203,
+        "any": 0.1812228262424469
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.11006013303995132,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.1742641031742096,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.0974942222237587,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.08611278235912323,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.09261931478977203,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.1812228262424469,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 13,
+      "probs": {
+        "epidural": 0.10472140461206436,
+        "intraparenchymal": 0.17431694269180298,
+        "intraventricular": 0.09738601744174957,
+        "subarachnoid": 0.07805352658033371,
+        "subdural": 0.08538340032100677,
+        "any": 0.1849195659160614
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.10472140461206436,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.17431694269180298,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.09738601744174957,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.07805352658033371,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.08538340032100677,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.1849195659160614,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 14,
+      "probs": {
+        "epidural": 0.16296625137329102,
+        "intraparenchymal": 0.209707111120224,
+        "intraventricular": 0.12763552367687225,
+        "subarachnoid": 0.10297975689172745,
+        "subdural": 0.11381286382675171,
+        "any": 0.2815999388694763
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.16296625137329102,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.209707111120224,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.12763552367687225,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.10297975689172745,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.11381286382675171,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.2815999388694763,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 15,
+      "probs": {
+        "epidural": 0.17721109092235565,
+        "intraparenchymal": 0.25617098808288574,
+        "intraventricular": 0.15687917172908783,
+        "subarachnoid": 0.13927170634269714,
+        "subdural": 0.15054365992546082,
+        "any": 0.3211834132671356
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.17721109092235565,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.25617098808288574,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.15687917172908783,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.13927170634269714,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.15054365992546082,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.3211834132671356,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 16,
+      "probs": {
+        "epidural": 0.18131032586097717,
+        "intraparenchymal": 0.25662606954574585,
+        "intraventricular": 0.15295295417308807,
+        "subarachnoid": 0.13435882329940796,
+        "subdural": 0.16827137768268585,
+        "any": 0.3244810700416565
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.18131032586097717,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.25662606954574585,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.15295295417308807,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.13435882329940796,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.16827137768268585,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.3244810700416565,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 17,
+      "probs": {
+        "epidural": 0.2022331953048706,
+        "intraparenchymal": 0.27779194712638855,
+        "intraventricular": 0.14533886313438416,
+        "subarachnoid": 0.1409914195537567,
+        "subdural": 0.18363672494888306,
+        "any": 0.3623962998390198
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.2022331953048706,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.27779194712638855,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.14533886313438416,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.1409914195537567,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.18363672494888306,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.3623962998390198,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 18,
+      "probs": {
+        "epidural": 0.13955971598625183,
+        "intraparenchymal": 0.21562376618385315,
+        "intraventricular": 0.11274755001068115,
+        "subarachnoid": 0.0993216261267662,
+        "subdural": 0.13675042986869812,
+        "any": 0.25480031967163086
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.13955971598625183,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.21562376618385315,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.11274755001068115,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.0993216261267662,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.13675042986869812,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.25480031967163086,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 19,
+      "probs": {
+        "epidural": 0.16963718831539154,
+        "intraparenchymal": 0.21555009484291077,
+        "intraventricular": 0.12221340090036392,
+        "subarachnoid": 0.12540516257286072,
+        "subdural": 0.16191783547401428,
+        "any": 0.2915470004081726
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.16963718831539154,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.21555009484291077,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.12221340090036392,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.12540516257286072,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.16191783547401428,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.2915470004081726,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 20,
+      "probs": {
+        "epidural": 0.1673065423965454,
+        "intraparenchymal": 0.17930415272712708,
+        "intraventricular": 0.12302931398153305,
+        "subarachnoid": 0.11927594989538193,
+        "subdural": 0.14161476492881775,
+        "any": 0.26592522859573364
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.1673065423965454,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.17930415272712708,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.12302931398153305,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.11927594989538193,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.14161476492881775,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.26592522859573364,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 21,
+      "probs": {
+        "epidural": 0.22789493203163147,
+        "intraparenchymal": 0.22725553810596466,
+        "intraventricular": 0.13768504559993744,
+        "subarachnoid": 0.16446179151535034,
+        "subdural": 0.1743849217891693,
+        "any": 0.3524841070175171
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.22789493203163147,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.22725553810596466,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.13768504559993744,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.16446179151535034,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.1743849217891693,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.3524841070175171,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 22,
+      "probs": {
+        "epidural": 0.1783241331577301,
+        "intraparenchymal": 0.15260571241378784,
+        "intraventricular": 0.08630941808223724,
+        "subarachnoid": 0.0970098003745079,
+        "subdural": 0.120630644261837,
+        "any": 0.2598561644554138
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.1783241331577301,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.15260571241378784,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.08630941808223724,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.0970098003745079,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.120630644261837,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.2598561644554138,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 23,
+      "probs": {
+        "epidural": 0.15293468534946442,
+        "intraparenchymal": 0.13767358660697937,
+        "intraventricular": 0.07385678589344025,
+        "subarachnoid": 0.07357321679592133,
+        "subdural": 0.09801387786865234,
+        "any": 0.19624926149845123
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.15293468534946442,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.13767358660697937,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.07385678589344025,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.07357321679592133,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.09801387786865234,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.19624926149845123,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 24,
+      "probs": {
+        "epidural": 0.17858605086803436,
+        "intraparenchymal": 0.17734548449516296,
+        "intraventricular": 0.10598836839199066,
+        "subarachnoid": 0.10849859565496445,
+        "subdural": 0.14213630557060242,
+        "any": 0.27208369970321655
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.17858605086803436,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.17734548449516296,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.10598836839199066,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.10849859565496445,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.14213630557060242,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.27208369970321655,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 25,
+      "probs": {
+        "epidural": 0.16455118358135223,
+        "intraparenchymal": 0.1785149872303009,
+        "intraventricular": 0.11178096383810043,
+        "subarachnoid": 0.09858417510986328,
+        "subdural": 0.12908057868480682,
+        "any": 0.25161707401275635
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.16455118358135223,
+          "positive": true,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.1785149872303009,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.11178096383810043,
+          "positive": true,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.09858417510986328,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.12908057868480682,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.25161707401275635,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 26,
+      "probs": {
+        "epidural": 0.1251319944858551,
+        "intraparenchymal": 0.13102519512176514,
+        "intraventricular": 0.07593420892953873,
+        "subarachnoid": 0.06358375400304794,
+        "subdural": 0.09591098874807358,
+        "any": 0.18673384189605713
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.1251319944858551,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.13102519512176514,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.07593420892953873,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.06358375400304794,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.09591098874807358,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.18673384189605713,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 27,
+      "probs": {
+        "epidural": 0.09991788119077682,
+        "intraparenchymal": 0.12235145270824432,
+        "intraventricular": 0.06527715176343918,
+        "subarachnoid": 0.05011730268597603,
+        "subdural": 0.08487702906131744,
+        "any": 0.15999798476696014
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.09991788119077682,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.12235145270824432,
+          "positive": true,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.06527715176343918,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.05011730268597603,
+          "positive": true,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.08487702906131744,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.15999798476696014,
+          "positive": true,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 28,
+      "probs": {
+        "epidural": 0.07061437517404556,
+        "intraparenchymal": 0.08990395069122314,
+        "intraventricular": 0.04316801577806473,
+        "subarachnoid": 0.03149166703224182,
+        "subdural": 0.05985851213335991,
+        "any": 0.12048296630382538
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.07061437517404556,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.08990395069122314,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.04316801577806473,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.03149166703224182,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.05985851213335991,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.12048296630382538,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 29,
+      "probs": {
+        "epidural": 0.07367777079343796,
+        "intraparenchymal": 0.08797342330217361,
+        "intraventricular": 0.039921004325151443,
+        "subarachnoid": 0.03024550899863243,
+        "subdural": 0.058993928134441376,
+        "any": 0.12149856239557266
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.07367777079343796,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.08797342330217361,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.039921004325151443,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.03024550899863243,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.058993928134441376,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.12149856239557266,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 30,
+      "probs": {
+        "epidural": 0.05952059105038643,
+        "intraparenchymal": 0.07360921800136566,
+        "intraventricular": 0.0327589176595211,
+        "subarachnoid": 0.0223828312009573,
+        "subdural": 0.04295738413929939,
+        "any": 0.09326736629009247
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.05952059105038643,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.07360921800136566,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.0327589176595211,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.0223828312009573,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.04295738413929939,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.09326736629009247,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 31,
+      "probs": {
+        "epidural": 0.06588776409626007,
+        "intraparenchymal": 0.08291588723659515,
+        "intraventricular": 0.03665116801857948,
+        "subarachnoid": 0.028267046436667442,
+        "subdural": 0.06097966432571411,
+        "any": 0.1082724779844284
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.06588776409626007,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.08291588723659515,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.03665116801857948,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.028267046436667442,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.06097966432571411,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.1082724779844284,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 32,
+      "probs": {
+        "epidural": 0.09621399641036987,
+        "intraparenchymal": 0.07899612188339233,
+        "intraventricular": 0.033949218690395355,
+        "subarachnoid": 0.02861655130982399,
+        "subdural": 0.05829746276140213,
+        "any": 0.12864097952842712
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.09621399641036987,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.07899612188339233,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.033949218690395355,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.02861655130982399,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.05829746276140213,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.12864097952842712,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 33,
+      "probs": {
+        "epidural": 0.09524122625589371,
+        "intraparenchymal": 0.06782303750514984,
+        "intraventricular": 0.027142509818077087,
+        "subarachnoid": 0.020986028015613556,
+        "subdural": 0.051200319081544876,
+        "any": 0.11272621154785156
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.09524122625589371,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.06782303750514984,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.027142509818077087,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.020986028015613556,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.051200319081544876,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.11272621154785156,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 34,
+      "probs": {
+        "epidural": 0.09174471348524094,
+        "intraparenchymal": 0.06108735874295235,
+        "intraventricular": 0.02857908234000206,
+        "subarachnoid": 0.01780359074473381,
+        "subdural": 0.050491370260715485,
+        "any": 0.1279560923576355
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.09174471348524094,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.06108735874295235,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.02857908234000206,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.01780359074473381,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.050491370260715485,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.1279560923576355,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 35,
+      "probs": {
+        "epidural": 0.07069990783929825,
+        "intraparenchymal": 0.04261317476630211,
+        "intraventricular": 0.02089717984199524,
+        "subarachnoid": 0.012306086719036102,
+        "subdural": 0.032370563596487045,
+        "any": 0.08833275735378265
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.07069990783929825,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.04261317476630211,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.02089717984199524,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.012306086719036102,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.032370563596487045,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.08833275735378265,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 36,
+      "probs": {
+        "epidural": 0.07534712553024292,
+        "intraparenchymal": 0.0442923977971077,
+        "intraventricular": 0.02049601636826992,
+        "subarachnoid": 0.011696243658661842,
+        "subdural": 0.030418097972869873,
+        "any": 0.08973059803247452
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.07534712553024292,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.0442923977971077,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.02049601636826992,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.011696243658661842,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.030418097972869873,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.08973059803247452,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 37,
+      "probs": {
+        "epidural": 0.07571635395288467,
+        "intraparenchymal": 0.044460881501436234,
+        "intraventricular": 0.020604649558663368,
+        "subarachnoid": 0.01177570316940546,
+        "subdural": 0.030560489743947983,
+        "any": 0.09020859003067017
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.07571635395288467,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.044460881501436234,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.020604649558663368,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.01177570316940546,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.030560489743947983,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.09020859003067017,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    },
+    {
+      "slice_idx": 38,
+      "probs": {
+        "epidural": 0.07588985562324524,
+        "intraparenchymal": 0.04460180178284645,
+        "intraventricular": 0.02063794992864132,
+        "subarachnoid": 0.011843422427773476,
+        "subdural": 0.030688807368278503,
+        "any": 0.0906960666179657
+      },
+      "detected": {
+        "epidural": {
+          "prob": 0.07588985562324524,
+          "positive": false,
+          "threshold": 0.13
+        },
+        "intraparenchymal": {
+          "prob": 0.04460180178284645,
+          "positive": false,
+          "threshold": 0.11
+        },
+        "intraventricular": {
+          "prob": 0.02063794992864132,
+          "positive": false,
+          "threshold": 0.09
+        },
+        "subarachnoid": {
+          "prob": 0.011843422427773476,
+          "positive": false,
+          "threshold": 0.05
+        },
+        "subdural": {
+          "prob": 0.030688807368278503,
+          "positive": false,
+          "threshold": 0.5
+        },
+        "any": {
+          "prob": 0.0906960666179657,
+          "positive": false,
+          "threshold": 0.15
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+# ─── Core Deep Learning ────────────────────────────────────────────────────────
+# IMPORTANT: Install PyTorch FIRST with the command in setup_env.bat
+# Requires CUDA 12.8 for RTX 5060 (Blackwell sm_120) and newer NVIDIA GPUs
+# pip install torch==2.10.0+cu128 torchvision==0.25.0+cu128 --index-url https://download.pytorch.org/whl/cu128
+torch==2.10.0+cu128
+torchvision==0.25.0+cu128
+
+# ─── Medical Image Models ──────────────────────────────────────────────────────
+timm==1.0.25
+
+# ─── Explainability ────────────────────────────────────────────────────────────
+grad-cam==1.5.5
+opencv-python-headless==4.10.0.84
+
+# ─── Dashboard ─────────────────────────────────────────────────────────────────
+streamlit==1.54.0
+pydicom==3.0.1
+matplotlib==3.10.0
+
+# ─── Quantum ML ────────────────────────────────────────────────────────────────
+pennylane==0.44.0
+
+# ─── Federated Learning ────────────────────────────────────────────────────────
+flwr[simulation]==1.26.1
+
+# ─── Post-Quantum Cryptography ─────────────────────────────────────────────────
+pqcrypto==0.4.0
+cryptography>=42.0.0
+
+# ─── Medical Image Formats ─────────────────────────────────────────────────────
+nibabel>=5.0.0    # NIfTI file loading (CT-ICH real dataset)
+scipy>=1.11.0     # skull stripping (ndimage)
+
+# ─── Data / Utilities ──────────────────────────────────────────────────────────
+numpy==2.2.3
+pandas==2.2.3
+scikit-learn==1.6.1
+Pillow==11.1.0
+tqdm==4.67.1

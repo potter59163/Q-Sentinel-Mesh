@@ -1,0 +1,27 @@
+{
+  "nodes": [
+    1,
+    2,
+    3
+  ],
+  "baseline_auc": [
+    0.8535,
+    0.8667,
+    0.8799
+  ],
+  "qsentinel_auc": [
+    0.8849,
+    0.9157,
+    0.9363
+  ],
+  "labels": {
+    "baseline": "Baseline CNN (EfficientNet-B4)",
+    "qsentinel": "Q-Sentinel Mesh (Quantum + Federated)"
+  },
+  "metadata": {
+    "baseline_best_auc": 0.8799,
+    "hybrid_best_auc": 0.8143,
+    "fed_final_auc": 0.9363,
+    "dataset": "Combined: CT-ICH + RSNA-12K + Afridi-ICH (~10K+ slices)"
+  }
+}

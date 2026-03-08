@@ -1,0 +1,2122 @@
+{
+  "n_patients": 75,
+  "weights": "C:\\Users\\parip\\Downloads\\CEDT hack\\q-sentinel-mesh\\weights\\high_acc_b4.pth",
+  "tta": 5,
+  "thresholds": {
+    "epidural": 0.272,
+    "intraparenchymal": 0.223,
+    "intraventricular": 0.158,
+    "subarachnoid": 0.135,
+    "subdural": 0.254,
+    "any": 0.323
+  },
+  "metrics": {
+    "epidural": {
+      "auc": 0.8492063492063492,
+      "sensitivity": 0.7619047619047619,
+      "specificity": 0.7407407407407407,
+      "precision": 0.5333333333333333,
+      "f1": 0.6274509803921569,
+      "accuracy": 0.7466666666666667,
+      "tp": 16,
+      "tn": 40,
+      "fp": 14,
+      "fn": 5
+    },
+    "intraparenchymal": {
+      "auc": 0.8983050847457628,
+      "sensitivity": 0.75,
+      "specificity": 0.864406779661017,
+      "precision": 0.6,
+      "f1": 0.6666666666666665,
+      "accuracy": 0.84,
+      "tp": 12,
+      "tn": 51,
+      "fp": 8,
+      "fn": 4
+    },
+    "intraventricular": {
+      "auc": 0.8257142857142857,
+      "sensitivity": 0.6,
+      "specificity": 0.8285714285714286,
+      "precision": 0.2,
+      "f1": 0.3,
+      "accuracy": 0.8133333333333334,
+      "tp": 3,
+      "tn": 58,
+      "fp": 12,
+      "fn": 2
+    },
+    "subarachnoid": {
+      "auc": 0.8676470588235294,
+      "sensitivity": 0.8571428571428571,
+      "specificity": 0.7352941176470589,
+      "precision": 0.25,
+      "f1": 0.3870967741935483,
+      "accuracy": 0.7466666666666667,
+      "tp": 6,
+      "tn": 50,
+      "fp": 18,
+      "fn": 1
+    },
+    "subdural": {
+      "auc": 0.9612676056338028,
+      "sensitivity": 1.0,
+      "specificity": 0.9295774647887324,
+      "precision": 0.4444444444444444,
+      "f1": 0.6153846153846153,
+      "accuracy": 0.9333333333333333,
+      "tp": 4,
+      "tn": 66,
+      "fp": 5,
+      "fn": 0
+    },
+    "any": {
+      "auc": 0.9344729344729344,
+      "sensitivity": 0.8888888888888888,
+      "specificity": 0.8461538461538461,
+      "precision": 0.8421052631578947,
+      "f1": 0.8648648648648649,
+      "accuracy": 0.8666666666666667,
+      "tp": 32,
+      "tn": 33,
+      "fp": 6,
+      "fn": 4
+    }
+  },
+  "summary": {
+    "mean_auc": 0.8894355530994439,
+    "any_auc": 0.9344729344729344,
+    "any_sensitivity": 0.8888888888888888,
+    "any_specificity": 0.8461538461538461,
+    "any_f1": 0.8648648648648649,
+    "any_accuracy": 0.8666666666666667
+  },
+  "per_patient": [
+    {
+      "patient_num": 49,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.22789493203163147,
+        "intraparenchymal": 0.27779194712638855,
+        "intraventricular": 0.15687917172908783,
+        "subarachnoid": 0.16446179151535034,
+        "subdural": 0.18363672494888306,
+        "any": 0.3623962998390198
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 50,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.34354814887046814,
+        "intraparenchymal": 0.37597885727882385,
+        "intraventricular": 0.21832656860351562,
+        "subarachnoid": 0.22975683212280273,
+        "subdural": 0.2816789150238037,
+        "any": 0.48741674423217773
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 51,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 1,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3415999412536621,
+        "intraparenchymal": 0.29563742876052856,
+        "intraventricular": 0.16287916898727417,
+        "subarachnoid": 0.16794493794441223,
+        "subdural": 0.28347697854042053,
+        "any": 0.4431383013725281
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 52,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3942660093307495,
+        "intraparenchymal": 0.19641292095184326,
+        "intraventricular": 0.142887681722641,
+        "subarachnoid": 0.1357138454914093,
+        "subdural": 0.19945958256721497,
+        "any": 0.4319656491279602
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 53,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3015258312225342,
+        "intraparenchymal": 0.3006509840488434,
+        "intraventricular": 0.18676146864891052,
+        "subarachnoid": 0.17047534883022308,
+        "subdural": 0.21687965095043182,
+        "any": 0.41432976722717285
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 54,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.14722840487957,
+        "intraparenchymal": 0.09685903787612915,
+        "intraventricular": 0.07557204365730286,
+        "subarachnoid": 0.05332186818122864,
+        "subdural": 0.09614190459251404,
+        "any": 0.16909480094909668
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 55,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.1865426003932953,
+        "intraparenchymal": 0.1963198184967041,
+        "intraventricular": 0.11077000200748444,
+        "subarachnoid": 0.09902318567037582,
+        "subdural": 0.12641027569770813,
+        "any": 0.24802443385124207
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 56,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.15688911080360413,
+        "intraparenchymal": 0.13327360153198242,
+        "intraventricular": 0.08385930955410004,
+        "subarachnoid": 0.05992898344993591,
+        "subdural": 0.08394255489110947,
+        "any": 0.1785055547952652
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 57,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.14557556807994843,
+        "intraparenchymal": 0.16554789245128632,
+        "intraventricular": 0.09765881299972534,
+        "subarachnoid": 0.08403409272432327,
+        "subdural": 0.11470268666744232,
+        "any": 0.23895835876464844
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 58,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.1525065004825592,
+        "intraparenchymal": 0.1802145540714264,
+        "intraventricular": 0.10619745403528214,
+        "subarachnoid": 0.09213100373744965,
+        "subdural": 0.11397246271371841,
+        "any": 0.23412489891052246
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 66,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.386340469121933,
+        "intraparenchymal": 0.1655655801296234,
+        "intraventricular": 0.12477634847164154,
+        "subarachnoid": 0.11265264451503754,
+        "subdural": 0.18025855720043182,
+        "any": 0.4054655432701111
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 67,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.332608163356781,
+        "intraparenchymal": 0.14379926025867462,
+        "intraventricular": 0.11047638952732086,
+        "subarachnoid": 0.09775151312351227,
+        "subdural": 0.16412603855133057,
+        "any": 0.36260685324668884
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 68,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.42459017038345337,
+        "intraparenchymal": 0.182191401720047,
+        "intraventricular": 0.13471156358718872,
+        "subarachnoid": 0.124358631670475,
+        "subdural": 0.19482262432575226,
+        "any": 0.44840797781944275
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 69,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.20021574199199677,
+        "intraparenchymal": 0.24077609181404114,
+        "intraventricular": 0.1614958792924881,
+        "subarachnoid": 0.14450593292713165,
+        "subdural": 0.13803288340568542,
+        "any": 0.3225227892398834
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 70,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.4184190630912781,
+        "intraparenchymal": 0.21267719566822052,
+        "intraventricular": 0.1546044647693634,
+        "subarachnoid": 0.14281624555587769,
+        "subdural": 0.1970808357000351,
+        "any": 0.4189678132534027
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 71,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 1,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.34736135601997375,
+        "intraparenchymal": 0.24023370444774628,
+        "intraventricular": 0.17160625755786896,
+        "subarachnoid": 0.14454403519630432,
+        "subdural": 0.2783970534801483,
+        "any": 0.4266696572303772
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 72,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.21658173203468323,
+        "intraparenchymal": 0.1980484426021576,
+        "intraventricular": 0.11989851295948029,
+        "subarachnoid": 0.10993459075689316,
+        "subdural": 0.11818194389343262,
+        "any": 0.2753482460975647
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 73,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.32005825638771057,
+        "intraparenchymal": 0.14487309753894806,
+        "intraventricular": 0.0970398411154747,
+        "subarachnoid": 0.09151948988437653,
+        "subdural": 0.16128692030906677,
+        "any": 0.3345577120780945
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 74,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 1,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.31348592042922974,
+        "intraparenchymal": 0.23068571090698242,
+        "intraventricular": 0.15494850277900696,
+        "subarachnoid": 0.16594770550727844,
+        "subdural": 0.25437140464782715,
+        "any": 0.4315531849861145
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 75,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.41454046964645386,
+        "intraparenchymal": 0.21786189079284668,
+        "intraventricular": 0.15629461407661438,
+        "subarachnoid": 0.14602918922901154,
+        "subdural": 0.2564277648925781,
+        "any": 0.47553205490112305
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 76,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 1,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.32848384976387024,
+        "intraparenchymal": 0.3557204604148865,
+        "intraventricular": 0.21838578581809998,
+        "subarachnoid": 0.23252105712890625,
+        "subdural": 0.2979196012020111,
+        "any": 0.510189414024353
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 77,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3151282072067261,
+        "intraparenchymal": 0.21650731563568115,
+        "intraventricular": 0.15544575452804565,
+        "subarachnoid": 0.16516119241714478,
+        "subdural": 0.2130367010831833,
+        "any": 0.43124666810035706
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 78,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.2716728150844574,
+        "intraparenchymal": 0.2722039818763733,
+        "intraventricular": 0.17632359266281128,
+        "subarachnoid": 0.17156362533569336,
+        "subdural": 0.20092670619487762,
+        "any": 0.40903520584106445
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 79,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.24164529144763947,
+        "intraparenchymal": 0.15887968242168427,
+        "intraventricular": 0.10146113485097885,
+        "subarachnoid": 0.08485741913318634,
+        "subdural": 0.15728184580802917,
+        "any": 0.3096100687980652
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 80,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 1,
+        "subarachnoid": 1,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.2619467079639435,
+        "intraparenchymal": 0.277335524559021,
+        "intraventricular": 0.21410532295703888,
+        "subarachnoid": 0.18011976778507233,
+        "subdural": 0.17796170711517334,
+        "any": 0.3797511160373688
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 81,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 1,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3231359124183655,
+        "intraparenchymal": 0.3244970440864563,
+        "intraventricular": 0.20127364993095398,
+        "subarachnoid": 0.22482016682624817,
+        "subdural": 0.3022260069847107,
+        "any": 0.5083844065666199
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 82,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 1,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.25100627541542053,
+        "intraparenchymal": 0.2591763138771057,
+        "intraventricular": 0.18034237623214722,
+        "subarachnoid": 0.16201186180114746,
+        "subdural": 0.14988812804222107,
+        "any": 0.38268399238586426
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 83,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.2847701609134674,
+        "intraparenchymal": 0.22866201400756836,
+        "intraventricular": 0.16266274452209473,
+        "subarachnoid": 0.16439148783683777,
+        "subdural": 0.21209566295146942,
+        "any": 0.38668352365493774
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 84,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 1,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.24173370003700256,
+        "intraparenchymal": 0.22271916270256042,
+        "intraventricular": 0.135361909866333,
+        "subarachnoid": 0.14764811098575592,
+        "subdural": 0.1808667629957199,
+        "any": 0.3652825355529785
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 85,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 1,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3135971426963806,
+        "intraparenchymal": 0.15381629765033722,
+        "intraventricular": 0.10369336605072021,
+        "subarachnoid": 0.09303983300924301,
+        "subdural": 0.15454807877540588,
+        "any": 0.3725726008415222
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 86,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3718040883541107,
+        "intraparenchymal": 0.15822111070156097,
+        "intraventricular": 0.10928235203027725,
+        "subarachnoid": 0.09068585187196732,
+        "subdural": 0.1755419671535492,
+        "any": 0.3982431888580322
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 87,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3835518956184387,
+        "intraparenchymal": 0.1951366662979126,
+        "intraventricular": 0.1381615400314331,
+        "subarachnoid": 0.1217508465051651,
+        "subdural": 0.204135462641716,
+        "any": 0.44715508818626404
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 88,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.2480805367231369,
+        "intraparenchymal": 0.24423165619373322,
+        "intraventricular": 0.1390218287706375,
+        "subarachnoid": 0.12909436225891113,
+        "subdural": 0.2228759229183197,
+        "any": 0.35423094034194946
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 89,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3614112436771393,
+        "intraparenchymal": 0.2313750982284546,
+        "intraventricular": 0.17339129745960236,
+        "subarachnoid": 0.17951105535030365,
+        "subdural": 0.2561131417751312,
+        "any": 0.46762433648109436
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 90,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.30896836519241333,
+        "intraparenchymal": 0.14587673544883728,
+        "intraventricular": 0.0942024514079094,
+        "subarachnoid": 0.08165336400270462,
+        "subdural": 0.1741856187582016,
+        "any": 0.3301798701286316
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 91,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 1,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.25877276062965393,
+        "intraparenchymal": 0.29626187682151794,
+        "intraventricular": 0.19767311215400696,
+        "subarachnoid": 0.17327427864074707,
+        "subdural": 0.2078370302915573,
+        "any": 0.396325021982193
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 92,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 1,
+        "intraventricular": 1,
+        "subarachnoid": 1,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.23963341116905212,
+        "intraparenchymal": 0.2876269519329071,
+        "intraventricular": 0.15797211229801178,
+        "subarachnoid": 0.1346503049135208,
+        "subdural": 0.21196988224983215,
+        "any": 0.32739198207855225
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 93,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 1,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.24326357245445251,
+        "intraparenchymal": 0.24181297421455383,
+        "intraventricular": 0.14275620877742767,
+        "subarachnoid": 0.14201629161834717,
+        "subdural": 0.1732618510723114,
+        "any": 0.3517068326473236
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": true,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 94,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 1,
+        "intraventricular": 1,
+        "subarachnoid": 1,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.28667452931404114,
+        "intraparenchymal": 0.3629237711429596,
+        "intraventricular": 0.24879863858222961,
+        "subarachnoid": 0.2412509173154831,
+        "subdural": 0.3106837570667267,
+        "any": 0.496755987405777
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": true,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 95,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.35671693086624146,
+        "intraparenchymal": 0.16368331015110016,
+        "intraventricular": 0.11774728447198868,
+        "subarachnoid": 0.10739517211914062,
+        "subdural": 0.1795610636472702,
+        "any": 0.3973141610622406
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 96,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.24702470004558563,
+        "intraparenchymal": 0.18277455866336823,
+        "intraventricular": 0.12077748775482178,
+        "subarachnoid": 0.114791139960289,
+        "subdural": 0.12067846953868866,
+        "any": 0.3045695126056671
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 97,
+      "gt": {
+        "epidural": 1,
+        "intraparenchymal": 1,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 1
+      },
+      "prob": {
+        "epidural": 0.3199911415576935,
+        "intraparenchymal": 0.28053006529808044,
+        "intraventricular": 0.1827465444803238,
+        "subarachnoid": 0.18247829377651215,
+        "subdural": 0.23776686191558838,
+        "any": 0.42224255204200745
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": true,
+        "intraventricular": true,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 98,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.21922416985034943,
+        "intraparenchymal": 0.15888109803199768,
+        "intraventricular": 0.09913333505392075,
+        "subarachnoid": 0.09576428681612015,
+        "subdural": 0.12934327125549316,
+        "any": 0.2612072825431824
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 99,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.2699189782142639,
+        "intraparenchymal": 0.21981878578662872,
+        "intraventricular": 0.1450732797384262,
+        "subarachnoid": 0.15104320645332336,
+        "subdural": 0.18531076610088348,
+        "any": 0.3923864960670471
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": true,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 100,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.21300704777240753,
+        "intraparenchymal": 0.11546452343463898,
+        "intraventricular": 0.0732341930270195,
+        "subarachnoid": 0.08083634078502655,
+        "subdural": 0.11502568423748016,
+        "any": 0.2615441083908081
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 101,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.27891847491264343,
+        "intraparenchymal": 0.1553362011909485,
+        "intraventricular": 0.09873200953006744,
+        "subarachnoid": 0.08283785730600357,
+        "subdural": 0.12650270760059357,
+        "any": 0.31984761357307434
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 102,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.11270890384912491,
+        "intraparenchymal": 0.1019073948264122,
+        "intraventricular": 0.06439722329378128,
+        "subarachnoid": 0.04738214612007141,
+        "subdural": 0.09362436830997467,
+        "any": 0.17280974984169006
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 103,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.20136800408363342,
+        "intraparenchymal": 0.16757497191429138,
+        "intraventricular": 0.0952206626534462,
+        "subarachnoid": 0.07601014524698257,
+        "subdural": 0.09811131656169891,
+        "any": 0.21453475952148438
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 104,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.1735668033361435,
+        "intraparenchymal": 0.1495695859193802,
+        "intraventricular": 0.0853564441204071,
+        "subarachnoid": 0.07831431925296783,
+        "subdural": 0.09440566599369049,
+        "any": 0.23515038192272186
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 105,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.2305784970521927,
+        "intraparenchymal": 0.15384146571159363,
+        "intraventricular": 0.10737131536006927,
+        "subarachnoid": 0.09830102324485779,
+        "subdural": 0.1525062918663025,
+        "any": 0.2667810916900635
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 106,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.23590393364429474,
+        "intraparenchymal": 0.17359048128128052,
+        "intraventricular": 0.12575247883796692,
+        "subarachnoid": 0.11410720646381378,
+        "subdural": 0.16315138339996338,
+        "any": 0.30348023772239685
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 107,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.16378146409988403,
+        "intraparenchymal": 0.15849921107292175,
+        "intraventricular": 0.09750865399837494,
+        "subarachnoid": 0.07664618641138077,
+        "subdural": 0.11433613300323486,
+        "any": 0.2183031141757965
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 108,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.15675681829452515,
+        "intraparenchymal": 0.1890425682067871,
+        "intraventricular": 0.11224012076854706,
+        "subarachnoid": 0.09410123527050018,
+        "subdural": 0.13267140090465546,
+        "any": 0.23105458915233612
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 109,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.17215301096439362,
+        "intraparenchymal": 0.17381587624549866,
+        "intraventricular": 0.1108732596039772,
+        "subarachnoid": 0.09147723019123077,
+        "subdural": 0.11382114887237549,
+        "any": 0.23841044306755066
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 110,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.17393967509269714,
+        "intraparenchymal": 0.1448187530040741,
+        "intraventricular": 0.0865510106086731,
+        "subarachnoid": 0.08001561462879181,
+        "subdural": 0.126024529337883,
+        "any": 0.21675936877727509
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 111,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.16652527451515198,
+        "intraparenchymal": 0.194767028093338,
+        "intraventricular": 0.12701043486595154,
+        "subarachnoid": 0.11150588095188141,
+        "subdural": 0.12834595143795013,
+        "any": 0.27429550886154175
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 112,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.33381763100624084,
+        "intraparenchymal": 0.13172674179077148,
+        "intraventricular": 0.09395405650138855,
+        "subarachnoid": 0.07724791765213013,
+        "subdural": 0.13103079795837402,
+        "any": 0.32848161458969116
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 113,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.18779206275939941,
+        "intraparenchymal": 0.133523091673851,
+        "intraventricular": 0.08514688163995743,
+        "subarachnoid": 0.07181425392627716,
+        "subdural": 0.10250526666641235,
+        "any": 0.21262483298778534
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 114,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.29806944727897644,
+        "intraparenchymal": 0.2009742259979248,
+        "intraventricular": 0.13979366421699524,
+        "subarachnoid": 0.13359180092811584,
+        "subdural": 0.165758416056633,
+        "any": 0.3559432625770569
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 115,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.12738078832626343,
+        "intraparenchymal": 0.13989213109016418,
+        "intraventricular": 0.07856610417366028,
+        "subarachnoid": 0.0637264996767044,
+        "subdural": 0.0858098641037941,
+        "any": 0.1620706468820572
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 116,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.22626638412475586,
+        "intraparenchymal": 0.20578090846538544,
+        "intraventricular": 0.14465436339378357,
+        "subarachnoid": 0.12141557037830353,
+        "subdural": 0.14256593585014343,
+        "any": 0.2882002294063568
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 117,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.184991255402565,
+        "intraparenchymal": 0.1286875307559967,
+        "intraventricular": 0.08257360011339188,
+        "subarachnoid": 0.06730684638023376,
+        "subdural": 0.08855584263801575,
+        "any": 0.19183936715126038
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 118,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.23582907021045685,
+        "intraparenchymal": 0.19840215146541595,
+        "intraventricular": 0.11916841566562653,
+        "subarachnoid": 0.1054876446723938,
+        "subdural": 0.14824479818344116,
+        "any": 0.3337746560573578
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 119,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.2955707013607025,
+        "intraparenchymal": 0.18861815333366394,
+        "intraventricular": 0.12275288254022598,
+        "subarachnoid": 0.1313719004392624,
+        "subdural": 0.19859513640403748,
+        "any": 0.35380080342292786
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": true
+      }
+    },
+    {
+      "patient_num": 120,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.16074860095977783,
+        "intraparenchymal": 0.1369706392288208,
+        "intraventricular": 0.08097999542951584,
+        "subarachnoid": 0.07321033626794815,
+        "subdural": 0.12417890876531601,
+        "any": 0.21634221076965332
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 121,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.2421092540025711,
+        "intraparenchymal": 0.1706027090549469,
+        "intraventricular": 0.11794173717498779,
+        "subarachnoid": 0.11646173149347305,
+        "subdural": 0.14533105492591858,
+        "any": 0.3190869688987732
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 122,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.2910749018192291,
+        "intraparenchymal": 0.15497370064258575,
+        "intraventricular": 0.10889443010091782,
+        "subarachnoid": 0.08608637005090714,
+        "subdural": 0.1414252668619156,
+        "any": 0.31094521284103394
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 123,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.2453148365020752,
+        "intraparenchymal": 0.15867619216442108,
+        "intraventricular": 0.10166790336370468,
+        "subarachnoid": 0.10789141803979874,
+        "subdural": 0.15926429629325867,
+        "any": 0.30548542737960815
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 124,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.13654454052448273,
+        "intraparenchymal": 0.13693061470985413,
+        "intraventricular": 0.07298104465007782,
+        "subarachnoid": 0.061069387942552567,
+        "subdural": 0.10589152574539185,
+        "any": 0.1943434774875641
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 125,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.20012760162353516,
+        "intraparenchymal": 0.16698376834392548,
+        "intraventricular": 0.09823592007160187,
+        "subarachnoid": 0.08322389423847198,
+        "subdural": 0.10501301288604736,
+        "any": 0.2521089017391205
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 126,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.11952809989452362,
+        "intraparenchymal": 0.11250374466180801,
+        "intraventricular": 0.06849895417690277,
+        "subarachnoid": 0.05224127694964409,
+        "subdural": 0.08516737818717957,
+        "any": 0.1564388871192932
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 127,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.2441493570804596,
+        "intraparenchymal": 0.16800251603126526,
+        "intraventricular": 0.11367519944906235,
+        "subarachnoid": 0.09383674710988998,
+        "subdural": 0.15300671756267548,
+        "any": 0.3084728717803955
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 128,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.13094769418239594,
+        "intraparenchymal": 0.15482774376869202,
+        "intraventricular": 0.09561804682016373,
+        "subarachnoid": 0.07541657984256744,
+        "subdural": 0.1019606962800026,
+        "any": 0.20085373520851135
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 129,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.318488210439682,
+        "intraparenchymal": 0.12555597722530365,
+        "intraventricular": 0.08246184885501862,
+        "subarachnoid": 0.06988319009542465,
+        "subdural": 0.12603507936000824,
+        "any": 0.3104146420955658
+      },
+      "pred": {
+        "epidural": true,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    },
+    {
+      "patient_num": 130,
+      "gt": {
+        "epidural": 0,
+        "intraparenchymal": 0,
+        "intraventricular": 0,
+        "subarachnoid": 0,
+        "subdural": 0,
+        "any": 0
+      },
+      "prob": {
+        "epidural": 0.19821082055568695,
+        "intraparenchymal": 0.12176873534917831,
+        "intraventricular": 0.07284041494131088,
+        "subarachnoid": 0.06405440717935562,
+        "subdural": 0.1017773300409317,
+        "any": 0.2131222039461136
+      },
+      "pred": {
+        "epidural": false,
+        "intraparenchymal": false,
+        "intraventricular": false,
+        "subarachnoid": false,
+        "subdural": false,
+        "any": false
+      }
+    }
+  ]
+}

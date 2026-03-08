@@ -1,0 +1,8 @@
+{
+  "epidural": 0.05,
+  "intraparenchymal": 0.15000000000000002,
+  "intraventricular": 0.15000000000000002,
+  "subarachnoid": 0.15000000000000002,
+  "subdural": 0.19,
+  "any": 0.21000000000000002
+}

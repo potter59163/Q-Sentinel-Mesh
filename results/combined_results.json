@@ -1,0 +1,67 @@
+{
+  "cross_dataset_auc": 0.8755836553331204,
+  "rsna_val_auc": 0.7821878947542432,
+  "per_class_auc": {
+    "epidural": 0.853554333290289,
+    "intraparenchymal": 0.8658024018831243,
+    "intraventricular": 0.8603345280764636,
+    "subarachnoid": 0.9163288825305993,
+    "subdural": 0.908972599191961,
+    "any": 0.8485091870262862
+  },
+  "total_epochs": 8,
+  "elapsed_min": 125.2,
+  "mode": "cross_dataset",
+  "train_source": "RSNA",
+  "test_source": "CT-ICH (PhysioNet, all 75 patients)",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.01845133871533908,
+      "val_loss": 0.01813355501151843,
+      "val_auc": 0.7821878947542432
+    },
+    {
+      "epoch": 2,
+      "train_loss": NaN,
+      "val_loss": NaN,
+      "val_auc": 0.5
+    },
+    {
+      "epoch": 3,
+      "train_loss": NaN,
+      "val_loss": NaN,
+      "val_auc": 0.5
+    },
+    {
+      "epoch": 4,
+      "train_loss": NaN,
+      "val_loss": NaN,
+      "val_auc": 0.5
+    },
+    {
+      "epoch": 5,
+      "train_loss": NaN,
+      "val_loss": NaN,
+      "val_auc": 0.5
+    },
+    {
+      "epoch": 6,
+      "train_loss": NaN,
+      "val_loss": NaN,
+      "val_auc": 0.5
+    },
+    {
+      "epoch": 7,
+      "train_loss": NaN,
+      "val_loss": NaN,
+      "val_auc": 0.5
+    },
+    {
+      "epoch": 8,
+      "train_loss": NaN,
+      "val_loss": NaN,
+      "val_auc": 0.5
+    }
+  ]
+}

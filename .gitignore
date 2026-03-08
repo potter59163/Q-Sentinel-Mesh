@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large data files (use Git LFS or external storage)
+data/rsna/
+data/*.dcm
+data/*.nii
+data/*.nii.gz
+data/*.csv
+
+# Model weights (too large for GitHub — use Git LFS or Google Drive)
+weights/*.pth
+
+# Claude internal
+.claude/
+
+# Secrets / config
+*.env
+.env*
+
+# Logs
+*.log
+
+# Temp
+*.tmp
+*.bak

@@ -1,0 +1,1081 @@
+"""
+Q-Sentinel Mesh — Main Streamlit Dashboard
+
+Doctor-facing interface for:
+1. CT Scan 3D viewer with slice navigation
+2. AI-powered hemorrhage detection with Grad-CAM explanation
+3. Federated learning intelligence dashboard
+4. Post-Quantum security layer visualization
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+import streamlit as st
+import torch
+
+# ─── Path Setup ───────────────────────────────────────────────────────────────
+ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(ROOT))
+
+from src.data.rsna_loader import SUBTYPES
+from src.utils.metrics import generate_benchmark_data, load_fed_results
+from dashboard.components.ct_viewer import render_ct_viewer
+from dashboard.components.fed_chart import (
+    render_benchmark_chart,
+    render_federated_rounds_chart,
+    render_live_simulation_animation,
+    render_hospital_breakdown_chart,
+)
+from dashboard.i18n import T, get_lang
+from dashboard.utils.pdf_export import generate_report_pdf
+
+# ─── Page Config ──────────────────────────────────────────────────────────────
+st.set_page_config(
+    page_title="Q-Sentinel Mesh",
+    page_icon="🧠",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# ─── Session State Init ───────────────────────────────────────────────────────
+if "scans_analyzed" not in st.session_state:
+    st.session_state["scans_analyzed"] = 0
+# Stored for PDF export
+if "last_ct_slice" not in st.session_state:
+    st.session_state["last_ct_slice"] = None
+if "last_overlay" not in st.session_state:
+    st.session_state["last_overlay"] = None
+if "last_probs" not in st.session_state:
+    st.session_state["last_probs"] = [0.0] * 5
+if "last_detection" not in st.session_state:
+    st.session_state["last_detection"] = ("—", 0.0)
+if "pdf_bytes" not in st.session_state:
+    st.session_state["pdf_bytes"] = None
+
+# ─── Custom CSS ───────────────────────────────────────────────────────────────
+with open(ROOT / "dashboard/assets/styles.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+
+# ─── Model Loading ────────────────────────────────────────────────────────────
+
+@st.cache_resource(show_spinner="Loading AI model...")
+def load_model(model_type: str = "baseline"):
+    """Load model (cached across sessions)."""
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    weights_dir = ROOT / "weights"
+
+    if model_type == "hybrid":
+        weights_path = weights_dir / "hybrid_qsentinel.pth"
+        if weights_path.exists():
+            from src.models.hybrid_model import load_hybrid_model
+            return load_hybrid_model(str(weights_path), device), device
+
+    # Prefer finetuned_ctich.pth (AUC 96%), fall back to high_acc, then baseline
+    weights_path = weights_dir / "finetuned_ctich.pth"
+    if not weights_path.exists():
+        weights_path = weights_dir / "high_acc_b4.pth"
+    if not weights_path.exists():
+        weights_path = weights_dir / "baseline_b4.pth"
+    if weights_path.exists():
+        from src.models.cnn_encoder import load_baseline
+        return load_baseline(str(weights_path), device), device
+
+    return None, device
+
+
+@st.cache_data(show_spinner=False)
+def load_calibrated_thresholds() -> dict:
+    """Load per-class optimal thresholds from training calibration."""
+    thr_path = ROOT / "results" / "optimal_thresholds.json"
+    if thr_path.exists():
+        with open(thr_path, encoding="utf-8") as f:
+            return json.load(f)
+    # Default fallback thresholds
+    return {
+        "epidural": 0.13, "intraparenchymal": 0.11, "intraventricular": 0.09,
+        "subarachnoid": 0.05, "subdural": 0.50, "any": 0.15,
+    }
+
+
+# ─── CT-ICH Dataset Path ──────────────────────────────────────────────────────
+_CT_DATASET_DIR = (
+    ROOT.parent
+    / "computed-tomography-images-for-intracranial-hemorrhage-detection-and-segmentation-1.3.1"
+    / "ct_scans"
+)
+
+
+@st.cache_data(show_spinner=False)
+def get_dataset_patients() -> list:
+    """Return sorted list of patient IDs available in the CT-ICH dataset."""
+    if not _CT_DATASET_DIR.exists():
+        return []
+    return sorted([f.stem for f in _CT_DATASET_DIR.glob("*.nii")])
+
+
+@st.cache_resource(show_spinner="Loading CT scan from dataset...")
+def load_dataset_ct(patient_id: str) -> np.ndarray:
+    """Load a real NIfTI CT scan from the CT-ICH dataset and return as (D, H, W) HU array."""
+    import nibabel as nib
+
+    nii_path = _CT_DATASET_DIR / f"{patient_id}.nii"
+    if not nii_path.exists():
+        # Return a blank placeholder volume if file not found
+        return np.zeros((30, 256, 256), dtype=np.float32)
+
+    img = nib.load(str(nii_path))
+    data = img.get_fdata(dtype=np.float32)
+
+    if data.ndim == 4:
+        data = data[..., 0]
+
+    # Ensure (D, H, W): if depth is last axis (H, W, D) → transpose
+    shape = data.shape
+    if shape[2] < shape[0] and shape[2] < shape[1]:
+        volume = np.transpose(data, (2, 0, 1))
+    else:
+        volume = data
+
+    volume = np.ascontiguousarray(volume)
+
+    # HU intercept correction (same logic as NIfTI uploader)
+    vmin, vmax = float(volume.min()), float(volume.max())
+    if vmax < 5:
+        volume = (volume - vmin) / (vmax - vmin + 1e-6) * 1000.0 - 500.0
+    elif vmin >= 0 and vmax < 600:
+        volume = (volume / (vmax + 1e-6)) * 1000.0 - 500.0
+    elif vmin >= 0 and vmax > 500 and vmax < 5000:
+        volume = volume - 1024.0
+
+    return volume
+
+
+# ─── Sidebar ──────────────────────────────────────────────────────────────────
+
+with st.sidebar:
+    st.markdown(
+        f"""
+        <div style="text-align:center; padding:16px 0 8px;">
+            <div style="font-size:36px; margin-bottom:6px;">🧠</div>
+            <h2 style="color:#00D4FF; margin:0; font-size:1.2rem; letter-spacing:0.04em;">
+                {T('brand_name')}
+            </h2>
+            <p style="color:#475569; margin:4px 0 8px; font-size:11px; letter-spacing:0.06em; text-transform:uppercase;">
+                {T('brand_subtitle')}
+            </p>
+            <span class="badge badge-online">
+                <span class="dot-online"></span>{T('online')}
+            </span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.divider()
+
+    # System Status
+    device_str = "cuda" if torch.cuda.is_available() else "cpu"
+    device_label = (
+        f"🟢 {T('gpu_mode')} · {torch.cuda.get_device_name(0)}"
+        if torch.cuda.is_available()
+        else f"🟡 {T('cpu_mode')}"
+    )
+    _finetuned_exists = (ROOT / "weights" / "finetuned_ctich.pth").exists()
+    _high_acc_exists = (ROOT / "weights" / "high_acc_b4.pth").exists()
+    _base_exists = (ROOT / "weights" / "baseline_b4.pth").exists()
+    weights_exist = _finetuned_exists or _high_acc_exists or _base_exists
+    _model_label = "Fine-Tuned CT-ICH (AUC 96.0%)" if _finetuned_exists else ("High-Acc (AUC 87.6%)" if _high_acc_exists else T('loaded'))
+    model_status = f"🟢 {_model_label}" if weights_exist else f"🟠 {T('mock')}"
+
+    st.markdown(
+        f"""
+        <div style="background:rgba(15,24,39,0.7); border:1px solid #1A2540;
+                    border-radius:10px; padding:12px 14px; margin-bottom:12px;">
+            <div style="font-size:11px; color:#475569; text-transform:uppercase;
+                        letter-spacing:0.06em; margin-bottom:8px;">{T('system_status')}</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span style="color:#64748B; font-size:12px;">{T('compute')}</span>
+                <span style="color:#CBD5E1; font-size:12px;">{device_label}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span style="color:#64748B; font-size:12px;">{T('ai_model_label')}</span>
+                <span style="color:#CBD5E1; font-size:12px;">{model_status}</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(f"**{T('hospital_node')}**")
+    hospital = st.selectbox(
+        T("select_node"),
+        ["Hospital A (Bangkok)", "Hospital B (Chiang Mai)", "Hospital C (Khon Kaen)"],
+        label_visibility="collapsed",
+    )
+
+    st.divider()
+
+    st.markdown(f"**{T('demo_case')}**")
+    _available_patients = get_dataset_patients()
+    if _available_patients:
+        patient_id = st.selectbox(
+            "Patient ID",
+            _available_patients,
+            index=0,
+            label_visibility="collapsed",
+            help="Select a patient from the CT-ICH dataset (PhysioNet)",
+        )
+    else:
+        patient_id = "049"
+        st.caption("⚠️ CT-ICH dataset not found")
+    case_type = patient_id  # unified alias used elsewhere
+
+    model_type = st.radio(
+        T("ai_model_label"),
+        options=["baseline", "hybrid"],
+        format_func=lambda x: T('cnn_baseline') if x == "baseline" else T('qsentinel_hybrid'),
+        horizontal=False,
+    )
+
+    st.divider()
+
+    # ── CT Upload (NIfTI or DICOM) ─────────────────────────────────────────────
+    st.markdown(f"**{T('upload_section')}**")
+
+    # NIfTI uploader (.nii)
+    uploaded_nii = st.file_uploader(
+        "📂 NIfTI (.nii)",
+        type=["nii"],
+        accept_multiple_files=False,
+        help="อัปโหลดไฟล์ .nii (NIfTI) หนึ่งไฟล์ต่อหนึ่ง CT scan",
+        key="nii_uploader",
+    )
+
+    # DICOM uploader (.dcm)
+    uploaded_dcm = st.file_uploader(
+        T("upload_dicom"),
+        type=["dcm"],
+        accept_multiple_files=True,
+        help=T("upload_dicom_help"),
+        key="dicom_uploader",
+    )
+
+    if uploaded_nii:
+        if st.button("⬆️ Load NIfTI Volume", use_container_width=True, type="primary", key="load_nii"):
+            with st.spinner("กำลังโหลด NIfTI..."):
+                try:
+                    import nibabel as nib
+                    import io as _io
+                    import tempfile, os
+
+                    # nibabel ต้องการ file path จริง — เขียน temp file
+                    _tmp = tempfile.NamedTemporaryFile(suffix=".nii", delete=False)
+                    _tmp.write(uploaded_nii.read())
+                    _tmp.close()
+
+                    _img = nib.load(_tmp.name)
+                    _data = _img.get_fdata(dtype=np.float32)  # (H, W, D) or (H, W, D, T)
+                    os.unlink(_tmp.name)
+
+                    # ── Handle Dimensions ──────────────────────────────────────────
+                    # NIfTI axes: often (H, W, D) or (D, H, W)
+                    # We want (D, H, W) for the axial viewer
+                    if _data.ndim == 4:
+                        _data = _data[..., 0]
+                    
+                    # Heuristic: smallest dimension is usually Depth (D)
+                    # If Depth is at index 0, it's already (D, H, W)
+                    # If Depth is at index 2, transpose from (H, W, D)
+                    _shape = _data.shape
+                    if _shape[2] < _shape[0] and _shape[2] < _shape[1]:
+                        _volume = np.transpose(_data, (2, 0, 1))  # (D, H, W)
+                    else:
+                        _volume = _data  # Assume already (D, H, W)
+                    
+                    _volume = np.ascontiguousarray(_volume)
+
+                    # ── Robust Intensity Normalization ──────────────────────
+                    _vmin, _vmax = float(_volume.min()), float(_volume.max())
+                    _hu_warning = None
+                    
+                    # If range is very small (e.g. [0, 1] or [0, 3]), it's likely normalized
+                    if _vmax < 5:
+                        _volume = (_volume - _vmin) / (_vmax - _vmin + 1e-6) * 1000.0 - 500.0
+                        _hu_warning = f"Likely normalized [0,1] range -> Mapped to [-500, 500] HU"
+                    elif _vmin >= 0 and _vmax < 600:
+                        _volume = (_volume / (_vmax + 1e-6)) * 1000.0 - 500.0
+                        _hu_warning = f"Detected 8/9-bit range [0, {_vmax:.0f}] -> Estimated HU mapping applied"
+                    elif _vmin >= 0 and _vmax > 500 and _vmax < 5000:
+                        _volume = _volume - 1024.0
+                        _hu_warning = f"Detected raw uint range [0, {_vmax:.0f}] -> Applied -1024 Intercept shift"
+                    
+                    st.session_state["real_volume"] = _volume
+                    st.session_state["real_volume_name"] = uploaded_nii.name
+                    st.session_state["ai_ran"] = False
+                    if _hu_warning:
+                        st.info(f"💡 {T('intensity_adjusted')}: {_hu_warning}")
+                    st.toast(T("upload_dicom_success"), icon="✅")
+                    st.rerun()
+                except Exception as _e:
+                    st.error(f"โหลด NIfTI ไม่สำเร็จ: {_e}")
+
+    if uploaded_dcm:
+        if st.button(T("load_dicom_btn"), use_container_width=True, type="primary", key="load_dicom"):
+            with st.spinner(T("loading_dicom")):
+                try:
+                    import pydicom
+                    import io as _io
+                    
+                    import importlib
+                    import src.data.rsna_loader
+                    importlib.reload(src.data.rsna_loader)
+                    from src.data.rsna_loader import dicom_to_hu
+
+                    _slices = []
+                    for _f in uploaded_dcm:
+                        _dcm = pydicom.dcmread(_io.BytesIO(_f.read()))
+                        _slices.append(_dcm)
+
+                    def _sort_key(s):
+                        if hasattr(s, "InstanceNumber"):
+                            try:
+                                return float(s.InstanceNumber)
+                            except Exception:
+                                pass
+                        if hasattr(s, "SliceLocation"):
+                            try:
+                                return float(s.SliceLocation)
+                            except Exception:
+                                pass
+                        return 0.0
+
+                    _slices.sort(key=_sort_key)
+                    _hu_stack = np.stack([dicom_to_hu(s) for s in _slices])  # (D, H, W)
+                    st.session_state["real_volume"] = _hu_stack
+                    st.session_state["real_volume_name"] = "DICOM series"
+                    st.session_state["ai_ran"] = False
+                    st.toast(T("upload_dicom_success"), icon="✅")
+                    st.rerun()
+                except Exception as _e:
+                    st.error(f"{T('upload_dicom_error')}: {_e}")
+
+    if "real_volume" in st.session_state:
+        _vs = st.session_state["real_volume"].shape
+        _vname = st.session_state.get("real_volume_name", "CT")
+        st.markdown(
+            f"""<div style="background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.25);
+                            border-radius:8px; padding:8px 12px; font-size:11px;
+                            color:#7DD3FC; margin:6px 0 8px;">
+                ✅ <strong>{_vname}</strong><br>
+                {_vs[0]} {T('slices')} &nbsp;·&nbsp; {_vs[1]}×{_vs[2]} px
+            </div>""",
+            unsafe_allow_html=True,
+        )
+        if st.button(T("clear_real_ct"), use_container_width=True, key="clear_real_ct"):
+            del st.session_state["real_volume"]
+            st.session_state["ai_ran"] = False
+            st.rerun()
+
+    st.divider()
+
+    st.markdown(f"**{T('export')}**")
+    _cached_pdf = st.session_state.get("pdf_bytes")
+    if _cached_pdf:
+        st.download_button(
+            label=T("export_pdf"),
+            data=_cached_pdf,
+            file_name=f"qsentinel_report_patient{patient_id}.pdf",
+            mime="application/pdf",
+            use_container_width=True,
+        )
+    else:
+        st.button(T("export_pdf_disabled"), use_container_width=True, disabled=True)
+
+    st.markdown(
+        f"""
+        <div style="padding:16px 0 0; color:#334155; font-size:11px; text-align:center;">
+            {T('version_line')}<br>
+            <span style="color:#1E3050;">{T('prototype_line')}</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ─── Header ───────────────────────────────────────────────────────────────────
+
+st.markdown(
+    f"""
+    <div class="hero-header">
+        <div style="position:absolute; right:24px; top:10px; font-size:72px; font-weight:900;
+                    color:#1A2540; letter-spacing:-6px; user-select:none; pointer-events:none;">
+            QSM
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+            <div>
+                <h1 style="color:#00D4FF; margin:0 0 4px; font-size:32px; font-weight:800; letter-spacing:-0.03em;">
+                    🧠 Q-Sentinel Mesh
+                </h1>
+                <p style="color:#94A3B8; margin:0 0 12px; font-size:13px;">
+                    {T('page_desc')}
+                </p>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <span class="tech-pill">⚡ EfficientNet-B4</span>
+                    <span class="tech-pill">🔬 VQC 4-qubit</span>
+                    <span class="tech-pill">🔒 ML-KEM-512</span>
+                    <span class="tech-pill">🌐 3 Hospital Nodes</span>
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <span class="badge badge-online">
+                    <span class="dot-online"></span>{T('online')}
+                </span>
+                <span class="badge badge-pqc">PQC · NIST FIPS 203</span>
+                <span class="badge" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);color:#A78BFA;">
+                    {T('quantum_enhanced')}
+                </span>
+            </div>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ─── Quick Metrics Strip ───────────────────────────────────────────────────────
+m1, m2, m3, m4, m5 = st.columns(5)
+
+with m1:
+    st.metric(T("active_nodes"), "3", delta=T("federation_online"))
+
+with m2:
+    # Show high_acc AUC if available, else fall back to benchmark
+    _ha_path = ROOT / "results" / "high_acc_results.json"
+    _bm_path = ROOT / "results" / "benchmark_results.json"
+    if _ha_path.exists():
+        try:
+            with open(_ha_path, encoding="utf-8") as _f:
+                _ha = json.load(_f)
+            _real_auc = _ha["best_auc"] * 100
+            st.metric(T("global_auc"), f"{_real_auc:.1f}%", delta="High-Acc trained")
+        except Exception:
+            st.metric(T("global_auc"), "—", delta=T("run_pipeline"))
+    elif _bm_path.exists():
+        try:
+            with open(_bm_path, encoding="utf-8") as _f:
+                _bm = json.load(_f)
+            _real_auc = _bm["qsentinel_auc"][-1] * 100
+            st.metric(T("global_auc"), f"{_real_auc:.1f}%", delta=T("real_trained"))
+        except Exception:
+            st.metric(T("global_auc"), "—", delta=T("run_pipeline"))
+    else:
+        st.metric(T("global_auc"), "—", delta=T("run_pipeline_first"))
+
+with m3:
+    st.metric(T("avg_inference"), "~2.5 s", delta="TTA ×7 augmentations")
+
+with m4:
+    st.metric(T("encryption"), "ML-KEM-512", delta="NIST FIPS 203")
+
+with m5:
+    _scans = st.session_state["scans_analyzed"]
+    st.metric(T("scans_analyzed"), str(_scans), delta=T("this_session"))
+
+st.divider()
+
+
+# ─── Tab Layout ───────────────────────────────────────────────────────────────
+tab_diag, tab_fed, tab_sec = st.tabs([
+    T("tab_diagnostic"),
+    T("tab_federated"),
+    T("tab_security"),
+])
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 1: DIAGNOSTIC VIEW
+# ══════════════════════════════════════════════════════════════════════════════
+
+with tab_diag:
+    col_viewer, col_ai = st.columns([1, 1], gap="large")
+
+    with col_viewer:
+        if "real_volume" in st.session_state:
+            volume = st.session_state["real_volume"]
+            _ct_title = f"🏥 {T('using_real_ct')}"
+        else:
+            volume = load_dataset_ct(patient_id)
+            _ct_title = f"📋 Patient {patient_id} — {T('using_mock_ct')}"
+
+        slice_idx, window = render_ct_viewer(
+            volume,
+            title=_ct_title,
+            key_prefix="main_ct",
+        )
+
+    with col_ai:
+        st.markdown(
+            f"""
+            <div style="margin-bottom:12px;">
+                <h3 style="color:#E2E8F0; margin:0 0 8px; font-size:16px;">{T('ai_analysis')}</h3>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <span style="background:#1A2540; border-radius:6px; padding:4px 10px;
+                                 color:#94A3B8; font-size:12px;">
+                        📍 {hospital}
+                    </span>
+                    <span style="background:#1A2540; border-radius:6px; padding:4px 10px;
+                                 color:#94A3B8; font-size:12px;">
+                        📋 Patient {patient_id}
+                    </span>
+                    <span style="background:#1A2540; border-radius:6px; padding:4px 10px;
+                                 color:#94A3B8; font-size:12px;">
+                        {'⚛️ Q-Sentinel Hybrid' if model_type == 'hybrid' else '🔷 CNN Baseline'}
+                    </span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        with st.expander(f"⚙️ {T('analysis_config')}", expanded=False):
+            analysis_mode = st.radio(
+                T("analysis_mode"),
+                ["auto", "current"],
+                index=0,
+                format_func=lambda x: "🚀 Auto-Triage (Best Slice)" if x == "auto" else "📍 Current Selected Slice",
+                horizontal=True,
+            )
+
+            st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+            # Load calibrated threshold for 'any' class as the default sensitivity
+            _cal_thr = load_calibrated_thresholds()
+            _default_sensitivity = float(_cal_thr.get("any", 0.15))
+            sensitivity = st.slider(
+                T("ai_sensitivity"),
+                min_value=0.01,
+                max_value=0.50,
+                value=_default_sensitivity,
+                step=0.01,
+                help=T("ai_sensitivity_help") + f" (Calibrated default: {_default_sensitivity:.2f})"
+            )
+
+        ai_button = st.button(
+            T("run_ai_analysis"),
+            type="primary",
+            use_container_width=True,
+            key="ai_suggest_btn",
+        )
+
+        if ai_button or st.session_state.get("ai_ran"):
+            # Increment counter only on actual button click, not reruns
+            if ai_button:
+                st.session_state["scans_analyzed"] += 1
+            st.session_state["ai_ran"] = True
+
+            with st.spinner(T("running_analysis")):
+                model, device = load_model(model_type)
+
+                if model is None:
+                    st.error(f"⚠️ **{T('demo_mode_active')}**: {T('missing_weights_msg')}")
+                else:
+                    import importlib
+                    import src.xai.gradcam
+                    import src.data.rsna_loader
+                    importlib.reload(src.data.rsna_loader)
+                    importlib.reload(src.xai.gradcam)
+                    from src.xai.gradcam import analyze_volume, overlay_heatmap
+                    from src.data.rsna_loader import get_volume_slice_tensor, apply_window, get_brain_mask
+                    
+                    target_idx = None if analysis_mode == "auto" else slice_idx
+                    xai_results = analyze_volume(
+                        volume_hu=volume, 
+                        model=model, 
+                        device=device, 
+                        target_slice_idx=target_idx
+                    )
+                    
+                    # ── Preprocessing Debug View ────────────────────────
+                    with st.expander(T("model_input_debug"), expanded=False):
+                        t_in = get_volume_slice_tensor(volume, xai_results["top_slice_idx"], normalize=False)
+                        t_np = t_in[0].permute(1, 2, 0).numpy() # (H, W, 3)
+                        st.image(t_np, caption="AI Multi-Window Input (Red=Brain, Green=Blood, Blue=Subdural)", use_container_width=True, clamp=True)
+
+                    # ── Heatmap Customization ───────────────────────────
+                    with st.expander(f"🎨 {T('visualization_settings')}", expanded=False):
+                        hm_opacity = st.slider(
+                            T("heatmap_opacity"),
+                            min_value=0.0,
+                            max_value=1.0,
+                            value=0.5,
+                            step=0.05,
+                            key="hm_alpha_slider",
+                        )
+                        # Re-generate overlay on-the-fly with selected alpha
+                        _hu = volume[xai_results["top_slice_idx"]]
+                        _brain = apply_window(_hu, center=40, width=80)
+                        _mask = get_brain_mask(_hu)
+                        xai_results["overlay"] = overlay_heatmap(_brain, xai_results["heatmap"], alpha=hm_opacity, brain_mask=_mask)
+
+                    # Store for PDF
+                    _hu = volume[xai_results["top_slice_idx"]]
+                    st.session_state["last_ct_slice"] = apply_window(_hu, 40, 80)
+                    st.session_state["last_overlay"]  = xai_results["overlay"]
+                    _ap = xai_results["all_probs"][xai_results["top_slice_idx"]]
+                    st.session_state["last_probs"] = [float(_ap[i]) for i in range(5)]
+                    st.session_state["last_detection"] = (
+                        xai_results["top_class_name"], xai_results["confidence"]
+                    )
+                    import importlib
+                    import dashboard.components.heatmap_overlay
+                    importlib.reload(dashboard.components.heatmap_overlay)
+                    from dashboard.components.heatmap_overlay import render_ai_suggestion
+                    render_ai_suggestion(xai_results, volume, slice_idx, key_prefix="ai_res", detect_thresh=sensitivity)
+
+            # ── Generate & Cache PDF bytes (only on actual button click) ──
+            if ai_button:
+                try:
+                    _fed_hist_pdf = load_fed_results(ROOT / "results/fed_results.json")
+                    _bm_path_pdf = ROOT / "results" / "benchmark_results.json"
+                    _bl_auc_pdf = _hy_auc_pdf = None
+                    if _bm_path_pdf.exists():
+                        with open(_bm_path_pdf, encoding="utf-8") as _bf2:
+                            _bmd2 = json.load(_bf2)
+                        _bl_auc_pdf = _bmd2["baseline_auc"][-1]
+                        _hy_auc_pdf = _bmd2["qsentinel_auc"][-1]
+                    _det_label_pdf, _det_conf_pdf = st.session_state["last_detection"]
+                    st.session_state["pdf_bytes"] = generate_report_pdf(
+                        hospital=hospital,
+                        case_type=case_type,
+                        model_type=model_type,
+                        ct_slice=st.session_state["last_ct_slice"],
+                        overlay=st.session_state["last_overlay"],
+                        detection_label=_det_label_pdf,
+                        confidence=_det_conf_pdf,
+                        probs=st.session_state["last_probs"],
+                        fed_history=_fed_hist_pdf,
+                        baseline_auc=_bl_auc_pdf,
+                        hybrid_auc=_hy_auc_pdf,
+                    )
+                except Exception as _pdf_err:
+                    st.session_state["pdf_bytes"] = None
+                    st.toast(f"PDF generation failed: {_pdf_err}", icon="⚠️")
+
+            # ── Model Comparison Card ──────────────────────────────────────
+            _bm_path_ai = ROOT / "results" / "benchmark_results.json"
+            if _bm_path_ai.exists():
+                try:
+                    with open(_bm_path_ai, encoding="utf-8") as _bf:
+                        _bmd = json.load(_bf)
+                    _bl = _bmd["baseline_auc"][-1] * 100
+                    _hy = _bmd["qsentinel_auc"][-1] * 100
+                    _gain = _hy - _bl
+                    _active_bl = model_type == "baseline"
+                    _active_hy = model_type == "hybrid"
+                    # Pre-compute all conditional values to keep HTML clean
+                    _bl_bg  = "rgba(0,212,255,0.1)"   if _active_bl else "#0A0F1C"
+                    _bl_bdr = "rgba(0,212,255,0.35)"  if _active_bl else "#1A2540"
+                    _bl_col = "#00D4FF"                if _active_bl else "#CBD5E1"
+                    _bl_tag = '<div style="color:#00D4FF;font-size:10px;margin-top:4px;">▶ Active</div>' if _active_bl else ""
+                    _hy_bg  = "rgba(139,92,246,0.12)" if _active_hy else "#0A0F1C"
+                    _hy_bdr = "rgba(139,92,246,0.35)" if _active_hy else "#1A2540"
+                    _hy_col = "#A78BFA"                if _active_hy else "#CBD5E1"
+                    _hy_tag = '<div style="color:#A78BFA;font-size:10px;margin-top:4px;">▶ Active</div>' if _active_hy else ""
+                    st.markdown(
+                        f"""<div style="background:linear-gradient(135deg,#0F1827,#111E30);border:1px solid #1A2540;border-radius:12px;padding:14px 16px;margin-top:14px;">
+<div style="color:#64748B;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">{T('model_comparison')}</div>
+<div style="display:flex;gap:8px;margin-bottom:8px;">
+<div style="flex:1;background:{_bl_bg};border:1px solid {_bl_bdr};border-radius:8px;padding:10px 12px;text-align:center;">
+<div style="color:#64748B;font-size:10px;margin-bottom:4px;">🔷 CNN Baseline</div>
+<div style="color:{_bl_col};font-size:18px;font-weight:700;font-family:monospace;">{_bl:.1f}%</div>
+{_bl_tag}</div>
+<div style="flex:1;background:{_hy_bg};border:1px solid {_hy_bdr};border-radius:8px;padding:10px 12px;text-align:center;">
+<div style="color:#64748B;font-size:10px;margin-bottom:4px;">⚛️ Q-Sentinel</div>
+<div style="color:{_hy_col};font-size:18px;font-weight:700;font-family:monospace;">{_hy:.1f}%</div>
+{_hy_tag}</div>
+<div style="flex:1;background:#0A0F1C;border:1px solid #1A2540;border-radius:8px;padding:10px 12px;text-align:center;">
+<div style="color:#64748B;font-size:10px;margin-bottom:4px;">⚡ {T('quantum_gain')}</div>
+<div style="color:#4ADE80;font-size:18px;font-weight:700;font-family:monospace;">+{_gain:.1f}%</div>
+</div></div></div>""",
+                        unsafe_allow_html=True,
+                    )
+                except Exception:
+                    pass
+        else:
+            st.markdown(
+                f"""
+                <div class="heatmap-placeholder">
+                    <div style="font-size:52px; margin-bottom:12px; opacity:0.6;">🧠</div>
+                    <div style="color:#475569; font-size:14px; font-weight:600; margin-bottom:6px;">
+                        {T('ai_heatmap_ready')}
+                    </div>
+                    <div style="color:#334155; font-size:12px; max-width:220px; margin:0 auto; line-height:1.5;">
+                        {T('click_run_ai')}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div style="background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.12);
+                            border-radius:10px; padding:14px 16px;">
+                    <div style="color:#00D4FF; font-size:12px; font-weight:600; margin-bottom:8px;">
+                        {T('what_ai_does')}
+                    </div>
+                    <ul style="color:#64748B; font-size:12px; margin:0; padding-left:16px; line-height:1.7;">
+                        <li>{T('ai_does_1')}</li>
+                        <li>{T('ai_does_2')}</li>
+                        <li>{T('ai_does_3')}</li>
+                        <li>{T('ai_does_4')}</li>
+                    </ul>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 2: FEDERATED INTELLIGENCE
+# ══════════════════════════════════════════════════════════════════════════════
+
+with tab_fed:
+    st.markdown(
+        f"""
+        <div style="margin-bottom:20px;">
+            <h2 style="color:#E2E8F0; margin:0 0 6px; font-size:20px;">{T('fed_title')}</h2>
+            <p style="color:#64748B; margin:0; font-size:13px;">
+                {T('fed_subtitle')}
+                <strong style="color:#4ADE80;">{T('no_data_leaves')}</strong> {T('local_servers')}
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ── Benchmark Chart ────────────────────────────────────────────────────────
+    _benchmark_path = ROOT / "results" / "benchmark_results.json"
+    if _benchmark_path.exists():
+        try:
+            with open(_benchmark_path, encoding="utf-8") as _f:
+                benchmark_data = json.load(_f)
+            data_source = T("real_results")
+        except Exception:
+            benchmark_data = generate_benchmark_data()
+            data_source = T("sim_json_error")
+    else:
+        benchmark_data = generate_benchmark_data()
+        data_source = T("sim_run_pipeline")
+
+    col_chart, col_stats = st.columns([3, 1], gap="large")
+
+    with col_chart:
+        st.markdown(
+            f"""
+            <div class="section-heading">{T('benchmark_heading')}</div>
+            <div style="color:#475569; font-size:11px; margin-bottom:8px;">{data_source}</div>
+            """,
+            unsafe_allow_html=True,
+        )
+        render_benchmark_chart(benchmark_data)
+
+    with col_stats:
+        st.markdown(f"<div class='section-heading'>{T('key_metrics')}</div>", unsafe_allow_html=True)
+        _meta = benchmark_data.get("metadata", {})
+        _baseline_best = _meta.get("baseline_best_auc", benchmark_data["baseline_auc"][-1])
+        _hybrid_best   = _meta.get("hybrid_best_auc",   benchmark_data["qsentinel_auc"][-1])
+        _fed_final     = _meta.get("fed_final_auc",      benchmark_data["qsentinel_auc"][-1])
+        _improvement   = (_fed_final - _baseline_best) * 100
+
+        st.metric(T("baseline_auc"),   f"{_baseline_best*100:.1f}%")
+        st.metric(T("hybrid_auc"),     f"{_hybrid_best*100:.1f}%",   delta=f"+{(_hybrid_best-_baseline_best)*100:.1f}%")
+        st.metric(T("federated_auc"),  f"{_fed_final*100:.1f}%",     delta=f"+{_improvement:.1f}% {T('vs_isolated')}")
+        st.metric(T("nodes"),          "3",                           delta="Bangkok · CM · KK")
+
+    st.divider()
+
+    # ── Animation ─────────────────────────────────────────────────────────────
+    col_anim, col_info = st.columns([3, 1], gap="large")
+
+    with col_anim:
+        if st.button(T("animate_fed"), use_container_width=True):
+            _b_start = benchmark_data["baseline_auc"][0] * 100
+            _b_end   = benchmark_data["qsentinel_auc"][-1] * 100
+            render_live_simulation_animation(baseline_start=_b_start, final_fed=_b_end)
+
+    with col_info:
+        st.markdown(
+            f"""
+            <div style="background:rgba(15,24,39,0.7); border:1px solid #1A2540;
+                        border-radius:10px; padding:14px;">
+                <div style="color:#475569; font-size:11px; text-transform:uppercase;
+                            letter-spacing:0.06em; margin-bottom:10px;">{T('round_config')}</div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="color:#64748B; font-size:12px;">{T('rounds')}</span>
+                    <span style="color:#CBD5E1; font-size:12px; font-family:monospace;">5</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="color:#64748B; font-size:12px;">{T('hospitals')}</span>
+                    <span style="color:#CBD5E1; font-size:12px; font-family:monospace;">3</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="color:#64748B; font-size:12px;">{T('algorithm')}</span>
+                    <span style="color:#00D4FF; font-size:12px; font-family:monospace;">FedAvg</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="color:#64748B; font-size:12px;">{T('privacy')}</span>
+                    <span style="color:#4ADE80; font-size:12px;">{T('preserved')}</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.divider()
+
+    # ── Per-round results ──────────────────────────────────────────────────────
+    fed_history = load_fed_results(ROOT / "results/fed_results.json")
+    if fed_history:
+        st.markdown(f"<div class='section-heading'>{T('last_sim_results')}</div>", unsafe_allow_html=True)
+        render_federated_rounds_chart(fed_history)
+
+        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+        render_hospital_breakdown_chart(fed_history)
+    else:
+        st.markdown(
+            f"""
+            <div style="background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.12);
+                        border-radius:10px; padding:20px 24px;">
+                <div style="color:#00D4FF; font-weight:600; font-size:14px; margin-bottom:8px;">
+                    {T('run_full_pipeline')}
+                </div>
+                <div style="color:#64748B; font-size:13px; margin-bottom:12px;">
+                    {T('run_full_pipeline_desc')}
+                </div>
+                <code style="display:block; background:#0F1827; border:1px solid #1A2540;
+                             border-radius:8px; padding:10px 14px; font-size:13px; color:#4ADE80;">
+                    python run_all.py
+                </code>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # ── Node Status ────────────────────────────────────────────────────────────
+    st.markdown(f"<div class='section-heading'>{T('node_status')}</div>", unsafe_allow_html=True)
+    st.markdown(
+        '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">'
+        '<span class="tech-pill">🌐 3/3 Nodes Online</span>'
+        '<span class="tech-pill">🔒 PQC Encrypted</span>'
+        '<span class="tech-pill">🔬 Quantum Enhanced</span>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    c1, c2, c3 = st.columns(3)
+    _last_round = fed_history[-1]["hospitals"] if fed_history else {}
+    _node_defaults = [
+        (c1, "Hospital A", "Bangkok",    "Hospital A (Bangkok)",    847,  85.1),
+        (c2, "Hospital B", "Chiang Mai", "Hospital B (Chiang Mai)", 612,  83.7),
+        (c3, "Hospital C", "Khon Kaen",  "Hospital C (Khon Kaen)",  534,  82.9),
+    ]
+    for col, short, city, fed_key, default_cases, default_auc in _node_defaults:
+        _hdata = _last_round.get(fed_key, {})
+        cases = _hdata.get("num_examples", default_cases)
+        auc   = _hdata["local_auc"] * 100 if _hdata else default_auc
+        with col:
+            st.markdown(
+                f"""
+                <div class="node-card">
+                    <div class="node-title">
+                        🏥 {short}
+                        <span style="color:#64748B; font-weight:400; font-size:12px;">· {city}</span>
+                    </div>
+                    <div class="node-auc">{auc:.1f}%</div>
+                    <div class="node-stat">
+                        <span class="node-stat-label">{T('local_dataset')}</span>
+                        <span class="node-stat-value">{cases} {T('scans')}</span>
+                    </div>
+                    <div class="node-stat">
+                        <span class="node-stat-label">{T('status')}</span>
+                        <span class="node-stat-value green">
+                            <span class="dot-online"></span>{T('online')}
+                        </span>
+                    </div>
+                    <div class="node-stat">
+                        <span class="node-stat-label">{T('encryption')}</span>
+                        <span class="node-stat-value cyan">ML-KEM-512</span>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 3: SECURITY LAYER
+# ══════════════════════════════════════════════════════════════════════════════
+
+with tab_sec:
+    st.markdown(
+        f"""
+        <div style="margin-bottom:20px;">
+            <h2 style="color:#E2E8F0; margin:0 0 6px; font-size:20px;">{T('pqc_title')}</h2>
+            <p style="color:#64748B; margin:0; font-size:13px;">
+                {T('pqc_subtitle')}
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    col_flow, col_spec = st.columns([3, 2], gap="large")
+
+    with col_flow:
+        st.markdown(f"<div class='section-heading'>{T('secure_flow')}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div style="background:linear-gradient(135deg,#0F1827,#111E30);
+                        border:1px solid #1A2540; border-radius:14px; padding:20px 24px;">
+
+                <div class="flow-step">
+                    <div class="flow-num">1</div>
+                    <div class="flow-body">
+                        <div class="flow-title">{T('flow1_title')}</div>
+                        <div class="flow-desc">{T('flow1_desc')}</div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-num">2</div>
+                    <div class="flow-body">
+                        <div class="flow-title">{T('flow2_title')}</div>
+                        <div class="flow-desc">{T('flow2_desc')}</div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-num">3</div>
+                    <div class="flow-body">
+                        <div class="flow-title">{T('flow3_title')}</div>
+                        <div class="flow-desc">{T('flow3_desc')}</div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-num" style="background:linear-gradient(135deg,#0F4C81,#0099CC);">→</div>
+                    <div class="flow-body">
+                        <div class="flow-title" style="color:#00D4FF;">{T('flow4_title')}</div>
+                        <div class="flow-desc" style="color:#94A3B8;">{{ kem_ciphertext · aes_ciphertext · nonce · salt }}</div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-num">4</div>
+                    <div class="flow-body">
+                        <div class="flow-title">{T('flow5_title')}</div>
+                        <div class="flow-desc">{T('flow5_desc')}</div>
+                    </div>
+                </div>
+
+                <div class="flow-step" style="border-bottom:none; padding-bottom:0;">
+                    <div class="flow-num">5</div>
+                    <div class="flow-body">
+                        <div class="flow-title">{T('flow6_title')}</div>
+                        <div class="flow-desc">{T('flow6_desc')}</div>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col_spec:
+        st.markdown(f"<div class='section-heading'>{T('specifications')}</div>", unsafe_allow_html=True)
+        specs = [
+            (T("kem_algorithm"),    "ML-KEM-512",           "cyan"),
+            (T("standard"),         "NIST FIPS 203",         "cyan"),
+            (T("security_level"),   T("security_level_val"), "text"),
+            (T("symmetric_cipher"), "AES-256-GCM",           "text"),
+            (T("key_derivation"),   "HKDF-SHA256",           "text"),
+            (T("transport"),        "TLS 1.3 + PQC",         "text"),
+            (T("data_privacy"),     T("data_privacy_val"),    "green"),
+            (T("compliance"),       "PDPA · HIPAA-aligned",  "text"),
+        ]
+        spec_rows = "".join(
+            f"""
+            <div class="node-stat">
+                <span class="node-stat-label">{label}</span>
+                <span class="node-stat-value {color}">{value}</span>
+            </div>
+            """
+            for label, value, color in specs
+        )
+        st.markdown(
+            f"""
+            <div style="background:linear-gradient(135deg,#0F1827,#111E30);
+                        border:1px solid #1A2540; border-radius:14px; padding:18px 20px;">
+                {spec_rows}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
+
+        st.markdown(f"<div class='section-heading'>{T('live_pqc_demo')}</div>", unsafe_allow_html=True)
+        if st.button(T("gen_keypair"), use_container_width=True):
+            with st.spinner(T("generating_keys")):
+                try:
+                    from src.federated.pqc_crypto import (
+                        generate_pqc_keypair,
+                        encrypt_weights,
+                        decrypt_weights,
+                    )
+
+                    keypair = generate_pqc_keypair()
+                    dummy_weights = np.random.randn(10).astype(np.float32).tobytes()
+                    payload = encrypt_weights(dummy_weights, keypair.public_key)
+                    recovered = decrypt_weights(payload, keypair.secret_key)
+                    success = recovered == dummy_weights
+
+                    st.markdown(
+                        f"""
+                        <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25);
+                                    border-radius:10px; padding:14px 16px; margin-top:8px;">
+                            <div style="color:#4ADE80; font-weight:600; margin-bottom:10px;">{T('pqc_success')}</div>
+                            <div style="font-family:monospace; font-size:12px; color:#94A3B8; line-height:1.8;">
+                                Public Key &nbsp;&nbsp;{len(keypair.public_key):,} bytes<br>
+                                Secret Key &nbsp;&nbsp;{len(keypair.secret_key):,} bytes<br>
+                                KEM Cipher &nbsp;&nbsp;{len(payload.kem_ciphertext):,} bytes<br>
+                                AES Payload &nbsp;{len(payload.aes_ciphertext):,} bytes<br>
+                                Decrypt &nbsp;&nbsp;&nbsp;&nbsp;{T('decrypt_ok') if success else T('decrypt_failed')}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+                except ImportError:
+                    st.warning(T("pqc_not_installed"), icon="⚠️")
+                except Exception as e:
+                    st.error(f"Error: {e}")
+
+    st.divider()
+    st.markdown(
+        f"""
+        <div style="background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.1);
+                    border-radius:12px; padding:18px 22px;">
+            <div style="color:#00D4FF; font-weight:600; font-size:14px; margin-bottom:8px;">
+                {T('why_pqc')}
+            </div>
+            <div style="color:#64748B; font-size:13px; line-height:1.7;">
+                {T('why_pqc_text')}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
