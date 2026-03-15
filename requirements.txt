@@ -21,7 +21,8 @@ pennylane==0.38.0
 flwr==1.26.1
 
 # ─── Post-Quantum Cryptography ─────────────────────────────────────────────────
-pqcrypto==0.4.0
+# pqcrypto removed (needs Rust compiler, unavailable on Streamlit Cloud)
+# ML-KEM-512 simulated via pure-Python in src/federated/pqc_crypto.py
 cryptography>=42.0.0
 
 # ─── Medical Image Formats ─────────────────────────────────────────────────────
