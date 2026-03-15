@@ -642,12 +642,20 @@ with tab_diag:
                     st.error(f"⚠️ **{T('demo_mode_active')}**: {T('missing_weights_msg')}")
                 else:
                     import importlib
-                    import src.xai.gradcam
-                    import src.data.rsna_loader
-                    importlib.reload(src.data.rsna_loader)
-                    importlib.reload(src.xai.gradcam)
-                    from src.xai.gradcam import analyze_volume, overlay_heatmap
-                    from src.data.rsna_loader import get_volume_slice_tensor, apply_window, get_brain_mask
+                    try:
+                        import src.xai.gradcam
+                        import src.data.rsna_loader
+                        importlib.reload(src.data.rsna_loader)
+                        importlib.reload(src.xai.gradcam)
+                        from src.xai.gradcam import analyze_volume, overlay_heatmap
+                        from src.data.rsna_loader import get_volume_slice_tensor, apply_window, get_brain_mask
+                        _gradcam_available = True
+                    except Exception as _gcam_err:
+                        _gradcam_available = False
+                        st.warning(f"⚠️ Explainability module unavailable (cv2 missing): {_gcam_err}")
+                    if not _gradcam_available:
+                        st.info("AI Analysis running in score-only mode (no heatmap overlay)")
+                        st.stop()
                     
                     target_idx = None if analysis_mode == "auto" else slice_idx
                     xai_results = analyze_volume(
