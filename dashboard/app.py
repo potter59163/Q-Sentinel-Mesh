@@ -72,21 +72,19 @@ with open(ROOT / "dashboard/assets/styles.css") as f:
 
 # ─── Weights Download ─────────────────────────────────────────────────────────
 
-@st.cache_resource(show_spinner="Downloading model weights...")
+@st.cache_resource(show_spinner="Downloading model weights & CT samples...")
 def ensure_weights():
-    """Download model weights from HF Hub if not present locally."""
+    """Download model weights and CT-ICH demo scans from HF Hub if not present locally."""
+    from huggingface_hub import hf_hub_download
+
+    # ── Model weights ──────────────────────────────────────────────────────────
     weights_dir = ROOT / "weights"
     weights_dir.mkdir(exist_ok=True)
-    files = [
-        "finetuned_ctich.pth",
-        "high_acc_b4.pth",
-        "hybrid_qsentinel.pth",
-    ]
-    missing = [f for f in files if not (weights_dir / f).exists()]
-    if missing:
+    weight_files = ["finetuned_ctich.pth", "high_acc_b4.pth", "hybrid_qsentinel.pth"]
+    missing_weights = [f for f in weight_files if not (weights_dir / f).exists()]
+    if missing_weights:
         try:
-            from huggingface_hub import hf_hub_download
-            for fname in missing:
+            for fname in missing_weights:
                 hf_hub_download(
                     repo_id="Pottersk/q-sentinel-weights",
                     filename=fname,
@@ -94,6 +92,28 @@ def ensure_weights():
                 )
         except Exception as e:
             st.warning(f"Could not download weights: {e}")
+
+    # ── CT-ICH demo scans (real NIfTI, 049–055) ────────────────────────────────
+    samples_dir = ROOT / "data" / "samples"
+    samples_dir.mkdir(parents=True, exist_ok=True)
+    ct_patients = ["049", "050", "051", "052", "053", "054", "055"]
+    missing_ct = [p for p in ct_patients if not (samples_dir / f"{p}.nii").exists()]
+    if missing_ct:
+        try:
+            for pid in missing_ct:
+                hf_hub_download(
+                    repo_id="Pottersk/q-sentinel-weights",
+                    filename=f"ct_scans/{pid}.nii",
+                    local_dir=str(samples_dir),
+                    local_dir_use_symlinks=False,
+                )
+                # hf_hub_download saves to samples_dir/ct_scans/pid.nii — move up one level
+                src = samples_dir / "ct_scans" / f"{pid}.nii"
+                dst = samples_dir / f"{pid}.nii"
+                if src.exists() and not dst.exists():
+                    src.rename(dst)
+        except Exception as e:
+            st.warning(f"Could not download CT demo scans: {e}")
 
 ensure_weights()
 
@@ -139,16 +159,8 @@ def load_calibrated_thresholds() -> dict:
 
 
 # ─── CT-ICH Dataset Path ──────────────────────────────────────────────────────
-# Use bundled demo samples (data/samples/049.nii – 055.nii) that ship with the repo.
-# Falls back to the full local CT-ICH dataset if present.
-_CT_SAMPLE_DIR  = ROOT / "data" / "samples"
-_CT_DATASET_DIR = (
-    _CT_SAMPLE_DIR
-    if _CT_SAMPLE_DIR.exists()
-    else ROOT.parent
-    / "computed-tomography-images-for-intracranial-hemorrhage-detection-and-segmentation-1.3.1"
-    / "ct_scans"
-)
+# Real CT-ICH scans (049–055) are downloaded from HuggingFace by ensure_weights().
+_CT_DATASET_DIR = ROOT / "data" / "samples"
 
 
 @st.cache_data(show_spinner=False)
