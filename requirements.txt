@@ -1,6 +1,6 @@
-# ─── Core Deep Learning (CPU version for HF Spaces) ───────────────────────────
-torch==2.5.1
-torchvision==0.20.1
+# ─── Core Deep Learning (CPU version for cloud deployment) ────────────────────
+torch==2.9.1
+torchvision
 
 # ─── Medical Image Models ──────────────────────────────────────────────────────
 timm==1.0.25
