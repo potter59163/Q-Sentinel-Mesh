@@ -94,21 +94,20 @@ def ensure_weights():
             st.warning(f"Could not download weights: {e}")
 
     # ── CT-ICH demo scans (real NIfTI, 049–055) ────────────────────────────────
+    # /mount/src/ is read-only on Streamlit Cloud → use /tmp/ instead
     import shutil
-    samples_dir = ROOT / "data" / "samples"
-    samples_dir.mkdir(parents=True, exist_ok=True)
+    ct_dir = Path("/tmp/ct_samples")
+    ct_dir.mkdir(parents=True, exist_ok=True)
     ct_patients = ["049", "050", "051", "052", "053", "054", "055"]
-    missing_ct = [p for p in ct_patients if not (samples_dir / f"{p}.nii").exists()]
+    missing_ct = [p for p in ct_patients if not (ct_dir / f"{p}.nii").exists()]
     if missing_ct:
         try:
             for pid in missing_ct:
-                # hf_hub_download returns the local cache path of the file
                 cached_path = hf_hub_download(
                     repo_id="Pottersk/q-sentinel-weights",
                     filename=f"ct_scans/{pid}.nii",
                 )
-                dst = samples_dir / f"{pid}.nii"
-                shutil.copy2(cached_path, str(dst))
+                shutil.copy2(cached_path, str(ct_dir / f"{pid}.nii"))
         except Exception as e:
             st.warning(f"Could not download CT demo scans: {e}")
 
@@ -155,35 +154,49 @@ def load_calibrated_thresholds() -> dict:
     }
 
 
-# ─── CT-ICH Dataset Path ──────────────────────────────────────────────────────
-# Real CT-ICH scans (049–055) are downloaded from HuggingFace by ensure_weights().
-_CT_DATASET_DIR = ROOT / "data" / "samples"
+# ─── CT-ICH Dataset Paths ─────────────────────────────────────────────────────
+# /tmp/ct_samples/ → writable temp dir used on Streamlit Cloud
+# data/samples/    → local dev fallback
+_CT_TMP_DIR   = Path("/tmp/ct_samples")
+_CT_LOCAL_DIR = ROOT / "data" / "samples"
+
+
+def _find_ct_file(patient_id: str):
+    """Return Path to NIfTI file, checking /tmp first then local."""
+    for d in [_CT_TMP_DIR, _CT_LOCAL_DIR]:
+        p = d / f"{patient_id}.nii"
+        if p.exists():
+            return p
+    return None
 
 
 def get_dataset_patients() -> list:
-    """Return sorted list of patient IDs available in the CT-ICH dataset."""
-    if not _CT_DATASET_DIR.exists():
-        return []
-    return sorted([f.stem for f in _CT_DATASET_DIR.glob("*.nii")])
+    """Return sorted list of patient IDs available (checks both /tmp and local)."""
+    found = set()
+    for d in [_CT_TMP_DIR, _CT_LOCAL_DIR]:
+        if d.exists():
+            for f in d.glob("*.nii"):
+                found.add(f.stem)
+    return sorted(found)
 
 
-@st.cache_resource(show_spinner="Loading CT scan from dataset...")
 def load_dataset_ct(patient_id: str) -> np.ndarray:
-    """Load a real NIfTI CT scan from the CT-ICH dataset and return as (D, H, W) HU array."""
+    """Load a real NIfTI CT scan and return as (D, H, W) HU array."""
     import nibabel as nib
 
-    nii_path = _CT_DATASET_DIR / f"{patient_id}.nii"
-    if not nii_path.exists():
-        # Return a blank placeholder volume if file not found
-        return np.zeros((30, 256, 256), dtype=np.float32)
+    nii_path = _find_ct_file(patient_id)
+    if nii_path is None:
+        # Fallback: generate realistic synthetic volume
+        from src.data.mock_data import generate_mock_volume
+        return generate_mock_volume(depth=30, size=256, seed=int(patient_id) if patient_id.isdigit() else 42)
 
-    img = nib.load(str(nii_path))
+    img  = nib.load(str(nii_path))
     data = img.get_fdata(dtype=np.float32)
 
     if data.ndim == 4:
         data = data[..., 0]
 
-    # Ensure (D, H, W): if depth is last axis (H, W, D) → transpose
+    # Ensure (D, H, W): NIfTI is usually (H, W, D)
     shape = data.shape
     if shape[2] < shape[0] and shape[2] < shape[1]:
         volume = np.transpose(data, (2, 0, 1))
@@ -192,7 +205,7 @@ def load_dataset_ct(patient_id: str) -> np.ndarray:
 
     volume = np.ascontiguousarray(volume)
 
-    # HU intercept correction (same logic as NIfTI uploader)
+    # HU intercept correction
     vmin, vmax = float(volume.min()), float(volume.max())
     if vmax < 5:
         volume = (volume - vmin) / (vmax - vmin + 1e-6) * 1000.0 - 500.0
@@ -568,7 +581,12 @@ with tab_diag:
             _ct_title = f"🏥 {T('using_real_ct')}"
         else:
             volume = load_dataset_ct(patient_id)
-            _ct_title = f"📋 Patient {patient_id} — {T('using_mock_ct')}"
+            _is_real = _find_ct_file(patient_id) is not None
+            _ct_title = (
+                f"📋 Patient {patient_id} \u2014 CT-ICH Dataset"
+                if _is_real
+                else f"🔬 Patient {patient_id} \u2014 Demo Data"
+            )
 
         slice_idx, window = render_ct_viewer(
             volume,
@@ -641,29 +659,52 @@ with tab_diag:
                 if model is None:
                     st.error(f"⚠️ **{T('demo_mode_active')}**: {T('missing_weights_msg')}")
                 else:
-                    import importlib
                     try:
-                        import src.xai.gradcam
-                        import src.data.rsna_loader
-                        importlib.reload(src.data.rsna_loader)
-                        importlib.reload(src.xai.gradcam)
                         from src.xai.gradcam import analyze_volume, overlay_heatmap
                         from src.data.rsna_loader import get_volume_slice_tensor, apply_window, get_brain_mask
-                        _gradcam_available = True
+                        _gradcam_ok = True
                     except Exception as _gcam_err:
-                        _gradcam_available = False
-                        st.warning(f"⚠️ Explainability module unavailable (cv2 missing): {_gcam_err}")
-                    if not _gradcam_available:
-                        st.info("AI Analysis running in score-only mode (no heatmap overlay)")
-                        st.stop()
-                    
+                        _gradcam_ok = False
+                        st.warning(f"Explainability module unavailable: {_gcam_err}")
+
                     target_idx = None if analysis_mode == "auto" else slice_idx
-                    xai_results = analyze_volume(
-                        volume_hu=volume, 
-                        model=model, 
-                        device=device, 
-                        target_slice_idx=target_idx
-                    )
+
+                    if _gradcam_ok:
+                        xai_results = analyze_volume(
+                            volume_hu=volume,
+                            model=model,
+                            device=device,
+                            target_slice_idx=target_idx,
+                        )
+                    else:
+                        # Score-only fallback (no heatmap)
+                        from src.data.rsna_loader import get_volume_slice_tensor, apply_window, WINDOWS
+                        from src.data.rsna_loader import SUBTYPES as _SUBTYPES
+                        best_idx = target_idx if target_idx is not None else volume.shape[0] // 2
+                        _probs_list = []
+                        with torch.no_grad():
+                            for _i in range(volume.shape[0]):
+                                _t = get_volume_slice_tensor(volume, _i).to(device)
+                                _probs_list.append(model.predict_proba(_t).cpu())
+                        _all_p = torch.cat(_probs_list, dim=0)
+                        if target_idx is None:
+                            best_idx = int(_all_p[:, 5].argmax())
+                        _sp = _all_p[best_idx]
+                        _tc = int(_sp[:5].argmax())
+                        _conf = max(float(_sp[5]), float(_sp[:5].max()))
+                        _hu  = volume[best_idx]
+                        _bs  = apply_window(_hu, center=40, width=80)
+                        _rgb = np.stack([_bs, _bs, _bs], axis=-1)
+                        xai_results = {
+                            "top_slice_idx":  best_idx,
+                            "all_probs":      _all_p,
+                            "top_class_idx":  _tc,
+                            "top_class_name": _SUBTYPES[_tc],
+                            "confidence":     _conf,
+                            "heatmap":        np.zeros(_bs.shape, dtype=np.float32),
+                            "overlay":        np.clip(_rgb * 255, 0, 255).astype(np.uint8),
+                        }
+                        st.info("Showing AI scores (heatmap unavailable)")
                     
                     # ── Preprocessing Debug View ────────────────────────
                     with st.expander(T("model_input_debug"), expanded=False):

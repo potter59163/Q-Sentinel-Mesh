@@ -6,9 +6,8 @@ torchvision==0.19.1+cpu
 # ─── Medical Image Models ──────────────────────────────────────────────────────
 timm==1.0.25
 
-# ─── Explainability ────────────────────────────────────────────────────────────
-grad-cam==1.5.5
-opencv-python-headless>=4.8.0
+# ─── Explainability (pure PyTorch/numpy HiResCAM — no cv2 needed) ──────────────
+# grad-cam removed: custom implementation in src/xai/gradcam.py avoids cv2 dep
 
 # ─── Dashboard ─────────────────────────────────────────────────────────────────
 streamlit>=1.40.0
