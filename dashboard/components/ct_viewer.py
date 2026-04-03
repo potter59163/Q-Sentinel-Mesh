@@ -34,6 +34,18 @@ _WINDOW_PRESETS = {
     "wide":     (50,  400,  "🔭"),
 }
 
+THEME = {
+    "bg": "#fff8fb",
+    "surface": "#fffdfd",
+    "surface_soft": "#fff1f6",
+    "surface_strong": "#fde7ef",
+    "border": "#ead6df",
+    "text": "#412b34",
+    "muted": "#8f7482",
+    "accent": "#c25b86",
+    "accent_soft": "#f3c7d8",
+}
+
 
 def _apply_window_display(hu: np.ndarray, window: str) -> np.ndarray:
     center, width, _ = _WINDOW_PRESETS.get(window, _WINDOW_PRESETS["brain"])
@@ -60,11 +72,11 @@ def render_ct_viewer(
         f"""
         <div style="display:flex; align-items:center; justify-content:space-between;
                     margin-bottom:10px;">
-            <h3 style="color:#E2E8F0; margin:0; font-size:15px; font-weight:600;">
+            <h3 style="color:{THEME['text']}; margin:0; font-size:15px; font-weight:600;">
                 {title}
             </h3>
-            <span style="background:rgba(212,160,64,0.1); border:1px solid rgba(212,160,64,0.2);
-                         border-radius:6px; padding:3px 10px; color:#D4A040;
+            <span style="background:{THEME['surface_soft']}; border:1px solid {THEME['accent_soft']};
+                         border-radius:6px; padding:3px 10px; color:{THEME['accent']};
                          font-size:11px; font-family:monospace;">
                 {depth} {T('slices')}
             </span>
@@ -77,6 +89,10 @@ def render_ct_viewer(
     col_slider, col_window = st.columns([4, 2])
 
     with col_slider:
+        st.markdown(
+            f"<div class='subtle-caption' style='margin-bottom:6px; font-weight:600;'>{T('axial_slice')}</div>",
+            unsafe_allow_html=True,
+        )
         slice_idx = st.slider(
             T("axial_slice"),
             min_value=0,
@@ -96,6 +112,10 @@ def render_ct_viewer(
     }
 
     with col_window:
+        st.markdown(
+            f"<div class='subtle-caption' style='margin-bottom:6px; font-weight:600;'>{T('window')}</div>",
+            unsafe_allow_html=True,
+        )
         window_options = list(_WINDOW_PRESETS.keys())
         window = st.selectbox(
             T("window"),
@@ -113,21 +133,21 @@ def render_ct_viewer(
     _, wwidth, _ = _WINDOW_PRESETS[window]
     wcenter, _, _ = _WINDOW_PRESETS[window]
 
-    fig, ax = plt.subplots(figsize=(5, 5), facecolor="#060A14")
+    fig, ax = plt.subplots(figsize=(5, 5), facecolor=THEME["bg"])
     ax.imshow(display_slice, cmap="gray", vmin=0, vmax=1, interpolation="bilinear")
 
     # Clinical overlay: slice info
     ax.text(
         5, 10,
         f"S{slice_idx + 1:02d}/{depth}",
-        color="#D4A040", fontsize=8, family="monospace",
-        bbox=dict(facecolor="#060A14", alpha=0.6, edgecolor="none", pad=2),
+        color=THEME["accent"], fontsize=8, family="monospace",
+        bbox=dict(facecolor=THEME["surface"], alpha=0.82, edgecolor="none", pad=2),
     )
     ax.text(
         5, display_slice.shape[0] - 6,
         f"W:{wwidth} / C:{wcenter}",
-        color="#94A3B8", fontsize=7, family="monospace",
-        bbox=dict(facecolor="#060A14", alpha=0.5, edgecolor="none", pad=2),
+        color=THEME["muted"], fontsize=7, family="monospace",
+        bbox=dict(facecolor=THEME["surface"], alpha=0.82, edgecolor="none", pad=2),
     )
 
     # HU stats
@@ -136,8 +156,8 @@ def render_ct_viewer(
         ax.text(
             display_slice.shape[1] - 5, display_slice.shape[0] - 6,
             f"HU {roi_hu.mean():.0f}±{roi_hu.std():.0f}",
-            color="#FFD166", fontsize=7, family="monospace", ha="right",
-            bbox=dict(facecolor="#060A14", alpha=0.5, edgecolor="none", pad=2),
+            color="#b07b4f", fontsize=7, family="monospace", ha="right",
+            bbox=dict(facecolor=THEME["surface"], alpha=0.82, edgecolor="none", pad=2),
         )
 
     ax.axis("off")
@@ -150,11 +170,11 @@ def render_ct_viewer(
     st.markdown(
         f"""
         <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-            <div style="flex:1; background:#2A2118; border-radius:3px; height:4px; overflow:hidden;">
-                <div style="width:{pct:.1f}%; background:#D4A040;
+            <div style="flex:1; background:{THEME['surface_strong']}; border-radius:3px; height:4px; overflow:hidden;">
+                <div style="width:{pct:.1f}%; background:{THEME['accent']};
                              height:100%; border-radius:3px; transition:width 0.3s;"></div>
             </div>
-            <span style="color:#475569; font-size:11px; font-family:monospace; min-width:50px; text-align:right;">
+            <span style="color:{THEME['muted']}; font-size:11px; font-family:monospace; min-width:50px; text-align:right;">
                 {pct:.0f}% {T('depth')}
             </span>
         </div>
@@ -167,27 +187,27 @@ def render_ct_viewer(
         hu_flat = hu_slice.flatten()
         hu_valid = hu_flat[(hu_flat > -1100) & (hu_flat < 3100)]
 
-        fig2, ax2 = plt.subplots(figsize=(5, 1.8), facecolor="#060A14")
-        ax2.set_facecolor("#0A0F1C")
-        ax2.hist(hu_valid, bins=60, color="#D4A040", alpha=0.7, rwidth=0.85)
+        fig2, ax2 = plt.subplots(figsize=(5, 1.8), facecolor=THEME["bg"])
+        ax2.set_facecolor(THEME["surface"])
+        ax2.hist(hu_valid, bins=60, color=THEME["accent"], alpha=0.7, rwidth=0.85)
 
         # Mark tissue ranges
         for _, lo, hi, color in [
-            ("Air", -1000, -200, "#475569"),
+            ("Air", -1000, -200, "#9b8391"),
             ("Brain", -50, 80, "#4ADE80"),
-            ("Blood", 50, 100, "#F87171"),
-            ("Bone", 300, 3000, "#FFD166"),
+            ("Blood", 50, 100, "#d97a95"),
+            ("Bone", 300, 3000, "#e5b27d"),
         ]:
             mask = (hu_valid >= lo) & (hu_valid <= hi)
             if mask.any():
                 ax2.axvspan(lo, hi, alpha=0.08, color=color)
 
-        ax2.set_xlabel(T("hu_value"), color="#64748B", fontsize=7)
-        ax2.set_ylabel(T("count"), color="#64748B", fontsize=7)
-        ax2.tick_params(colors="#475569", labelsize=7)
+        ax2.set_xlabel(T("hu_value"), color=THEME["muted"], fontsize=7)
+        ax2.set_ylabel(T("count"), color=THEME["muted"], fontsize=7)
+        ax2.tick_params(colors=THEME["muted"], labelsize=7)
         for spine in ax2.spines.values():
-            spine.set_edgecolor("#2A2118")
-        ax2.grid(True, color="#2A2118", linewidth=0.5, alpha=0.6)
+            spine.set_edgecolor(THEME["border"])
+        ax2.grid(True, color=THEME["border"], linewidth=0.5, alpha=0.6)
         fig2.tight_layout(pad=0.5)
         st.pyplot(fig2, use_container_width=True)
         plt.close(fig2)
@@ -196,10 +216,10 @@ def render_ct_viewer(
         st.markdown(
             """
             <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:6px;">
-                <span style="color:#475569; font-size:11px;">◼ Air (-1000)</span>
+                <span style="color:#9b8391; font-size:11px;">◼ Air (-1000)</span>
                 <span style="color:#4ADE80; font-size:11px;">◼ Brain (20–40)</span>
-                <span style="color:#F87171; font-size:11px;">◼ Blood (50–80)</span>
-                <span style="color:#FFD166; font-size:11px;">◼ Bone (400+)</span>
+                <span style="color:#d97a95; font-size:11px;">◼ Blood (50–80)</span>
+                <span style="color:#e5b27d; font-size:11px;">◼ Bone (400+)</span>
             </div>
             """,
             unsafe_allow_html=True,

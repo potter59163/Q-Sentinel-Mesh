@@ -23,12 +23,23 @@ from dashboard.i18n import T, get_lang
 
 # Subtype display info (emoji and color only — labels come from i18n)
 SUBTYPE_KEYS = {
-    "epidural":          ("epidural",          "⚠️",  "#FF6B6B", "epidural_desc"),
-    "intraparenchymal":  ("intraparenchymal",  "🔴", "#FF4757", "intraparenchymal_desc"),
-    "intraventricular":  ("intraventricular",  "🟠", "#FF6348", "intraventricular_desc"),
-    "subarachnoid":      ("subarachnoid",      "🟡", "#FFA502", "subarachnoid_desc"),
-    "subdural":          ("subdural",          "🟣", "#9C88FF", "subdural_desc"),
-    "any":               ("any_hemorrhage",    "🔵", "#D4A040", "any_hemorrhage_desc"),
+    "epidural":          ("epidural",          "⚠️",  "#d66d86", "epidural_desc"),
+    "intraparenchymal":  ("intraparenchymal",  "🔴", "#c7516c", "intraparenchymal_desc"),
+    "intraventricular":  ("intraventricular",  "🟠", "#dd8a63", "intraventricular_desc"),
+    "subarachnoid":      ("subarachnoid",      "🟡", "#d7a05f", "subarachnoid_desc"),
+    "subdural":          ("subdural",          "🟣", "#a46aa6", "subdural_desc"),
+    "any":               ("any_hemorrhage",    "🔵", "#c25b86", "any_hemorrhage_desc"),
+}
+
+THEME = {
+    "bg": "#fff8fb",
+    "surface": "#fffdfd",
+    "surface_soft": "#fff1f6",
+    "border": "#ead6df",
+    "text": "#412b34",
+    "muted": "#8f7482",
+    "accent": "#c25b86",
+    "success": "#4c8f6b",
 }
 
 def _get_subtype_info(key: str) -> tuple:
@@ -67,22 +78,24 @@ def render_ai_suggestion(
     label, emoji, color, description = info
 
     if confidence > detect_thresh:
+        triage_badge = (
+            f'<span class="badge badge-triage" style="margin-left:12px; font-size:10px;">{T("smart_triage")}</span>'
+            if confidence < 0.5
+            else ""
+        )
         st.markdown(
-            f"""
-            <div style="background: linear-gradient(135deg, {color}22, {color}11);
-                        border: 1px solid {color}66; border-radius: 12px;
-                        padding: 16px; margin-bottom: 16px;">
-                <h3 style="color: {color}; margin: 0 0 4px 0;">{emoji} {label}</h3>
-                <p style="color: #E2E8F0; margin: 0; font-size: 14px;">{description}</p>
-                <div style="margin-top: 8px;">
-                    <span style="color: #94A3B8; font-size: 13px;">{T('confidence')}: </span>
-                    <span style="color: {color}; font-size: 20px; font-weight: bold;">
-                        {confidence*100:.1f}%
-                    </span>
-                    {f'<span class="badge badge-triage" style="margin-left:12px; font-size:10px;">{T("smart_triage")}</span>' if confidence < 0.5 else ''}
-                </div>
-            </div>
-            """,
+            (
+                f'<div style="background: linear-gradient(135deg, {color}1f, {THEME["surface_soft"]});'
+                f' border: 1px solid {color}55; border-radius: 12px; padding: 16px; margin-bottom: 16px;">'
+                f'<h3 style="color: {color}; margin: 0 0 4px 0;">{emoji} {label}</h3>'
+                f'<p style="color: {THEME["text"]}; margin: 0; font-size: 14px;">{description}</p>'
+                f'<div style="margin-top: 8px;">'
+                f'<span style="color: {THEME["muted"]}; font-size: 13px;">{T("confidence")}: </span>'
+                f'<span style="color: {color}; font-size: 20px; font-weight: bold;">{confidence*100:.1f}%</span>'
+                f'{triage_badge}'
+                f'</div>'
+                f'</div>'
+            ),
             unsafe_allow_html=True,
         )
     else:
@@ -95,27 +108,27 @@ def render_ai_suggestion(
     col_orig, col_heat = st.columns(2)
 
     with col_orig:
-        fig, ax = plt.subplots(figsize=(4, 4), facecolor="#0A0E1A")
+        fig, ax = plt.subplots(figsize=(4, 4), facecolor=THEME["bg"])
         ax.imshow(brain_slice, cmap="gray", vmin=0, vmax=1)
-        ax.set_title(T("original_ct"), color="#E2E8F0", fontsize=10)
+        ax.set_title(T("original_ct"), color=THEME["text"], fontsize=10)
         ax.axis("off")
         st.pyplot(fig, use_container_width=True)
         plt.close(fig)
         st.caption(f"{T('most_relevant_slice')}: #{top_idx + 1}")
 
     with col_heat:
-        fig, ax = plt.subplots(figsize=(4, 4), facecolor="#0A0E1A")
+        fig, ax = plt.subplots(figsize=(4, 4), facecolor=THEME["bg"])
         ax.imshow(overlay)
-        ax.set_title(T("ai_heatmap_hirescam"), color="#D4A040", fontsize=10)
+        ax.set_title(T("ai_heatmap_hirescam"), color=THEME["accent"], fontsize=10)
         ax.axis("off")
         # Colorbar
         norm = Normalize(vmin=0, vmax=1)
         sm = cm.ScalarMappable(cmap=cm.jet, norm=norm)
         sm.set_array([])
         cbar = plt.colorbar(sm, ax=ax, fraction=0.04, pad=0.02)
-        cbar.ax.yaxis.set_tick_params(color="white")
-        plt.setp(cbar.ax.yaxis.get_ticklabels(), color="white", fontsize=7)
-        cbar.set_label(T("activation"), color="white", fontsize=7)
+        cbar.ax.yaxis.set_tick_params(color=THEME["muted"])
+        plt.setp(cbar.ax.yaxis.get_ticklabels(), color=THEME["muted"], fontsize=7)
+        cbar.set_label(T("activation"), color=THEME["text"], fontsize=7)
         st.pyplot(fig, use_container_width=True)
         plt.close(fig)
         st.caption(T("high_activation"))
@@ -125,20 +138,20 @@ def render_ai_suggestion(
     any_idx = SUBTYPES.index("any")
     v_probs = all_probs[:, any_idx].numpy()
     
-    fig_v, ax_v = plt.subplots(figsize=(10, 2), facecolor="#0A0E1A")
-    ax_v.set_facecolor("#0F172A")
-    ax_v.fill_between(range(len(v_probs)), v_probs * 100, color="#D4A040", alpha=0.3)
-    ax_v.plot(v_probs * 100, color="#D4A040", linewidth=1.5)
+    fig_v, ax_v = plt.subplots(figsize=(10, 2), facecolor=THEME["bg"])
+    ax_v.set_facecolor(THEME["surface"])
+    ax_v.fill_between(range(len(v_probs)), v_probs * 100, color=THEME["accent"], alpha=0.24)
+    ax_v.plot(v_probs * 100, color=THEME["accent"], linewidth=1.5)
     
     # Mark current/top slice
-    ax_v.axvline(top_idx, color="#F87171", linestyle="--", alpha=0.8, label=T("selected_slice"))
+    ax_v.axvline(top_idx, color="#d97a95", linestyle="--", alpha=0.8, label=T("selected_slice"))
     
     ax_v.set_xlim(0, len(v_probs)-1)
     ax_v.set_ylim(0, 105)
-    ax_v.set_ylabel("Prob %", color="#94A3B8", fontsize=8)
-    ax_v.set_xlabel(T("slice_index"), color="#94A3B8", fontsize=8)
-    ax_v.tick_params(colors="#475569", labelsize=7)
-    for s in ax_v.spines.values(): s.set_edgecolor("#1E293B")
+    ax_v.set_ylabel("Prob %", color=THEME["muted"], fontsize=8)
+    ax_v.set_xlabel(T("slice_index"), color=THEME["muted"], fontsize=8)
+    ax_v.tick_params(colors=THEME["muted"], labelsize=7)
+    for s in ax_v.spines.values(): s.set_edgecolor(THEME["border"])
     fig_v.tight_layout(pad=0.5)
     st.pyplot(fig_v, use_container_width=True)
     plt.close(fig_v)
@@ -153,12 +166,12 @@ def render_ai_suggestion(
         
         st.markdown(
             f"""
-            <div style="background:rgba(212,160,64,0.05); border-radius:8px; padding:12px; border:1px dashed #2A2118;">
-                <span style="color:#94A3B8; font-size:12px;">{T('volumetric_est')}:</span>
-                <span style="color:#D4A040; font-weight:700; font-size:18px; margin-left:8px;">
+            <div style="background:{THEME['surface_soft']}; border-radius:8px; padding:12px; border:1px dashed {THEME['border']};">
+                <span style="color:{THEME['muted']}; font-size:12px;">{T('volumetric_est')}:</span>
+                <span style="color:{THEME['accent']}; font-weight:700; font-size:18px; margin-left:8px;">
                     {vol_score:.1f} ml
                 </span>
-                <p style="color:#475569; font-size:10px; margin:4px 0 0 0;">
+                <p style="color:{THEME['muted']}; font-size:10px; margin:4px 0 0 0;">
                     * {T('vol_est_disclaimer')}
                 </p>
             </div>
@@ -170,9 +183,9 @@ def render_ai_suggestion(
     st.markdown(f"<div style='margin-top:20px'></div>", unsafe_allow_html=True)
     st.markdown(
         f"""
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <b style="font-size:14px;">{T('hemorrhage_type_breakdown')}</b>
-            <span style="font-size:10px; color:#475569; letter-spacing:0.05em;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <b style="font-size:14px; color:{THEME['text']};">{T('hemorrhage_type_breakdown')}</b>
+            <span style="font-size:10px; color:{THEME['muted']}; letter-spacing:0.05em;">
                 {T('live_slice_sync')}: #{slice_idx + 1}
             </span>
         </div>
@@ -202,7 +215,7 @@ def render_ai_suggestion(
     
     # Indicate if this is the "Focus" slice
     if slice_idx == top_idx:
-        st.markdown(f"<p style='color:#D4A040; font-size:11px; text-align:center; margin-top:-10px;'>🎯 {T('current_is_top_focus')}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='color:{THEME['accent']}; font-size:11px; text-align:center; margin-top:-10px;'>🎯 {T('current_is_top_focus')}</p>", unsafe_allow_html=True)
 
     # ── Clinical Findings Summary ─────────────────────────────────────────────
     with st.expander(f"📝 {T('clinical_summary')}", expanded=True):

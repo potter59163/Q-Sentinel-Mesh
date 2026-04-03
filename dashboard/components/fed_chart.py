@@ -22,21 +22,23 @@ from dashboard.i18n import T, get_lang
 
 # Chart color palette
 COLORS = {
-    "baseline":  "#64748B",
-    "qsentinel": "#D4A040",
-    "hospital_a": "#FF6B6B",
-    "hospital_b": "#4ECDC4",
-    "hospital_c": "#FFE66D",
-    "grid":      "#1E293B",
-    "bg":        "#0A0E1A",
-    "text":      "#E2E8F0",
+    "baseline":  "#9d7990",
+    "qsentinel": "#c25b86",
+    "hospital_a": "#d97a95",
+    "hospital_b": "#b26f9b",
+    "hospital_c": "#e6a56d",
+    "grid":      "#ead6df",
+    "bg":        "#fff8fb",
+    "surface":   "#fffdfd",
+    "text":      "#412b34",
+    "muted":     "#8f7482",
 }
 
 
 def _style_axes(ax: plt.Axes):
-    """Apply dark theme styling to matplotlib axes."""
-    ax.set_facecolor(COLORS["bg"])
-    ax.tick_params(colors=COLORS["text"], labelsize=9)
+    """Apply soft light styling to matplotlib axes."""
+    ax.set_facecolor(COLORS["surface"])
+    ax.tick_params(colors=COLORS["muted"], labelsize=9)
     ax.xaxis.label.set_color(COLORS["text"])
     ax.yaxis.label.set_color(COLORS["text"])
     ax.title.set_color(COLORS["text"])
@@ -99,7 +101,7 @@ def render_benchmark_chart(benchmark_data: dict, key: str = "benchmark"):
     ax.set_ylim(y_min, y_max)
     ax.legend(
         loc="lower right",
-        facecolor=COLORS["grid"],
+        facecolor="#fff3f7",
         edgecolor=COLORS["grid"],
         labelcolor=COLORS["text"],
         fontsize=8,
@@ -212,7 +214,7 @@ def render_hospital_breakdown_chart(fed_history: list[dict]):
     ax.set_title(T("per_hospital_auc"))
     ax.legend(
         loc="lower right",
-        facecolor=COLORS["grid"],
+        facecolor="#fff3f7",
         edgecolor=COLORS["grid"],
         labelcolor=COLORS["text"],
         fontsize=8,
@@ -270,7 +272,7 @@ def render_live_simulation_animation(
         ax.set_title(f"{T('round')} {r}/5 — {T('round_n_sharing')}")
         ax.set_xticks(rounds)
         ax.legend(
-            facecolor=COLORS["grid"],
+            facecolor="#fff3f7",
             edgecolor=COLORS["grid"],
             labelcolor=COLORS["text"],
             fontsize=8,
