@@ -1018,7 +1018,7 @@ with tab_fed:
     for col, short, city, fed_key, default_cases, default_auc in _node_defaults:
         _hdata = _last_round.get(fed_key, {})
         cases = _hdata.get("num_examples", default_cases)
-        auc   = _hdata["local_auc"] * 100 if _hdata else default_auc
+        auc   = _hdata.get("local_auc", default_auc / 100) * 100 if _hdata else default_auc
         with col:
             st.markdown(
                 f"""
