@@ -61,7 +61,7 @@ def set_model_params(model: nn.Module, params: list[np.ndarray]) -> None:
         k: torch.tensor(v)
         for k, v in zip(model.state_dict().keys(), params)
     }
-    model.load_state_dict(state_dict, strict=True)
+    model.load_state_dict(state_dict, strict=False)
 
 
 # ─── Hybrid Flower Client ─────────────────────────────────────────────────────
@@ -109,8 +109,8 @@ class HybridQSentinelClient(fl.client.NumPyClient):
         self.model = build_hybrid_model(pretrained=True)
         if pretrained_path and Path(pretrained_path).exists():
             state = torch.load(str(pretrained_path), map_location=self.device)
-            self.model.load_state_dict(state)
-            print(f"  [{self.hospital_name}] Loaded pretrained hybrid weights.")
+            missing, unexpected = self.model.load_state_dict(state, strict=False)
+            print(f"  [{self.hospital_name}] Loaded pretrained weights (missing={len(missing)}, unexpected={len(unexpected)})")
         self.model.to(self.device)
 
         # Only fine-tune head + VQC; CNN backbone frozen for federated rounds
