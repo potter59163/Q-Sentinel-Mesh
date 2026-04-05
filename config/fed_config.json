@@ -1,0 +1,38 @@
+{
+  "_comment": "Q-Sentinel Mesh — Federated Learning Network Configuration",
+
+  "server": {
+    "address": "0.0.0.0",
+    "port": 8443,
+    "num_rounds": 5,
+    "min_clients": 2,
+    "fraction_fit": 1.0,
+    "fraction_evaluate": 1.0,
+    "results_path": "results/fed_results.json",
+    "tls": {
+      "enabled": false,
+      "cert_path": "config/certs/server.crt",
+      "key_path": "config/certs/server.key",
+      "ca_cert_path": "config/certs/ca.crt"
+    }
+  },
+
+  "client": {
+    "server_address": "127.0.0.1:8443",
+    "local_epochs": 1,
+    "batch_size": 8,
+    "mock_samples": 300,
+    "img_size": 256,
+    "pretrained_path": "weights/hybrid_qsentinel.pth",
+    "tls": {
+      "enabled": false,
+      "ca_cert_path": "config/certs/ca.crt"
+    }
+  },
+
+  "nodes": {
+    "0": {"name": "Hospital A (Bangkok)",    "role": "primary"},
+    "1": {"name": "Hospital B (Chiang Mai)", "role": "secondary"},
+    "2": {"name": "Hospital C (Khon Kaen)",  "role": "secondary"}
+  }
+}
