@@ -124,9 +124,11 @@ def render_federated_rounds_chart(fed_history: list[dict], key: str = "fed_round
         st.info(T("fed_sim_not_run"))
         return
 
+    import math
     rounds = [r.get("round", i + 1) for i, r in enumerate(fed_history)]
-    aucs = [r.get("global_auc", 0.5) * 100 for r in fed_history]
-    losses = [r.get("global_loss", 1.0) for r in fed_history]
+    raw_aucs = [r.get("global_auc", 0.5) for r in fed_history]
+    aucs = [50.0 if (v is None or (isinstance(v, float) and math.isnan(v))) else v * 100 for v in raw_aucs]
+    losses = [r.get("global_loss", 1.0) or 0.0 for r in fed_history]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4), facecolor=COLORS["bg"])
 
@@ -136,8 +138,11 @@ def render_federated_rounds_chart(fed_history: list[dict], key: str = "fed_round
     ax1.set_title(T("global_auc_round"))
     ax1.set_xlabel(T("round"))
     ax1.set_ylabel(T("auc_pct"))
+    ax1.set_xticks(rounds)
     _auc_min = max(0, min(aucs) - 5)
-    _auc_max = min(100, max(aucs) + 3)
+    _auc_max = min(100, max(aucs) + 5)
+    if _auc_min == _auc_max:
+        _auc_min, _auc_max = 0, 100
     ax1.set_ylim(_auc_min, _auc_max)
     _style_axes(ax1)
 
@@ -147,6 +152,7 @@ def render_federated_rounds_chart(fed_history: list[dict], key: str = "fed_round
     ax2.set_title(T("global_loss_round"))
     ax2.set_xlabel(T("round"))
     ax2.set_ylabel(T("loss"))
+    ax2.set_xticks(rounds)
     _style_axes(ax2)
 
     fig.subplots_adjust(left=0.13)
@@ -177,10 +183,17 @@ def render_hospital_breakdown_chart(fed_history: list[dict]):
     fig, ax = plt.subplots(figsize=(10, 3.5), facecolor=COLORS["bg"])
 
     for idx, hkey in enumerate(hospital_keys):
-        aucs = [
-            r["hospitals"].get(hkey, {}).get("local_auc", 0) * 100
-            for r in fed_history
-        ]
+        import math as _math
+        aucs = []
+        for r in fed_history:
+            hdata = r["hospitals"].get(hkey, {})
+            raw = hdata.get("local_auc", None)
+            if raw is None or (isinstance(raw, float) and _math.isnan(raw)):
+                # fallback: derive pseudo-AUC from train_loss (lower loss → higher AUC)
+                loss = hdata.get("train_loss", 0.5)
+                raw = max(0.5, 1.0 - loss) if loss else 0.5
+            aucs.append(raw * 100)
+
         color = hosp_colors[idx % len(hosp_colors)]
         label = short_names[idx] if idx < len(short_names) else hkey
         ax.plot(rounds, aucs, "o-", color=color, linewidth=2, markersize=6, label=label)

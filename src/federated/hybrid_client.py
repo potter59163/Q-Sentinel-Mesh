@@ -258,6 +258,8 @@ class HybridQSentinelClient(fl.client.NumPyClient):
                 except ValueError:
                     per_class_aucs.append(0.5)
             auc = float(np.mean(per_class_aucs))
+            if np.isnan(auc):
+                auc = 0.5
         except Exception:
             auc = 0.5
 
