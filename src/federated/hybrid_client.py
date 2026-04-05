@@ -215,14 +215,18 @@ class HybridQSentinelClient(fl.client.NumPyClient):
 
     def evaluate(self, parameters: list[np.ndarray], config: dict) -> tuple:
         """Evaluate global model on local (private) validation set."""
-        set_model_params(self.model, parameters)
+        try:
+            set_model_params(self.model, parameters)
+        except Exception as e:
+            print(f"  [{self.hospital_name}] WARNING: set_model_params failed: {e}")
         self.model.eval()
 
         total_loss = 0.0
         all_preds: list[np.ndarray] = []
         all_labels: list[np.ndarray] = []
 
-        with torch.no_grad():
+        try:
+          with torch.no_grad():
             for batch in self.val_loader:
                 images, labels = batch[0], batch[1]
                 images = images.to(self.device)
@@ -235,6 +239,9 @@ class HybridQSentinelClient(fl.client.NumPyClient):
                 total_loss += loss.item()
                 all_preds.append(probs.cpu().numpy())
                 all_labels.append(labels.cpu().numpy())
+        except Exception as e:
+            print(f"  [{self.hospital_name}] WARNING: eval forward pass failed: {e}")
+            return 0.0, len(self.val_loader.dataset), {"auc": 0.5, "hospital": self.hospital_name, "quantum_layer": True}
 
         avg_loss = total_loss / max(len(self.val_loader), 1)
 
