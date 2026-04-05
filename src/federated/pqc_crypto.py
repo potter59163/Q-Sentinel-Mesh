@@ -239,7 +239,9 @@ def bytes_to_numpy_weights(data: bytes) -> list[np.ndarray]:
     import io
     buf = io.BytesIO(data)
     npz = np.load(buf, allow_pickle=False)
-    return [npz[k] for k in sorted(npz.keys())]
+    # Sort numerically (arr_2 < arr_10), not alphabetically (arr_10 < arr_2)
+    keys = sorted(npz.keys(), key=lambda k: int(k.split("_")[1]))
+    return [npz[k] for k in keys]
 
 
 # ─── Payload Serialization (for Flower transmission) ─────────────────────────
