@@ -3,60 +3,60 @@
     "round": 1,
     "hospitals": {
       "Hospital C (Khon Kaen)": {
-        "train_loss": 0.10263970494270325,
-        "num_examples": 40,
+        "train_loss": 0.11185087114572526,
+        "num_examples": 160,
         "pqc_encrypted": true,
         "quantum_layer": true
       },
       "Hospital B (Chiang Mai)": {
-        "train_loss": 0.10304101258516311,
-        "num_examples": 40,
+        "train_loss": 0.11317851282656193,
+        "num_examples": 160,
         "pqc_encrypted": true,
         "quantum_layer": true
       }
     },
     "pqc_rounds": 2,
-    "global_auc": 0.5,
-    "global_loss": 0.108303751796484
+    "global_auc": 0.5277747668639938,
+    "global_loss": 0.10792504996061325
   },
   {
     "round": 2,
     "hospitals": {
       "Hospital C (Khon Kaen)": {
-        "train_loss": 0.10015185326337814,
-        "num_examples": 40,
+        "train_loss": 0.1023414634168148,
+        "num_examples": 160,
         "pqc_encrypted": true,
         "quantum_layer": true
       },
       "Hospital B (Chiang Mai)": {
-        "train_loss": 0.10137000083923339,
-        "num_examples": 40,
+        "train_loss": 0.10133773945271969,
+        "num_examples": 160,
         "pqc_encrypted": true,
         "quantum_layer": true
       }
     },
     "pqc_rounds": 2,
-    "global_auc": 0.5,
-    "global_loss": 0.10376928001642227
+    "global_auc": 0.521120312380592,
+    "global_loss": 0.0989573486149311
   },
   {
     "round": 3,
     "hospitals": {
-      "Hospital B (Chiang Mai)": {
-        "train_loss": 0.10142906308174134,
-        "num_examples": 40,
+      "Hospital C (Khon Kaen)": {
+        "train_loss": 0.09865474477410316,
+        "num_examples": 160,
         "pqc_encrypted": true,
         "quantum_layer": true
       },
-      "Hospital C (Khon Kaen)": {
-        "train_loss": 0.10169766247272491,
-        "num_examples": 40,
+      "Hospital B (Chiang Mai)": {
+        "train_loss": 0.09834914430975913,
+        "num_examples": 160,
         "pqc_encrypted": true,
         "quantum_layer": true
       }
     },
     "pqc_rounds": 2,
-    "global_auc": 0.5,
-    "global_loss": 0.10134637728333473
+    "global_auc": 0.6075782469182963,
+    "global_loss": 0.09463827684521675
   }
 ]
