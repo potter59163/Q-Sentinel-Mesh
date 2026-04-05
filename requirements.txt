@@ -1,7 +1,8 @@
-# ─── Core Deep Learning (CPU-only for cloud) ──────────────────────────────────
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.4.1+cpu
-torchvision==0.19.1+cpu
+# ─── Core Deep Learning ────────────────────────────────────────────────────────
+# Keep PyTorch flexible so local GPU installs from setup_env.bat are not
+# accidentally downgraded to CPU-only wheels by pip -r requirements.txt.
+torch>=2.4.1
+torchvision>=0.19.1
 
 # ─── Medical Image Models ──────────────────────────────────────────────────────
 timm>=1.0.0
@@ -24,8 +25,8 @@ gast>=0.5.4
 flwr==1.9.0
 
 # ─── Post-Quantum Cryptography ─────────────────────────────────────────────────
-# pqcrypto removed (needs Rust compiler, unavailable on Streamlit Cloud)
-# ML-KEM-512 simulated via pure-Python in src/federated/pqc_crypto.py
+# kyber-py: pure-Python CRYSTALS-Kyber (ML-KEM-512), no Rust compiler needed
+kyber-py>=2.0.0
 cryptography>=42.0.0
 
 # ─── Medical Image Formats ─────────────────────────────────────────────────────

@@ -1,0 +1,7 @@
+{
+  "source": "ctich",
+  "nii_dir": "C:/data/ctich/ct_scans",
+  "csv_path": "C:/data/ctich/hemorrhage_diagnosis_raw_ct.csv",
+  "patient_ids": [49, 50, 51],
+  "auto_partition": false
+}

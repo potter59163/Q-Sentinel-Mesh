@@ -16,7 +16,7 @@ pinned: true
 [![Python](https://img.shields.io/badge/Python-3.11-blue)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.10-red)](https://pytorch.org)
 [![PennyLane](https://img.shields.io/badge/PennyLane-0.44-purple)](https://pennylane.ai)
-[![Flower](https://img.shields.io/badge/Flower-1.26-green)](https://flower.ai)
+[![Flower](https://img.shields.io/badge/Flower-1.9-green)](https://flower.ai)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 ---
@@ -188,6 +188,9 @@ pip install torch==2.10.0+cu128 torchvision==0.25.0+cu128 \
 
 # Install all other dependencies
 pip install -r requirements.txt
+
+# Verify the machine is ready for training / federated runs
+python scripts/healthcheck.py
 ```
 
 ### 3. Run Dashboard
@@ -237,8 +240,50 @@ python scripts/finetune_ctich.py \
 
 ```python
 from src.federated.simulation import run_hybrid
-run_hybrid(n_rounds=3, n_clients=3)
+run_hybrid()
 ```
+
+### Real Multi-Machine Federated Run
+
+1. On the server machine:
+
+```bash
+python scripts/fed_server.py --port 8443 --rounds 5 --min-clients 2
+```
+
+2. On hospital node machine A:
+
+```bash
+python scripts/fed_client.py ^
+  --server <SERVER_IP>:8443 ^
+  --node-id 0 ^
+  --data-source ctich ^
+  --nii-dir C:\data\ctich\ct_scans ^
+  --csv-path C:\data\ctich\hemorrhage_diagnosis_raw_ct.csv ^
+  --patient-ids 49,50,51
+```
+
+3. On hospital node machine B:
+
+```bash
+python scripts/fed_client.py ^
+  --server <SERVER_IP>:8443 ^
+  --node-id 1 ^
+  --data-source ctich ^
+  --nii-dir C:\data\ctich\ct_scans ^
+  --csv-path C:\data\ctich\hemorrhage_diagnosis_raw_ct.csv ^
+  --patient-ids 52,53,54
+```
+
+Optional:
+- Run a third client in another terminal with `--node-id 2`
+- Use `--auto-partition` when every machine has the same CT-ICH copy and you want deterministic patient assignment by node id
+- Use `--manifest path\to\node.json` to keep node-local dataset settings in a file
+
+Important:
+- Real PQC now requires `kyber-py` or `pqcrypto`; insecure fallback is disabled by default
+- Open TCP port `8443` on the server firewall/router
+- Use `--tls` on both server and clients after generating certs with `python scripts/gen_tls_certs.py`
 
 ---
 
@@ -255,14 +300,14 @@ run_hybrid(n_rounds=3, n_clients=3)
 - **AngleEmbedding** — classical-to-quantum data encoding
 
 ### Federated Learning
-- **Flower (flwr) 1.26** — production-grade FL framework
+- **Flower (flwr) 1.9** — production-grade FL framework
 - **FedAvg** — Federated Averaging aggregation strategy
 - **3-hospital simulation** — heterogeneous data distribution
 
 ### Post-Quantum Cryptography
 - **ML-KEM-512 (Kyber)** — NIST PQC standard key encapsulation
 - **AES-256-GCM** — symmetric encryption for model weights
-- **pqcrypto 0.4** — post-quantum primitives library
+- **kyber-py / pqcrypto** — real ML-KEM backends required for production runs
 
 ### Medical Imaging
 - **pydicom** — DICOM file parsing

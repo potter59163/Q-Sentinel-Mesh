@@ -39,7 +39,7 @@ NUM_CLIENTS = 3
 NUM_ROUNDS = 5
 LOCAL_EPOCHS = 1
 BATCH_SIZE = 16
-IMG_SIZE = 512
+IMG_SIZE = 224
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 DATA_DIR = Path("data")

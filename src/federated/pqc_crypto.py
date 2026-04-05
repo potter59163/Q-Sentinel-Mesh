@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import os
 import struct
+import warnings
 from dataclasses import dataclass
 
 import numpy as np
@@ -35,6 +36,8 @@ import numpy as np
 
 _PQCRYPTO_AVAILABLE = False
 _KYBER_PY_AVAILABLE = False
+_SIMULATION_FALLBACK = False
+_ALLOW_INSECURE_FALLBACK = os.getenv("QSENTINEL_ALLOW_INSECURE_PQC_FALLBACK", "").strip() == "1"
 
 try:
     try:
@@ -91,31 +94,50 @@ except ImportError:
 
     except ImportError:
         # ── Fallback: pure-Python simulation ──────────────────────────────────
-        # Key sizes match NIST FIPS 203 spec. AES-256-GCM is still real.
-        # KEM asymmetry is NOT lattice-based — demo/compatibility only.
-        import warnings
-        warnings.warn(
-            "kyber-py not found. Install with: pip install kyber-py\n"
-            "Falling back to PQC simulation (correct key sizes, no lattice hardness).",
-            RuntimeWarning, stacklevel=2
-        )
+        # Key sizes match NIST FIPS 203 spec. AES-256-GCM is still real, but the
+        # KEM behavior below is a demo-only compatibility mode and MUST NOT be
+        # used for real deployments unless the operator explicitly opts in.
         _PK_BYTES, _SK_BYTES, _CT_BYTES = 800, 1632, 768
+        _SIMULATION_FALLBACK = True
+
+        warnings.warn(
+            "No real ML-KEM backend found (kyber-py / pqcrypto missing). "
+            "Q-Sentinel will require a real backend unless "
+            "QSENTINEL_ALLOW_INSECURE_PQC_FALLBACK=1 is set.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
 
         def generate_keypair():
-            import hashlib
+            if not _ALLOW_INSECURE_FALLBACK:
+                raise RuntimeError(
+                    "Real ML-KEM backend not available. Install kyber-py or pqcrypto, "
+                    "or set QSENTINEL_ALLOW_INSECURE_PQC_FALLBACK=1 for demo-only mode."
+                )
             pk = os.urandom(_PK_BYTES)
-            sk = hashlib.sha512(pk).digest() * 3 + os.urandom(_SK_BYTES - 192)
+            # Embed the public key into the secret key so the demo decrypt path
+            # can deterministically reconstruct the same shared secret.
+            sk = pk + os.urandom(_SK_BYTES - _PK_BYTES)
             return pk[:_PK_BYTES], sk[:_SK_BYTES]
 
         def kem_encrypt(public_key: bytes):
             import hashlib
+            if not _ALLOW_INSECURE_FALLBACK:
+                raise RuntimeError(
+                    "Real ML-KEM backend not available. Refusing insecure fallback."
+                )
             ct = os.urandom(_CT_BYTES)
-            ss = hashlib.sha256(public_key[:32] + ct[:32]).digest()
+            ss = hashlib.sha256(public_key + ct).digest()
             return ct, ss
 
         def kem_decrypt(secret_key: bytes, ciphertext: bytes):
             import hashlib
-            return hashlib.sha256(secret_key[:32] + ciphertext[:32]).digest()
+            if not _ALLOW_INSECURE_FALLBACK:
+                raise RuntimeError(
+                    "Real ML-KEM backend not available. Refusing insecure fallback."
+                )
+            public_key = secret_key[:_PK_BYTES]
+            return hashlib.sha256(public_key + ciphertext).digest()
 
 # AES-256-GCM symmetric encryption
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -131,8 +153,43 @@ class PQCKeyPair:
     secret_key: bytes
 
 
+def pqc_backend_name() -> str:
+    """Return the active ML-KEM backend identifier."""
+    if _KYBER_PY_AVAILABLE:
+        return "kyber-py"
+    if _PQCRYPTO_AVAILABLE:
+        return "pqcrypto"
+    if _SIMULATION_FALLBACK:
+        return "simulation"
+    return "unavailable"
+
+
+def pqc_backend_is_real() -> bool:
+    """Return True when using a real ML-KEM implementation."""
+    return _KYBER_PY_AVAILABLE or _PQCRYPTO_AVAILABLE
+
+
+def ensure_pqc_backend() -> None:
+    """Fail fast unless a real backend is installed or demo fallback was opted into."""
+    if pqc_backend_is_real():
+        return
+    if _SIMULATION_FALLBACK and _ALLOW_INSECURE_FALLBACK:
+        warnings.warn(
+            "Running with insecure PQC simulation fallback. "
+            "This mode is for local demos only and must not be used in production.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        return
+    raise RuntimeError(
+        "No real PQC backend available. Install kyber-py or pqcrypto before running "
+        "federated training or PQC demos."
+    )
+
+
 def generate_pqc_keypair() -> PQCKeyPair:
     """Generate a fresh ML-KEM-512 key pair (real or simulated)."""
+    ensure_pqc_backend()
     public_key, secret_key = generate_keypair()
     return PQCKeyPair(public_key=public_key, secret_key=secret_key)
 

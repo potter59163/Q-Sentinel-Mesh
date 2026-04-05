@@ -57,9 +57,15 @@ def get_model_params(model: nn.Module) -> list[np.ndarray]:
 
 def set_model_params(model: nn.Module, params: list[np.ndarray]) -> None:
     """Load parameters from NumPy arrays into model."""
+    state_keys = list(model.state_dict().keys())
+    if len(params) != len(state_keys):
+        raise ValueError(
+            f"Parameter count mismatch for hybrid client: got {len(params)} arrays, "
+            f"expected {len(state_keys)}."
+        )
     state_dict = {
         k: torch.tensor(v)
-        for k, v in zip(model.state_dict().keys(), params)
+        for k, v in zip(state_keys, params)
     }
     model.load_state_dict(state_dict, strict=False)
 

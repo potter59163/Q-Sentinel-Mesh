@@ -18,6 +18,9 @@ pip install torch==2.10.0+cu128 torchvision==0.25.0+cu128 --index-url https://do
 echo Installing remaining dependencies...
 pip install -r requirements.txt
 
+echo Verifying PQC backend...
+python -c "from src.federated.pqc_crypto import pqc_backend_name, pqc_backend_is_real; print('PQC backend:', pqc_backend_name(), '| real=', pqc_backend_is_real())"
+
 echo.
 echo ============================================================
 echo  Setup complete! Activate environment with:

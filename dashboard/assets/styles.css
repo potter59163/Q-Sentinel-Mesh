@@ -334,6 +334,25 @@ p, li, label {
   padding: 1rem 1.2rem;
 }
 
+.tab-hero {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.tab-hero-copy {
+  min-width: 0;
+}
+
+.tab-hero-actions {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
 .dashboard-intro-title,
 .panel-title {
   color: var(--text-1);
@@ -477,6 +496,65 @@ p, li, label {
   gap: 0.55rem;
 }
 
+.summary-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin: 0.35rem 0 1rem;
+}
+
+.summary-card {
+  background: linear-gradient(180deg, rgba(255, 253, 253, 0.99), rgba(255, 243, 247, 0.94));
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-soft);
+  min-height: 100%;
+  padding: 0.95rem 1rem;
+}
+
+.summary-card.accent {
+  background: linear-gradient(180deg, rgba(253, 234, 241, 0.98), rgba(255, 243, 247, 0.94));
+  border-color: var(--accent-soft);
+}
+
+.summary-card.success {
+  background: linear-gradient(180deg, rgba(238, 249, 241, 0.98), rgba(255, 253, 253, 0.96));
+  border-color: var(--success-soft);
+}
+
+.summary-label {
+  color: var(--text-3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+.summary-value {
+  color: var(--text-1);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.summary-value.accent {
+  color: var(--accent);
+}
+
+.summary-value.success {
+  color: var(--success);
+}
+
+.summary-note {
+  color: var(--text-2);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  margin-top: 0.45rem;
+}
+
 .status-row {
   align-items: center;
   border-bottom: 1px solid var(--border);
@@ -510,6 +588,30 @@ p, li, label {
 .subtle-caption {
   color: var(--text-3);
   font-size: 0.78rem;
+}
+
+.code-block-soft {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--accent);
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  padding: 0.75rem 0.9rem;
+  white-space: pre-wrap;
+}
+
+.inline-code-soft {
+  background: var(--accent-light);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent);
+  display: inline-flex;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
 }
 
 .heatmap-placeholder {
@@ -659,6 +761,26 @@ p, li, label {
   color: var(--accent);
 }
 
+.mini-card {
+  background: linear-gradient(180deg, rgba(255, 253, 253, 0.98), rgba(255, 246, 249, 0.94));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+
+.mini-card-title {
+  color: var(--text-1);
+  font-size: 0.84rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.mini-card-copy {
+  color: var(--text-2);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
 code {
   background: var(--accent-light);
   border-radius: 8px;
@@ -718,6 +840,15 @@ select:focus {
     margin-bottom: 0.7rem;
   }
 
+  .tab-hero {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .tab-hero-actions {
+    justify-content: flex-start;
+  }
+
   .panel-title,
   .dashboard-intro-title {
     font-size: 0.95rem;
@@ -731,6 +862,11 @@ select:focus {
   .meta-cluster,
   .context-pills {
     gap: 0.35rem;
+  }
+
+  .summary-grid {
+    gap: 0.65rem;
+    grid-template-columns: 1fr;
   }
 
   .meta-pill,
@@ -780,6 +916,10 @@ select:focus {
   .flow-step {
     gap: 0.7rem;
     padding: 0.8rem 0;
+  }
+
+  .summary-value {
+    font-size: 1.32rem;
   }
 
   .flow-title {

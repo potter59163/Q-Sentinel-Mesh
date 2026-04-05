@@ -38,12 +38,12 @@ ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
 import torch
-from torch.utils.data import DataLoader, random_split
 
 import flwr as fl
 
 from src.federated.hybrid_client import HybridQSentinelClient
-from src.data.mock_data import MockCTDataset
+from src.federated.data_utils import build_client_dataloaders
+from src.federated.pqc_crypto import ensure_pqc_backend, pqc_backend_is_real, pqc_backend_name
 
 HOSPITAL_NAMES = [
     "Hospital A (Bangkok)",
@@ -100,7 +100,56 @@ def parse_args(cfg: dict):
         "--data-dir",
         type=str,
         default=None,
-        help="Path to real patient data directory (uses mock data if not set)",
+        help="Legacy shortcut for a real patient data directory. Prefer --nii-dir / --dicom-dir or --manifest.",
+    )
+    parser.add_argument(
+        "--manifest",
+        type=str,
+        default=None,
+        help="JSON manifest describing this node's local dataset.",
+    )
+    parser.add_argument(
+        "--data-source",
+        type=str,
+        default=client_cfg.get("data_source", "mock"),
+        choices=["mock", "ctich", "rsna"],
+        help="Dataset mode for this node.",
+    )
+    parser.add_argument(
+        "--nii-dir",
+        type=str,
+        default=client_cfg.get("nii_dir"),
+        help="CT-ICH NIfTI directory for local hospital data.",
+    )
+    parser.add_argument(
+        "--csv-path",
+        type=str,
+        default=client_cfg.get("csv_path"),
+        help="CT-ICH hemorrhage_diagnosis_raw_ct.csv path.",
+    )
+    parser.add_argument(
+        "--dicom-dir",
+        type=str,
+        default=client_cfg.get("dicom_dir"),
+        help="RSNA-style DICOM directory for local hospital data.",
+    )
+    parser.add_argument(
+        "--labels-csv",
+        type=str,
+        default=client_cfg.get("labels_csv"),
+        help="RSNA-style labels CSV used with --dicom-dir.",
+    )
+    parser.add_argument(
+        "--patient-ids",
+        type=str,
+        default=client_cfg.get("patient_ids"),
+        help="Comma-separated CT-ICH patient IDs owned by this node.",
+    )
+    parser.add_argument(
+        "--auto-partition",
+        action="store_true",
+        default=client_cfg.get("auto_partition", False),
+        help="Deterministically partition CT-ICH patients by node id when sharing one dataset copy across machines.",
     )
     parser.add_argument(
         "--weights",
@@ -123,56 +172,6 @@ def parse_args(cfg: dict):
     return parser.parse_args()
 
 
-def build_data_loaders(args, node_id: int, batch_size: int):
-    """
-    Build train/val DataLoaders.
-
-    If --data-dir is provided, attempts to load real DICOM/NIfTI data.
-    Falls back to mock synthetic CT data for development / demo.
-    """
-    if args.data_dir:
-        try:
-            from src.data.rsna_loader import RSNADataset
-            dataset = RSNADataset(
-                data_dir=Path(args.data_dir),
-                split="train",
-            )
-            print(f"  [Node {node_id}] Loaded real data: {len(dataset)} samples from {args.data_dir}")
-        except Exception as e:
-            print(f"  [Node {node_id}] WARNING: Could not load real data ({e})")
-            print(f"  [Node {node_id}] Falling back to synthetic mock data")
-            dataset = MockCTDataset(n_samples=args.samples, seed=node_id * 100)
-    else:
-        # Each node gets a different random seed → simulates different hospital distributions
-        dataset = MockCTDataset(n_samples=args.samples, seed=node_id * 100)
-        print(f"  [Node {node_id}] Using synthetic mock CT data: {len(dataset)} samples")
-
-    # 80/20 train/val split
-    n_train = int(0.8 * len(dataset))
-    n_val   = len(dataset) - n_train
-    train_ds, val_ds = random_split(
-        dataset,
-        [n_train, n_val],
-        generator=torch.Generator().manual_seed(node_id),
-    )
-
-    train_loader = DataLoader(
-        train_ds,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=0,   # 0 for Windows compatibility
-        pin_memory=torch.cuda.is_available(),
-    )
-    val_loader = DataLoader(
-        val_ds,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=0,
-        pin_memory=torch.cuda.is_available(),
-    )
-    return train_loader, val_loader
-
-
 def build_tls_credentials(cfg: dict):
     """Load CA certificate for client-side TLS verification."""
     ca_path = ROOT / cfg["client"]["tls"]["ca_cert_path"]
@@ -186,9 +185,22 @@ def build_tls_credentials(cfg: dict):
 def main():
     cfg  = load_config()
     args = parse_args(cfg)
+    ensure_pqc_backend()
 
     hospital_name = HOSPITAL_NAMES[args.node_id]
     pretrained    = ROOT / args.weights if args.weights else None
+    img_size = int(cfg["client"].get("img_size", 224))
+
+    data_source = args.data_source
+    if args.manifest:
+        data_source = data_source
+    elif args.nii_dir or args.csv_path:
+        data_source = "ctich"
+    elif args.dicom_dir or args.labels_csv:
+        data_source = "rsna"
+    elif args.data_dir and not (args.nii_dir or args.dicom_dir):
+        data_source = "rsna"
+        args.dicom_dir = args.data_dir
 
     print("=" * 60)
     print(f"  Q-Sentinel Mesh — Hospital Node {args.node_id}")
@@ -198,17 +210,35 @@ def main():
     print(f"  Device          : {args.device}")
     print(f"  Local epochs    : {args.epochs}")
     print(f"  Batch size      : {args.batch_size}")
+    print(f"  Image size      : {img_size}")
+    print(f"  Data source     : {data_source}")
     print(f"  TLS             : {'enabled' if args.tls else 'disabled'}")
+    print(f"  PQC backend     : {pqc_backend_name()} ({'real' if pqc_backend_is_real() else 'demo-only'})")
     print(f"  Pretrained      : {pretrained}")
     print("=" * 60)
     print()
 
     # Build DataLoaders
-    train_loader, val_loader = build_data_loaders(args, args.node_id, args.batch_size)
+    train_loader, val_loader, dataset_info = build_client_dataloaders(
+        node_id=args.node_id,
+        batch_size=args.batch_size,
+        img_size=img_size,
+        mock_samples=args.samples,
+        val_split=float(cfg["client"].get("val_split", 0.2)),
+        data_source=data_source,
+        manifest_path=args.manifest,
+        nii_dir=args.nii_dir,
+        csv_path=args.csv_path,
+        dicom_dir=args.dicom_dir,
+        labels_csv=args.labels_csv,
+        patient_ids=args.patient_ids,
+        auto_partition=args.auto_partition,
+    )
     print(
         f"  [Node {args.node_id}] Train batches: {len(train_loader)} | "
         f"Val batches: {len(val_loader)}"
     )
+    print(f"  [Node {args.node_id}] Dataset info: {dataset_info}")
 
     # Instantiate the Quantum+PQC Flower client
     client = HybridQSentinelClient(

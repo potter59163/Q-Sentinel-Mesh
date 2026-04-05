@@ -85,6 +85,7 @@ VAL_SPLIT       = 0.15
 EPOCHS_BASELINE = 10
 EPOCHS_HYBRID   = 5
 USE_AMP         = True  # mixed precision (FP16) to halve VRAM usage
+DATA_SPLIT_SEED = 42
 
 
 # ==============================================================================
@@ -106,7 +107,7 @@ def step1_train_baseline() -> float:
         afridi_dir=AFRIDI_DIR if AFRIDI_DIR.exists() else None,
         img_size=IMG_SIZE,
         val_ratio=VAL_SPLIT,
-        seed=42,
+        seed=DATA_SPLIT_SEED,
     )
     print(f"  Train: {len(train_set)} | Val: {len(val_set)} | Batch: {BATCH_BASELINE}")
 
@@ -230,7 +231,7 @@ def step2_train_hybrid(baseline_auc: float) -> float:
         afridi_dir=AFRIDI_DIR if AFRIDI_DIR.exists() else None,
         img_size=IMG_SIZE,
         val_ratio=VAL_SPLIT,
-        seed=99,
+        seed=DATA_SPLIT_SEED,
     )
     print(f"  Train: {len(train_set)} | Val: {len(val_set)} | Batch: {BATCH_HYBRID}")
     print("  Note: VQC runs on CPU - each batch takes longer than baseline.")
@@ -517,15 +518,21 @@ def step3_federated():
         set_params(global_model, global_params)
         global_model.eval()
         all_preds, all_truths = [], []
+        total_loss = 0.0
+        total_batches = 0
         for h_idx in range(NUM_HOSPITALS):
             _, val_set = hospital_splits[h_idx]
             vl = DataLoader(val_set, batch_size=FED_BATCH * 2, num_workers=0)
             with torch.no_grad():
                 for batch in vl:
                     imgs = batch[0].to(DEVICE)
-                    probs = torch.sigmoid(global_model(imgs).float())
+                    labels = batch[1].to(DEVICE)
+                    logits = global_model(imgs).float()
+                    probs = torch.sigmoid(logits)
                     all_preds.append(probs.cpu().numpy())
                     all_truths.append(batch[1].numpy())
+                    total_loss += criterion(logits, labels).item()
+                    total_batches += 1
         try:
             p_np = np.concatenate(all_preds)
             t_np = np.concatenate(all_truths)
@@ -539,7 +546,7 @@ def step3_federated():
             global_auc = 0.5
 
         round_metrics["global_auc"] = global_auc
-        round_metrics["global_loss"] = 0.0
+        round_metrics["global_loss"] = total_loss / max(total_batches, 1)
         history.append(round_metrics)
         print(f"    > Global AUC: {global_auc:.4f} | PQC nodes: {round_metrics['pqc_rounds']}/{NUM_HOSPITALS}")
 
@@ -559,23 +566,19 @@ def step4_benchmark(baseline_auc: float, hybrid_auc: float, fed_history: list):
     fed_aucs = [r["global_auc"] for r in fed_history]
     final_fed_auc = max(fed_aucs) if fed_aucs else 0.85
 
-    nodes = [1, 2, 3]
-    baseline_auc_scaled = [
-        round(baseline_auc * 0.97, 4),
-        round(baseline_auc * 0.985, 4),
+    nodes = [1, 3]
+    baseline_auc_series = [
+        round(baseline_auc, 4),
         round(baseline_auc, 4),
     ]
-    q_auc_start = min(max(hybrid_auc, baseline_auc + 0.005), 1.0)
-    q_auc_mid   = q_auc_start + (min(final_fed_auc, 1.0) - q_auc_start) * 0.6
     qsentinel_auc = [
-        round(q_auc_start, 4),
-        round(q_auc_mid, 4),
+        round(hybrid_auc, 4),
         round(min(final_fed_auc, 1.0), 4),
     ]
 
     benchmark = {
         "nodes": nodes,
-        "baseline_auc": baseline_auc_scaled,
+        "baseline_auc": baseline_auc_series,
         "qsentinel_auc": qsentinel_auc,
         "labels": {
             "baseline": "Baseline CNN (EfficientNet-B4)",
@@ -586,6 +589,8 @@ def step4_benchmark(baseline_auc: float, hybrid_auc: float, fed_history: list):
             "hybrid_best_auc": round(hybrid_auc, 4),
             "fed_final_auc": round(final_fed_auc, 4),
             "dataset": "Combined: CT-ICH + RSNA-12K + Afridi-ICH (~10K+ slices)",
+            "measured_points": True,
+            "node_axis_note": "1 node = isolated model, 3 nodes = federated global model",
         },
     }
 

@@ -61,13 +61,22 @@ except Exception as e:
 # Test 6: PQC Encryption
 try:
     import numpy as np
-    from src.federated.pqc_crypto import generate_pqc_keypair, encrypt_weights, decrypt_weights
-    kp = generate_pqc_keypair()
-    dummy = np.random.randn(16).astype("float32").tobytes()
-    payload = encrypt_weights(dummy, kp.public_key)
-    recovered = decrypt_weights(payload, kp.secret_key)
-    assert recovered == dummy, "Decryption mismatch!"
-    print(f"[OK] PQC Crypto: encrypt/decrypt verified, pubkey={len(kp.public_key)} bytes")
+    from src.federated.pqc_crypto import (
+        generate_pqc_keypair,
+        encrypt_weights,
+        decrypt_weights,
+        pqc_backend_name,
+        pqc_backend_is_real,
+    )
+    if not pqc_backend_is_real():
+        print(f"[SKIP] PQC Crypto: real backend unavailable ({pqc_backend_name()})")
+    else:
+        kp = generate_pqc_keypair()
+        dummy = np.random.randn(16).astype("float32").tobytes()
+        payload = encrypt_weights(dummy, kp.public_key)
+        recovered = decrypt_weights(payload, kp.secret_key)
+        assert recovered == dummy, "Decryption mismatch!"
+        print(f"[OK] PQC Crypto: encrypt/decrypt verified, pubkey={len(kp.public_key)} bytes")
 except Exception as e:
     errors.append(f"[FAIL] PQC Crypto: {e}")
 

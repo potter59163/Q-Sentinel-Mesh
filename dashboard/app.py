@@ -877,20 +877,7 @@ with tab_diag:
 # ══════════════════════════════════════════════════════════════════════════════
 
 with tab_fed:
-    st.markdown(
-        f"""
-        <div style="margin-bottom:20px;">
-            <h2 style="color:#412b34; margin:0 0 6px; font-size:20px; font-weight:600;">{T('fed_title')}</h2>
-            <p style="color:#6d5360; margin:0; font-size:13px;">
-                {T('fed_subtitle')}
-                <strong style="color:#4c8f6b;">{T('no_data_leaves')}</strong> {T('local_servers')}
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # ── Benchmark Chart ────────────────────────────────────────────────────────
+    # ── Benchmark Data ────────────────────────────────────────────────────────
     _benchmark_path = ROOT / "results" / "benchmark_results.json"
     if _benchmark_path.exists():
         try:
@@ -904,110 +891,188 @@ with tab_fed:
         benchmark_data = generate_benchmark_data()
         data_source = T("sim_run_pipeline")
 
-    col_chart, col_stats = st.columns([3, 1], gap="large")
+    _meta = benchmark_data.get("metadata", {})
+    _baseline_best = _meta.get("baseline_best_auc", benchmark_data["baseline_auc"][-1])
+    _hybrid_best = _meta.get("hybrid_best_auc", benchmark_data["qsentinel_auc"][-1])
+    _fed_final = _meta.get("fed_final_auc", benchmark_data["qsentinel_auc"][-1])
+    _improvement = (_fed_final - _baseline_best) * 100
+
+    st.markdown(
+        f"""
+        <div class="dashboard-intro">
+            <div class="tab-hero">
+                <div class="tab-hero-copy">
+                    <div class="dashboard-intro-title">{T('fed_title')}</div>
+                    <div class="dashboard-intro-copy">
+                        {T('fed_subtitle')} <strong style="color:#4c8f6b;">{T('no_data_leaves')}</strong> {T('local_servers')}
+                    </div>
+                </div>
+                <div class="tab-hero-actions">
+                    <span class="badge badge-online">3/3 nodes online</span>
+                    <span class="badge badge-pqc">ML-KEM-512 protected</span>
+                    <span class="badge badge-demo">{data_source}</span>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-label">{T('baseline_auc')}</div>
+                <div class="summary-value">{_baseline_best * 100:.1f}%</div>
+                <div class="summary-note">Standalone hospital performance before collaboration.</div>
+            </div>
+            <div class="summary-card accent">
+                <div class="summary-label">{T('federated_auc')}</div>
+                <div class="summary-value accent">{_fed_final * 100:.1f}%</div>
+                <div class="summary-note">Shared model performance after secure aggregation across all sites.</div>
+            </div>
+            <div class="summary-card success">
+                <div class="summary-label">Net Lift</div>
+                <div class="summary-value success">+{_improvement:.1f}%</div>
+                <div class="summary-note">Measured against the best isolated baseline.</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Federation Profile</div>
+                <div class="summary-value accent">5R / 3N</div>
+                <div class="summary-note">FedAvg rounds with Bangkok, Chiang Mai, and Khon Kaen participating.</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    col_chart, col_stats = st.columns([3, 2], gap="large")
 
     with col_chart:
         st.markdown(
             f"""
-            <div class="section-heading">{T('benchmark_heading')}</div>
-            <div style="color:#9c7f8c; font-size:11px; margin-bottom:8px;">{data_source}</div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-copy">
+                        <div class="panel-eyebrow">Performance Story</div>
+                        <div class="panel-title">{T('benchmark_heading')}</div>
+                        <div class="panel-subtitle">This view highlights how the shared global model overtakes isolated training as more hospitals contribute updates.</div>
+                    </div>
+                </div>
             """,
             unsafe_allow_html=True,
         )
         render_benchmark_chart(benchmark_data)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with col_stats:
-        st.markdown(f"<div class='section-heading'>{T('key_metrics')}</div>", unsafe_allow_html=True)
-        _meta = benchmark_data.get("metadata", {})
-        _baseline_best = _meta.get("baseline_best_auc", benchmark_data["baseline_auc"][-1])
-        _hybrid_best   = _meta.get("hybrid_best_auc",   benchmark_data["qsentinel_auc"][-1])
-        _fed_final     = _meta.get("fed_final_auc",      benchmark_data["qsentinel_auc"][-1])
-        _improvement   = (_fed_final - _baseline_best) * 100
-
-        st.metric(T("baseline_auc"),   f"{_baseline_best*100:.1f}%")
-        st.metric(T("hybrid_auc"),     f"{_hybrid_best*100:.1f}%",   delta=f"+{(_hybrid_best-_baseline_best)*100:.1f}%")
-        st.metric(T("federated_auc"),  f"{_fed_final*100:.1f}%",     delta=f"+{_improvement:.1f}% {T('vs_isolated')}")
-        st.metric(T("nodes"),          "3",                           delta="Bangkok · CM · KK")
-
-    st.divider()
-
-    # ── Animation ─────────────────────────────────────────────────────────────
-    col_anim, col_info = st.columns([3, 1], gap="large")
-
-    with col_anim:
+        st.markdown(
+            f"""
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-copy">
+                        <div class="panel-eyebrow">Configuration</div>
+                        <div class="panel-title">{T('key_metrics')}</div>
+                        <div class="panel-subtitle">A quick readout for what matters in the demo before diving into the training traces.</div>
+                    </div>
+                </div>
+                <div class="status-grid">
+                    <div class="status-row">
+                        <span class="status-label">{T('hybrid_auc')}</span>
+                        <span class="status-value accent">{_hybrid_best * 100:.1f}%</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">{T('federated_auc')}</span>
+                        <span class="status-value success">+{_improvement:.1f}% {T('vs_isolated')}</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">{T('algorithm')}</span>
+                        <span class="status-value accent">FedAvg</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Topology</span>
+                        <span class="status-value">3 hospitals</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">{T('privacy')}</span>
+                        <span class="status-value success">{T('preserved')}</span>
+                    </div>
+                </div>
+                <div style="height:14px"></div>
+                <div class="mini-card">
+                    <div class="mini-card-title">Training Playback</div>
+                    <div class="mini-card-copy">Use the animation to show how shared learning compounds across rounds without moving patient images off-site.</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         if st.button(T("animate_fed"), use_container_width=True):
             _b_start = benchmark_data["baseline_auc"][0] * 100
-            _b_end   = benchmark_data["qsentinel_auc"][-1] * 100
+            _b_end = benchmark_data["qsentinel_auc"][-1] * 100
             render_live_simulation_animation(baseline_start=_b_start, final_fed=_b_end)
 
-    with col_info:
-        st.markdown(
-            f"""
-            <div style="background:#fff1f6; border:1px solid #ecd9e2;
-                        border-radius:10px; padding:14px;">
-                <div style="color:#9c7f8c; font-size:10px; text-transform:uppercase;
-                            letter-spacing:0.06em; margin-bottom:10px; font-weight:600;">{T('round_config')}</div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span style="color:#9c7f8c; font-size:12px;">{T('rounds')}</span>
-                    <span style="color:#6d5360; font-size:12px; font-family:monospace;">5</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span style="color:#9c7f8c; font-size:12px;">{T('hospitals')}</span>
-                    <span style="color:#6d5360; font-size:12px; font-family:monospace;">3</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span style="color:#9c7f8c; font-size:12px;">{T('algorithm')}</span>
-                    <span style="color:#c25b86; font-size:12px; font-family:monospace; font-weight:600;">FedAvg</span>
-                </div>
-                <div style="display:flex; justify-content:space-between;">
-                    <span style="color:#9c7f8c; font-size:12px;">{T('privacy')}</span>
-                    <span style="color:#4c8f6b; font-size:12px; font-weight:600;">{T('preserved')}</span>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.divider()
-
-    # ── Per-round results ──────────────────────────────────────────────────────
     fed_history = load_fed_results(ROOT / "results/fed_results.json")
-    if fed_history:
-        st.markdown(f"<div class='section-heading'>{T('last_sim_results')}</div>", unsafe_allow_html=True)
-        render_federated_rounds_chart(fed_history)
 
-        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-        render_hospital_breakdown_chart(fed_history)
-    else:
+    col_rounds, col_nodes = st.columns([3, 2], gap="large")
+
+    with col_rounds:
+        if fed_history:
+            st.markdown(
+                f"""
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-header-copy">
+                            <div class="panel-eyebrow">Training Trace</div>
+                            <div class="panel-title">{T('last_sim_results')}</div>
+                            <div class="panel-subtitle">Global AUC and loss trends make the learning dynamics legible at a glance, then break down how each hospital contributed.</div>
+                        </div>
+                    </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            render_federated_rounds_chart(fed_history)
+            st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+            render_hospital_breakdown_chart(fed_history)
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.markdown(
+                f"""
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-header-copy">
+                            <div class="panel-eyebrow">Training Trace</div>
+                            <div class="panel-title">{T('run_full_pipeline')}</div>
+                            <div class="panel-subtitle">{T('run_full_pipeline_desc')}</div>
+                        </div>
+                    </div>
+                    <span class="inline-code-soft">python run_all.py</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    with col_nodes:
         st.markdown(
             f"""
-            <div style="background:#fff1f6; border:1px solid #ecd9e2;
-                        border-radius:10px; padding:20px 24px;">
-                <div style="color:#c25b86; font-weight:600; font-size:14px; margin-bottom:8px;">
-                    {T('run_full_pipeline')}
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-copy">
+                        <div class="panel-eyebrow">Network Health</div>
+                        <div class="panel-title">{T('node_status')}</div>
+                        <div class="panel-subtitle">Each site keeps data local while contributing encrypted model updates to the shared global model.</div>
+                    </div>
                 </div>
-                <div style="color:#6d5360; font-size:13px; margin-bottom:12px;">
-                    {T('run_full_pipeline_desc')}
+                <div class="meta-cluster">
+                    <span class="tech-pill">🌐 3/3 Nodes Online</span>
+                    <span class="tech-pill">🔒 PQC Encrypted</span>
+                    <span class="tech-pill">🧠 Shared Model</span>
                 </div>
-                <code style="display:block; background:#fffdfd; border:1px solid #ecd9e2;
-                             border-radius:8px; padding:10px 14px; font-size:13px; color:#4c8f6b;">
-                    python run_all.py
-                </code>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    # ── Node Status ────────────────────────────────────────────────────────────
-    st.markdown(f"<div class='section-heading'>{T('node_status')}</div>", unsafe_allow_html=True)
-    st.markdown(
-        '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">'
-        '<span class="tech-pill">🌐 3/3 Nodes Online</span>'
-        '<span class="tech-pill">🔒 PQC Encrypted</span>'
-        '<span class="tech-pill">🔬 Quantum Enhanced</span>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
     c1, c2, c3 = st.columns(3)
     _last_round = fed_history[-1]["hospitals"] if fed_history else {}
     _node_defaults = [
@@ -1055,11 +1120,46 @@ with tab_fed:
 with tab_sec:
     st.markdown(
         f"""
-        <div style="margin-bottom:20px;">
-            <h2 style="color:#412b34; margin:0 0 6px; font-size:20px; font-weight:600;">{T('pqc_title')}</h2>
-            <p style="color:#6d5360; margin:0; font-size:13px;">
-                {T('pqc_subtitle')}
-            </p>
+        <div class="dashboard-intro">
+            <div class="tab-hero">
+                <div class="tab-hero-copy">
+                    <div class="dashboard-intro-title">{T('pqc_title')}</div>
+                    <div class="dashboard-intro-copy">{T('pqc_subtitle')}</div>
+                </div>
+                <div class="tab-hero-actions">
+                    <span class="badge badge-pqc">NIST FIPS 203</span>
+                    <span class="badge badge-online">Federated-ready</span>
+                    <span class="badge badge-demo">Hybrid encryption</span>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""
+        <div class="summary-grid">
+            <div class="summary-card accent">
+                <div class="summary-label">{T('kem_algorithm')}</div>
+                <div class="summary-value accent">ML-KEM-512</div>
+                <div class="summary-note">Post-quantum key encapsulation protects model exchanges against future quantum attacks.</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">{T('security_level')}</div>
+                <div class="summary-value">128-bit PQ</div>
+                <div class="summary-note">{T('security_level_val')}</div>
+            </div>
+            <div class="summary-card success">
+                <div class="summary-label">{T('data_privacy')}</div>
+                <div class="summary-value success">No raw CT</div>
+                <div class="summary-note">{T('data_privacy_val')}</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Transport Stack</div>
+                <div class="summary-value accent">KEM + AES</div>
+                <div class="summary-note">ML-KEM-512 for key exchange, HKDF-SHA256 for derivation, and AES-256-GCM for authenticated payload encryption.</div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1068,12 +1168,16 @@ with tab_sec:
     col_flow, col_spec = st.columns([3, 2], gap="large")
 
     with col_flow:
-        st.markdown(f"<div class='section-heading'>{T('secure_flow')}</div>", unsafe_allow_html=True)
         st.markdown(
             f"""
-            <div style="background:#fffdfd;
-                        border:1px solid #ecd9e2; border-radius:12px; padding:20px 24px;">
-
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-copy">
+                        <div class="panel-eyebrow">Protocol Walkthrough</div>
+                        <div class="panel-title">{T('secure_flow')}</div>
+                        <div class="panel-subtitle">The security story is easier to trust when each handoff is explicit: local training, encapsulation, authenticated encryption, aggregation, then encrypted return delivery.</div>
+                    </div>
+                </div>
                 <div class="flow-step">
                     <div class="flow-num">1</div>
                     <div class="flow-body">
@@ -1121,13 +1225,20 @@ with tab_sec:
                         <div class="flow-desc">{T('flow6_desc')}</div>
                     </div>
                 </div>
+
+                <div style="height:16px"></div>
+                <div class="mini-card">
+                    <div class="mini-card-title">Encrypted Payload Shape</div>
+                    <div class="mini-card-copy">What traverses the network is a sealed packet of ciphertext and metadata rather than patient scans or plaintext weights.</div>
+                    <div style="height:10px"></div>
+                    <span class="inline-code-soft">kem_ciphertext · aes_ciphertext · nonce · salt</span>
+                </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
     with col_spec:
-        st.markdown(f"<div class='section-heading'>{T('specifications')}</div>", unsafe_allow_html=True)
         specs = [
             (T("kem_algorithm"),    "ML-KEM-512",           "cyan"),
             (T("standard"),         "NIST FIPS 203",         "cyan"),
@@ -1149,17 +1260,25 @@ with tab_sec:
         )
         st.markdown(
             f"""
-            <div style="background:#fffdfd;
-                        border:1px solid #ecd9e2; border-radius:12px; padding:18px 20px;">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-copy">
+                        <div class="panel-eyebrow">Implementation View</div>
+                        <div class="panel-title">{T('specifications')}</div>
+                        <div class="panel-subtitle">These parameters translate the cryptography choice into concrete engineering constraints for the federated pipeline.</div>
+                    </div>
+                </div>
                 {spec_rows}
+                <div style="height:16px"></div>
+                <div class="mini-card">
+                    <div class="mini-card-title">{T('live_pqc_demo')}</div>
+                    <div class="mini-card-copy">Generate a fresh key pair and run one encrypted round-trip to prove the demo path works end-to-end.</div>
+                </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
-
-        st.markdown(f"<div class='section-heading'>{T('live_pqc_demo')}</div>", unsafe_allow_html=True)
         if st.button(T("gen_keypair"), use_container_width=True):
             with st.spinner(T("generating_keys")):
                 try:
@@ -1177,10 +1296,9 @@ with tab_sec:
 
                     st.markdown(
                         f"""
-                        <div style="background:#eef9f1; border:1px solid #b7dec6;
-                                    border-radius:10px; padding:14px 16px; margin-top:8px;">
-                            <div style="color:#4c8f6b; font-weight:600; margin-bottom:10px;">{T('pqc_success')}</div>
-                            <div style="font-family:monospace; font-size:12px; color:#6d5360; line-height:1.8;">
+                        <div class="panel-card" style="background:linear-gradient(180deg, rgba(238, 249, 241, 0.98), rgba(255, 253, 253, 0.96)); border-color:#b7dec6; margin-top:10px;">
+                            <div class="panel-title" style="color:#4c8f6b; margin-bottom:10px;">{T('pqc_success')}</div>
+                            <div class="code-block-soft" style="color:#4c8f6b; border-color:#b7dec6; background:#f7fdf9;">
                                 Public Key &nbsp;&nbsp;{len(keypair.public_key):,} bytes<br>
                                 Secret Key &nbsp;&nbsp;{len(keypair.secret_key):,} bytes<br>
                                 KEM Cipher &nbsp;&nbsp;{len(payload.kem_ciphertext):,} bytes<br>
@@ -1196,16 +1314,15 @@ with tab_sec:
                 except Exception as e:
                     st.error(f"Error: {e}")
 
-    st.divider()
     st.markdown(
         f"""
-        <div style="background:#fdeaf1; border:1px solid #efb4c8;
-                    border-radius:12px; padding:18px 22px;">
-            <div style="color:#c25b86; font-weight:600; font-size:14px; margin-bottom:8px;">
-                {T('why_pqc')}
-            </div>
-            <div style="color:#6d5360; font-size:13px; line-height:1.7;">
-                {T('why_pqc_text')}
+        <div class="panel-card" style="margin-top:14px; background:linear-gradient(180deg, rgba(253, 234, 241, 0.98), rgba(255, 243, 247, 0.94)); border-color:#efb4c8;">
+            <div class="panel-header">
+                <div class="panel-header-copy">
+                    <div class="panel-eyebrow">Why It Matters</div>
+                    <div class="panel-title" style="color:#c25b86;">{T('why_pqc')}</div>
+                    <div class="panel-subtitle">{T('why_pqc_text')}</div>
+                </div>
             </div>
         </div>
         """,

@@ -35,6 +35,7 @@ sys.path.insert(0, str(ROOT))
 import flwr as fl
 
 from src.federated.server import QSentinelHybridStrategy
+from src.federated.pqc_crypto import ensure_pqc_backend, pqc_backend_is_real, pqc_backend_name
 
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -106,6 +107,7 @@ def build_tls_config(cfg: dict):
 def main():
     cfg  = load_config()
     args = parse_args(cfg)
+    ensure_pqc_backend()
 
     server_address = f"0.0.0.0:{args.port}"
     results_path   = str(ROOT / args.results)
@@ -117,6 +119,7 @@ def main():
     print(f"  Federated rounds: {args.rounds}")
     print(f"  Min clients     : {args.min_clients}")
     print(f"  TLS             : {'enabled' if args.tls else 'disabled'}")
+    print(f"  PQC backend     : {pqc_backend_name()} ({'real' if pqc_backend_is_real() else 'demo-only'})")
     print(f"  Results path    : {results_path}")
     print("=" * 60)
 
@@ -130,7 +133,7 @@ def main():
         min_available_clients=args.min_clients,
     )
 
-    server_config = fl.server.ServerConfig(num_rounds=args.rounds)
+    server_config = fl.server.ServerConfig(num_rounds=args.rounds, round_timeout=300)
 
     # Build optional TLS credentials
     ssl_credentials = build_tls_config(cfg) if args.tls else None
