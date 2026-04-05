@@ -2,96 +2,61 @@
   {
     "round": 1,
     "hospitals": {
-      "Hospital A (Bangkok)": {
-        "local_auc": 0.8353467198127392,
-        "num_examples": 837
-      },
       "Hospital B (Chiang Mai)": {
-        "local_auc": 0.9590912116069349,
-        "num_examples": 817
+        "train_loss": 0.11237216591835023,
+        "num_examples": 40,
+        "pqc_encrypted": true,
+        "quantum_layer": true
       },
       "Hospital C (Khon Kaen)": {
-        "local_auc": 0.9662734422262553,
-        "num_examples": 819
+        "train_loss": 0.10943196564912797,
+        "num_examples": 40,
+        "pqc_encrypted": true,
+        "quantum_layer": true
       }
     },
-    "global_auc": 0.9294458139306941,
-    "global_loss": 0.0
+    "pqc_rounds": 2,
+    "global_auc": NaN,
+    "global_loss": 0.10450879856944084
   },
   {
     "round": 2,
     "hospitals": {
-      "Hospital A (Bangkok)": {
-        "local_auc": 0.8487974451566686,
-        "num_examples": 837
-      },
       "Hospital B (Chiang Mai)": {
-        "local_auc": 0.9477357242687431,
-        "num_examples": 817
+        "train_loss": 0.11173641830682754,
+        "num_examples": 40,
+        "pqc_encrypted": true,
+        "quantum_layer": true
       },
       "Hospital C (Khon Kaen)": {
-        "local_auc": 0.9640048396854204,
-        "num_examples": 819
+        "train_loss": 0.11221520602703094,
+        "num_examples": 40,
+        "pqc_encrypted": true,
+        "quantum_layer": true
       }
     },
-    "global_auc": 0.9362769328225827,
-    "global_loss": 0.0
+    "pqc_rounds": 2,
+    "global_auc": NaN,
+    "global_loss": 0.10649409890174866
   },
   {
     "round": 3,
     "hospitals": {
-      "Hospital A (Bangkok)": {
-        "local_auc": 0.8622253668370172,
-        "num_examples": 837
+      "Hospital C (Khon Kaen)": {
+        "train_loss": 0.10825003236532212,
+        "num_examples": 40,
+        "pqc_encrypted": true,
+        "quantum_layer": true
       },
       "Hospital B (Chiang Mai)": {
-        "local_auc": 0.5,
-        "num_examples": 817
-      },
-      "Hospital C (Khon Kaen)": {
-        "local_auc": 0.9609800362976407,
-        "num_examples": 819
+        "train_loss": 0.10899700075387955,
+        "num_examples": 40,
+        "pqc_encrypted": true,
+        "quantum_layer": true
       }
     },
-    "global_auc": 0.5,
-    "global_loss": 0.0
-  },
-  {
-    "round": 4,
-    "hospitals": {
-      "Hospital A (Bangkok)": {
-        "local_auc": 0.8311226274818507,
-        "num_examples": 837
-      },
-      "Hospital B (Chiang Mai)": {
-        "local_auc": 0.9396120345412798,
-        "num_examples": 817
-      },
-      "Hospital C (Khon Kaen)": {
-        "local_auc": 0.9661222020568663,
-        "num_examples": 819
-      }
-    },
-    "global_auc": 0.9356538822533403,
-    "global_loss": 0.0
-  },
-  {
-    "round": 5,
-    "hospitals": {
-      "Hospital A (Bangkok)": {
-        "local_auc": 0.875689264160138,
-        "num_examples": 837
-      },
-      "Hospital B (Chiang Mai)": {
-        "local_auc": 0.9511218428671259,
-        "num_examples": 817
-      },
-      "Hospital C (Khon Kaen)": {
-        "local_auc": 0.970961887477314,
-        "num_examples": 819
-      }
-    },
-    "global_auc": 0.9257456639464005,
-    "global_loss": 0.0
+    "pqc_rounds": 2,
+    "global_auc": NaN,
+    "global_loss": 0.11014614999294281
   }
 ]
