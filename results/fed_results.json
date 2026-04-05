@@ -2,61 +2,61 @@
   {
     "round": 1,
     "hospitals": {
-      "Hospital B (Chiang Mai)": {
-        "train_loss": 0.11237216591835023,
+      "Hospital C (Khon Kaen)": {
+        "train_loss": 0.10263970494270325,
         "num_examples": 40,
         "pqc_encrypted": true,
         "quantum_layer": true
       },
-      "Hospital C (Khon Kaen)": {
-        "train_loss": 0.10943196564912797,
+      "Hospital B (Chiang Mai)": {
+        "train_loss": 0.10304101258516311,
         "num_examples": 40,
         "pqc_encrypted": true,
         "quantum_layer": true
       }
     },
     "pqc_rounds": 2,
-    "global_auc": NaN,
-    "global_loss": 0.10450879856944084
+    "global_auc": 0.5,
+    "global_loss": 0.108303751796484
   },
   {
     "round": 2,
     "hospitals": {
-      "Hospital B (Chiang Mai)": {
-        "train_loss": 0.11173641830682754,
+      "Hospital C (Khon Kaen)": {
+        "train_loss": 0.10015185326337814,
         "num_examples": 40,
         "pqc_encrypted": true,
         "quantum_layer": true
       },
-      "Hospital C (Khon Kaen)": {
-        "train_loss": 0.11221520602703094,
+      "Hospital B (Chiang Mai)": {
+        "train_loss": 0.10137000083923339,
         "num_examples": 40,
         "pqc_encrypted": true,
         "quantum_layer": true
       }
     },
     "pqc_rounds": 2,
-    "global_auc": NaN,
-    "global_loss": 0.10649409890174866
+    "global_auc": 0.5,
+    "global_loss": 0.10376928001642227
   },
   {
     "round": 3,
     "hospitals": {
-      "Hospital C (Khon Kaen)": {
-        "train_loss": 0.10825003236532212,
+      "Hospital B (Chiang Mai)": {
+        "train_loss": 0.10142906308174134,
         "num_examples": 40,
         "pqc_encrypted": true,
         "quantum_layer": true
       },
-      "Hospital B (Chiang Mai)": {
-        "train_loss": 0.10899700075387955,
+      "Hospital C (Khon Kaen)": {
+        "train_loss": 0.10169766247272491,
         "num_examples": 40,
         "pqc_encrypted": true,
         "quantum_layer": true
       }
     },
     "pqc_rounds": 2,
-    "global_auc": NaN,
-    "global_loss": 0.11014614999294281
+    "global_auc": 0.5,
+    "global_loss": 0.10134637728333473
   }
 ]
