@@ -37,22 +37,38 @@ _PQCRYPTO_AVAILABLE = False
 _KYBER_PY_AVAILABLE = False
 
 try:
-    from kyber import Kyber512
+    try:
+        from kyber import Kyber512 as _Kyber512  # some distros expose top-level 'kyber'
+        _ct, _ss = _Kyber512.enc(b"\x00" * 800)  # probe old API (enc/dec)
+        _USE_OLD_API = True
+    except (ImportError, AttributeError):
+        _USE_OLD_API = False
+        try:
+            from kyber import Kyber512 as _Kyber512
+        except ImportError:
+            from kyber_py.kyber import Kyber512 as _Kyber512
+
     _KYBER_PY_AVAILABLE = True
 
     def generate_keypair():
         """Generate ML-KEM-512 keypair using real Kyber lattice algorithm."""
-        pk, sk = Kyber512.keygen()
+        pk, sk = _Kyber512.keygen()
         return bytes(pk), bytes(sk)
 
     def kem_encrypt(public_key: bytes):
         """Real ML-KEM-512 encapsulation — lattice-based, NIST FIPS 203."""
-        ct, ss = Kyber512.enc(public_key)
+        if _USE_OLD_API:
+            ct, ss = _Kyber512.enc(public_key)   # old: (ct, ss)
+        else:
+            ss, ct = _Kyber512.encaps(public_key) # v1.2.0: (ss, ct)
         return bytes(ct), bytes(ss)
 
     def kem_decrypt(secret_key: bytes, ciphertext: bytes):
         """Real ML-KEM-512 decapsulation."""
-        ss = Kyber512.dec(secret_key, ciphertext)
+        if _USE_OLD_API:
+            ss = _Kyber512.dec(secret_key, ciphertext)
+        else:
+            ss = _Kyber512.decaps(secret_key, ciphertext)
         return bytes(ss)
 
 except ImportError:
