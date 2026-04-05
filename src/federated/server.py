@@ -217,22 +217,24 @@ class QSentinelHybridStrategy(FedAvg):
 
         avg_auc = weighted_auc / max(total_examples, 1)
 
+        safe_loss = float(loss) if loss is not None else 0.0
+
         if self.history and self.history[-1]["round"] == server_round:
             self.history[-1]["global_auc"] = float(avg_auc)
-            self.history[-1]["global_loss"] = float(loss)
+            self.history[-1]["global_loss"] = safe_loss
         else:
             self.history.append({
                 "round": server_round,
                 "global_auc": float(avg_auc),
-                "global_loss": float(loss),
+                "global_loss": safe_loss,
             })
 
         print(
             f"[Server] Round {server_round} — Global AUC: {avg_auc:.4f} "
-            f"| Loss: {loss:.4f} | quantum_layer=True"
+            f"| Loss: {safe_loss:.4f} | quantum_layer=True"
         )
         self._save_results()
-        return loss, {"auc": avg_auc}
+        return safe_loss, {"auc": avg_auc}
 
     def _save_results(self):
         self.results_path.parent.mkdir(parents=True, exist_ok=True)
