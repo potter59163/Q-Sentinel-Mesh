@@ -29,50 +29,77 @@ import numpy as np
 # ML-KEM-512 (NIST FIPS 203 / CRYSTALS-Kyber)
 # Try real pqcrypto first; fall back to a pure-Python simulation when the
 # Rust-compiled package is not available (e.g., Streamlit Cloud).
+# Priority 1: real kyber-py (pure-Python, no Rust needed, pip install kyber-py)
+# Priority 2: pqcrypto (Rust-compiled, fastest — rarely available on cloud)
+# Priority 3: pure-Python simulation (demo only, no lattice hardness)
+
+_PQCRYPTO_AVAILABLE = False
+_KYBER_PY_AVAILABLE = False
+
 try:
-    from pqcrypto.kem.ml_kem_512 import (
-        generate_keypair as _real_keygen,
-        encrypt as _real_kem_enc,
-        decrypt as _real_kem_dec,
-    )
-    _PQCRYPTO_AVAILABLE = True
+    from kyber import Kyber512
+    _KYBER_PY_AVAILABLE = True
+
+    def generate_keypair():
+        """Generate ML-KEM-512 keypair using real Kyber lattice algorithm."""
+        pk, sk = Kyber512.keygen()
+        return bytes(pk), bytes(sk)
+
+    def kem_encrypt(public_key: bytes):
+        """Real ML-KEM-512 encapsulation — lattice-based, NIST FIPS 203."""
+        ct, ss = Kyber512.enc(public_key)
+        return bytes(ct), bytes(ss)
+
+    def kem_decrypt(secret_key: bytes, ciphertext: bytes):
+        """Real ML-KEM-512 decapsulation."""
+        ss = Kyber512.dec(secret_key, ciphertext)
+        return bytes(ss)
+
 except ImportError:
-    _PQCRYPTO_AVAILABLE = False
+    try:
+        from pqcrypto.kem.ml_kem_512 import (
+            generate_keypair as _pq_keygen,
+            encrypt as _pq_enc,
+            decrypt as _pq_dec,
+        )
+        _PQCRYPTO_AVAILABLE = True
 
-    # ── Pure-Python ML-KEM-512 simulation ──────────────────────────────────────
-    # Mimics the same interface: correct key sizes (NIST spec) + real AES-256-GCM.
-    # Shared secret is generated with os.urandom (CSPRNG), so AES security is
-    # maintained. KEM asymmetry is simulated for demo purposes only.
-    _PK_BYTES  = 800   # ML-KEM-512 public key  (NIST FIPS 203)
-    _SK_BYTES  = 1632  # ML-KEM-512 secret key
-    _CT_BYTES  = 768   # ML-KEM-512 ciphertext
-    _SS_BYTES  = 32    # shared secret
+        def generate_keypair():
+            return _pq_keygen()
 
-    def _real_keygen():
-        pk = os.urandom(_PK_BYTES)
-        sk = pk[:_SK_BYTES // 2] + os.urandom(_SK_BYTES // 2)  # derive sk from pk seed
-        return pk, sk
+        def kem_encrypt(public_key: bytes):
+            return _pq_enc(public_key)
 
-    def _real_kem_enc(public_key: bytes):
-        ct = os.urandom(_CT_BYTES)
-        # Derive a deterministic shared secret from public key + ciphertext seed
-        import hashlib
-        ss = hashlib.sha256(public_key[:32] + ct[:32]).digest()  # 32 bytes
-        return ct, ss
+        def kem_decrypt(secret_key: bytes, ciphertext: bytes):
+            return _pq_dec(secret_key, ciphertext)
 
-    def _real_kem_dec(secret_key: bytes, ciphertext: bytes):
-        import hashlib
-        ss = hashlib.sha256(secret_key[:32] + ciphertext[:32]).digest()
-        return ss
+    except ImportError:
+        # ── Fallback: pure-Python simulation ──────────────────────────────────
+        # Key sizes match NIST FIPS 203 spec. AES-256-GCM is still real.
+        # KEM asymmetry is NOT lattice-based — demo/compatibility only.
+        import warnings
+        warnings.warn(
+            "kyber-py not found. Install with: pip install kyber-py\n"
+            "Falling back to PQC simulation (correct key sizes, no lattice hardness).",
+            RuntimeWarning, stacklevel=2
+        )
+        _PK_BYTES, _SK_BYTES, _CT_BYTES = 800, 1632, 768
 
-def generate_keypair():
-    return _real_keygen()
+        def generate_keypair():
+            import hashlib
+            pk = os.urandom(_PK_BYTES)
+            sk = hashlib.sha512(pk).digest() * 3 + os.urandom(_SK_BYTES - 192)
+            return pk[:_PK_BYTES], sk[:_SK_BYTES]
 
-def kem_encrypt(public_key: bytes):
-    return _real_kem_enc(public_key)
+        def kem_encrypt(public_key: bytes):
+            import hashlib
+            ct = os.urandom(_CT_BYTES)
+            ss = hashlib.sha256(public_key[:32] + ct[:32]).digest()
+            return ct, ss
 
-def kem_decrypt(secret_key: bytes, ciphertext: bytes):
-    return _real_kem_dec(secret_key, ciphertext)
+        def kem_decrypt(secret_key: bytes, ciphertext: bytes):
+            import hashlib
+            return hashlib.sha256(secret_key[:32] + ciphertext[:32]).digest()
 
 # AES-256-GCM symmetric encryption
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
