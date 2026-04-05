@@ -178,7 +178,7 @@ cd QsentinelMesh
 
 ```bash
 # Create virtual environment
-python -m venv .venv
+py -3.11 -m venv .venv
 .venv\Scripts\activate      # Windows
 source .venv/bin/activate   # Linux/Mac
 
@@ -190,13 +190,13 @@ pip install torch==2.10.0+cu128 torchvision==0.25.0+cu128 \
 pip install -r requirements.txt
 
 # Verify the machine is ready for training / federated runs
-python scripts/healthcheck.py
+py -3.11 scripts/healthcheck.py
 ```
 
 ### 3. Run Dashboard
 
 ```bash
-streamlit run dashboard/app.py
+py -3.11 -m streamlit run dashboard/app.py
 ```
 
 Then open [http://localhost:8501](http://localhost:8501)
@@ -248,13 +248,13 @@ run_hybrid()
 1. On the server machine:
 
 ```bash
-python scripts/fed_server.py --port 8443 --rounds 5 --min-clients 2
+py -3.11 scripts/fed_server.py --port 8443 --rounds 5 --min-clients 2
 ```
 
 2. On hospital node machine A:
 
 ```bash
-python scripts/fed_client.py ^
+py -3.11 scripts/fed_client.py ^
   --server <SERVER_IP>:8443 ^
   --node-id 0 ^
   --data-source ctich ^
@@ -266,7 +266,7 @@ python scripts/fed_client.py ^
 3. On hospital node machine B:
 
 ```bash
-python scripts/fed_client.py ^
+py -3.11 scripts/fed_client.py ^
   --server <SERVER_IP>:8443 ^
   --node-id 1 ^
   --data-source ctich ^

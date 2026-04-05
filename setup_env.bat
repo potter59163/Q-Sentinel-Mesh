@@ -4,11 +4,11 @@ echo  Q-Sentinel Mesh — Environment Setup
 echo ============================================================
 
 :: Step 1: Create virtual environment
-python -m venv .venv
+py -3.11 -m venv .venv
 call .venv\Scripts\activate.bat
 
 :: Step 2: Upgrade pip
-python -m pip install --upgrade pip
+py -3.11 -m pip install --upgrade pip
 
 :: Step 3: Install PyTorch with CUDA 12.8 (RTX 5060 / Blackwell compatible)
 echo Installing PyTorch 2.10.0 with CUDA 12.8...
@@ -19,7 +19,7 @@ echo Installing remaining dependencies...
 pip install -r requirements.txt
 
 echo Verifying PQC backend...
-python -c "from src.federated.pqc_crypto import pqc_backend_name, pqc_backend_is_real; print('PQC backend:', pqc_backend_name(), '| real=', pqc_backend_is_real())"
+py -3.11 -c "from src.federated.pqc_crypto import pqc_backend_name, pqc_backend_is_real; print('PQC backend:', pqc_backend_name(), '| real=', pqc_backend_is_real())"
 
 echo.
 echo ============================================================
