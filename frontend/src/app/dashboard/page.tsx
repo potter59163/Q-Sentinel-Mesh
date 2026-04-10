@@ -23,12 +23,12 @@ function SummaryCard({
   valueColor?: string;
 }) {
   return (
-    <article className="q-soft-panel rounded-[1.2rem] px-4 py-4">
+    <article className="q-soft-panel q-summary-card rounded-[1.2rem] px-5 py-5">
       <div className="q-eyebrow mb-1">{label}</div>
-      <div className="text-[1.55rem] font-bold leading-none" style={{ color: valueColor ?? "var(--text-1)", fontFamily: "var(--font-mono)" }}>
+      <div className="text-[1.7rem] font-bold leading-none" style={{ color: valueColor ?? "var(--text-1)", fontFamily: "var(--font-mono)" }}>
         {value}
       </div>
-      <p className="mt-2 text-xs leading-5" style={{ color: "var(--text-2)" }}>
+      <p className="mt-2.5 text-[0.79rem] leading-6" style={{ color: "var(--text-2)" }}>
         {note}
       </p>
     </article>
@@ -94,6 +94,7 @@ function DiagnosticWorkspace() {
 
   return (
     <>
+      <div className="q-dashboard-stack">
       <section className="q-dashboard-intro">
         <div className="q-dashboard-intro-row">
           <div className="q-dashboard-intro-copy">
@@ -111,7 +112,7 @@ function DiagnosticWorkspace() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
         <SummaryCard
           label="Case"
           value={ctMeta ? ctMeta.filename : "Waiting"}
@@ -132,9 +133,9 @@ function DiagnosticWorkspace() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <section className="q-card overflow-hidden">
-          <div className="border-b px-5 py-4" style={{ borderColor: "var(--border)" }}>
+          <div className="border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
             <div className="q-eyebrow mb-1">CT Viewer</div>
             <div className="text-base font-semibold" style={{ color: "var(--text-1)" }}>
               Slice inspection
@@ -144,7 +145,7 @@ function DiagnosticWorkspace() {
             </p>
           </div>
 
-          <div className="p-4 sm:p-5">
+          <div className="p-5 sm:p-6">
             <CTViewer
               imageSrc={imageSrc}
               heatmapSrc={result?.heatmap_b64 ?? null}
@@ -180,7 +181,7 @@ function DiagnosticWorkspace() {
         </section>
 
         <section className="q-card overflow-hidden">
-          <div className="border-b px-5 py-4" style={{ borderColor: "var(--border)" }}>
+          <div className="border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
             <div className="q-eyebrow mb-1">AI Analysis</div>
             <div className="text-base font-semibold" style={{ color: "var(--text-1)" }}>
               Detection summary
@@ -190,7 +191,7 @@ function DiagnosticWorkspace() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 p-4 sm:p-5">
+          <div className="flex flex-col gap-5 p-5 sm:p-6">
             <button
               onClick={handleRunAI}
               disabled={!ctMeta || inferLoading}
@@ -204,7 +205,7 @@ function DiagnosticWorkspace() {
             </button>
 
             {!ctMeta && !result ? (
-              <div className="rounded-[1.25rem] border border-dashed px-6 py-10 text-center" style={{ background: "var(--surface-2)", borderColor: "var(--border-strong)" }}>
+              <div className="rounded-[1.25rem] border border-dashed px-6 py-12 text-center" style={{ background: "var(--surface-2)", borderColor: "var(--border-strong)" }}>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-2)" }}>
                   Load a CT scan to begin
                 </div>
@@ -245,6 +246,7 @@ function DiagnosticWorkspace() {
             ) : null}
           </div>
         </section>
+      </div>
       </div>
     </>
   );
