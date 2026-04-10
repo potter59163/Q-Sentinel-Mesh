@@ -7,9 +7,12 @@ APP_USER="ec2-user"
 ASSET_BUCKET="__ASSET_BUCKET__"
 
 dnf update -y
-dnf install -y git nginx python3.11 python3.11-pip gcc gcc-c++ make tar gzip libgomp mesa-libGL
-dnf module enable nodejs:20 -y || true
+dnf install -y git nginx python3.11 python3.11-pip gcc gcc-c++ make tar gzip libgomp mesa-libGL curl
+dnf remove -y nodejs nodejs-full-i18n npm || true
+curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
 dnf install -y nodejs
+node -v
+npm -v
 
 mkdir -p /opt
 cd /opt
@@ -24,7 +27,7 @@ chown -R "$APP_USER":"$APP_USER" "$APP_DIR"
 cd "$APP_DIR"
 
 mkdir -p weights data/samples
-if [ "$ASSET_BUCKET" != "__ASSET_BUCKET__" ]; then
+if [ -n "$ASSET_BUCKET" ] && [ "$ASSET_BUCKET" != "__ASSET_BUCKET__" ]; then
   aws s3 sync "s3://${ASSET_BUCKET}/weights/" weights/ || true
   aws s3 sync "s3://${ASSET_BUCKET}/data/samples/" data/samples/ || true
 fi

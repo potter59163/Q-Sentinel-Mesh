@@ -117,14 +117,14 @@ Recommended security group:
 - `80/tcp` from `0.0.0.0/0`
 - `22/tcp` only if you need SSH
 
-The helper user-data script is in:
+The helper deployment files are in:
 
 - [infra/ec2-user-data.sh](C:/Users/parip/Downloads/CEDT%20hack/q-sentinel-mesh/infra/ec2-user-data.sh)
 - [infra/upload-runtime-assets.ps1](C:/Users/parip/Downloads/CEDT%20hack/q-sentinel-mesh/infra/upload-runtime-assets.ps1)
 
 That script:
 
-- installs Node.js, Python 3.11, Nginx, and Git
+- installs Node.js 20, Python 3.11, Nginx, and Git
 - clones `https://github.com/potter59163/Q-Sentinel-Mesh.git`
 - syncs weights and demo assets from S3
 - installs frontend/backend dependencies
@@ -168,6 +168,27 @@ npx cdk deploy --require-approval never
 6. Open port `80`
 7. Wait for cloud-init to finish
 8. Open the EC2 public IP in the browser
+
+Practical CLI flow:
+
+```powershell
+aws s3 mb s3://q-sentinel-runtime-<account-id> --region ap-southeast-7
+powershell -ExecutionPolicy Bypass -File infra/upload-runtime-assets.ps1 q-sentinel-runtime-<account-id>
+```
+
+Then edit `infra/ec2-user-data.sh` and replace `__ASSET_BUCKET__` with that bucket name before launching the instance.
+
+Recommended instance shape for demo use:
+
+- `t3.large` minimum
+- `50 GB` gp3 root volume
+- IAM role with `AmazonS3ReadOnlyAccess` and `AmazonSSMManagedInstanceCore`
+
+After boot, verify:
+
+```bash
+curl http://<ec2-public-ip>/api/health
+```
 
 ## GitHub
 

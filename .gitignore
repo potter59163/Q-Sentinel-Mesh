@@ -61,3 +61,7 @@ weights/*.pth
 *.tmp
 *.bak
 data/samples/*.nii
+data/samples/manifest.json
+infra/*.rendered.sh
+infra/*-trust-policy.json
+results/*_new.json
