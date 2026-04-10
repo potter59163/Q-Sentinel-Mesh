@@ -23,6 +23,16 @@ env/
 .idea/
 *.swp
 
+# Node / Next.js
+node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/.git/
+*.tsbuildinfo
+infra/cdk/node_modules/
+infra/cdk/cdk.out/
+slide_imgs/
+
 # OS
 .DS_Store
 Thumbs.db

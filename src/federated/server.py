@@ -204,7 +204,7 @@ class QSentinelHybridStrategy(FedAvg):
         return aggregated_params, aggregated_metrics
 
     def aggregate_evaluate(self, server_round, results, failures):
-        """Aggregate evaluation metrics + log per-round AUC."""
+        """Aggregate evaluation metrics + log per-round AUC (global + per-hospital)."""
         loss, metrics = super().aggregate_evaluate(server_round, results, failures)
 
         total_examples = 0
@@ -222,6 +222,12 @@ class QSentinelHybridStrategy(FedAvg):
         if self.history and self.history[-1]["round"] == server_round:
             self.history[-1]["global_auc"] = float(avg_auc)
             self.history[-1]["global_loss"] = safe_loss
+            # ── Store per-hospital local AUC so dashboard node cards show real data ──
+            for _, eval_res in results:
+                hospital = eval_res.metrics.get("hospital", "")
+                local_auc = eval_res.metrics.get("auc", 0.5)
+                if hospital and hospital in self.history[-1].get("hospitals", {}):
+                    self.history[-1]["hospitals"][hospital]["local_auc"] = float(local_auc)
         else:
             self.history.append({
                 "round": server_round,

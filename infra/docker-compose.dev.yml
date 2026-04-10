@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEMO_PASSWORD=qsentinel2026
+      - JWT_SECRET=dev-secret-change-in-prod
+      - CORS_ORIGINS=["http://localhost:3000"]
+      - USE_S3=false
+      - QSENTINEL_ALLOW_INSECURE_PQC_FALLBACK=1
+    volumes:
+      - ../results:/app/results:ro
+      - ../weights:/app/weights:ro
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped

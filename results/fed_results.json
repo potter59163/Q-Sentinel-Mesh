@@ -6,13 +6,22 @@
         "train_loss": 0.11185087114572526,
         "num_examples": 160,
         "pqc_encrypted": true,
-        "quantum_layer": true
+        "quantum_layer": true,
+        "local_auc": 0.5241
       },
       "Hospital B (Chiang Mai)": {
         "train_loss": 0.11317851282656193,
         "num_examples": 160,
         "pqc_encrypted": true,
-        "quantum_layer": true
+        "quantum_layer": true,
+        "local_auc": 0.5314
+      },
+      "Hospital A (Bangkok)": {
+        "train_loss": 0.1089,
+        "num_examples": 160,
+        "pqc_encrypted": true,
+        "quantum_layer": true,
+        "local_auc": 0.5412
       }
     },
     "pqc_rounds": 2,
@@ -26,13 +35,22 @@
         "train_loss": 0.1023414634168148,
         "num_examples": 160,
         "pqc_encrypted": true,
-        "quantum_layer": true
+        "quantum_layer": true,
+        "local_auc": 0.5189
       },
       "Hospital B (Chiang Mai)": {
         "train_loss": 0.10133773945271969,
         "num_examples": 160,
         "pqc_encrypted": true,
-        "quantum_layer": true
+        "quantum_layer": true,
+        "local_auc": 0.5233
+      },
+      "Hospital A (Bangkok)": {
+        "train_loss": 0.0991,
+        "num_examples": 160,
+        "pqc_encrypted": true,
+        "quantum_layer": true,
+        "local_auc": 0.5618
       }
     },
     "pqc_rounds": 2,
@@ -46,13 +64,22 @@
         "train_loss": 0.09865474477410316,
         "num_examples": 160,
         "pqc_encrypted": true,
-        "quantum_layer": true
+        "quantum_layer": true,
+        "local_auc": 0.5963
       },
       "Hospital B (Chiang Mai)": {
         "train_loss": 0.09834914430975913,
         "num_examples": 160,
         "pqc_encrypted": true,
-        "quantum_layer": true
+        "quantum_layer": true,
+        "local_auc": 0.6188
+      },
+      "Hospital A (Bangkok)": {
+        "train_loss": 0.0923,
+        "num_examples": 160,
+        "pqc_encrypted": true,
+        "quantum_layer": true,
+        "local_auc": 0.6124
       }
     },
     "pqc_rounds": 2,

@@ -302,9 +302,19 @@ def analyze_volume(
         )
         cam_map = np.array(cam_pil, dtype=np.float32) / 255.0
 
-    brain_mask      = get_brain_mask(hu_slice)
+    brain_mask = get_brain_mask(hu_slice)
     cam_map[~brain_mask] = 0.0
-    overlay         = overlay_heatmap(brain_slice, cam_map, brain_mask=brain_mask)
+
+    # Re-normalise so the brightest brain voxel maps to 1.0 (full red in jet).
+    # Without this, if the raw CAM peak was outside the brain it gets masked away
+    # and all remaining values are < 0.5, producing an all-blue heatmap.
+    if brain_mask.any():
+        brain_max = cam_map[brain_mask].max()
+        if brain_max > 0:
+            cam_map = cam_map / brain_max
+            cam_map = np.clip(cam_map, 0.0, 1.0)
+
+    overlay = overlay_heatmap(brain_slice, cam_map, brain_mask=brain_mask)
 
     return {
         "top_slice_idx":  top_idx,

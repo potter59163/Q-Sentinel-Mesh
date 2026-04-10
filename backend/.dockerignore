@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+
+# Dev files
+.env
+.env.*
+*.log
+
+# Large data files - loaded from S3 at runtime
+data/rsna*
+data/ct*
+
+# Test files
+tests/
+scripts/
+
+# Frontend
+frontend/
+frontend/node_modules/
+
+# Infra
+infra/
+
+# Notebooks
+notebooks/
+
+# Local results (fresh copy from S3)
+# NOTE: keep results/ for fallback JSON data

@@ -897,6 +897,12 @@ with tab_fed:
     _fed_final = _meta.get("fed_final_auc", benchmark_data["qsentinel_auc"][-1])
     _improvement = (_fed_final - _baseline_best) * 100
 
+    # ── Load real fed results early so summary cards reflect actual run ────────
+    _fed_preview = load_fed_results(ROOT / "results/fed_results.json")
+    _real_rounds = len(_fed_preview)
+    _real_nodes  = max((len(r.get("hospitals", {})) for r in _fed_preview), default=0) if _fed_preview else 0
+    _fed_profile_str = f"{_real_rounds}R / {_real_nodes}N" if _real_rounds else "5R / 3N"
+
     st.markdown(
         f"""
         <div class="dashboard-intro">
@@ -938,7 +944,7 @@ with tab_fed:
             </div>
             <div class="summary-card">
                 <div class="summary-label">Federation Profile</div>
-                <div class="summary-value accent">5R / 3N</div>
+                <div class="summary-value accent">{_fed_profile_str}</div>
                 <div class="summary-note">FedAvg rounds with Bangkok, Chiang Mai, and Khon Kaen participating.</div>
             </div>
         </div>
@@ -1012,7 +1018,7 @@ with tab_fed:
             _b_end = benchmark_data["qsentinel_auc"][-1] * 100
             render_live_simulation_animation(baseline_start=_b_start, final_fed=_b_end)
 
-    fed_history = load_fed_results(ROOT / "results/fed_results.json")
+    fed_history = _fed_preview  # already loaded above; avoids double disk read
 
     col_rounds, col_nodes = st.columns([3, 2], gap="large")
 

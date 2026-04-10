@@ -178,7 +178,13 @@ def render_hospital_breakdown_chart(fed_history: list[dict]):
 
     rounds = [r.get("round", i + 1) for i, r in enumerate(fed_history)]
     hosp_colors = [COLORS["hospital_a"], COLORS["hospital_b"], COLORS["hospital_c"]]
-    short_names = ["Bangkok", "Chiang Mai", "Khon Kaen"]
+
+    # Map full hospital key → short city name (handles any subset of nodes)
+    _CITY_MAP = {
+        "Hospital A (Bangkok)":    "Bangkok",
+        "Hospital B (Chiang Mai)": "Chiang Mai",
+        "Hospital C (Khon Kaen)":  "Khon Kaen",
+    }
 
     fig, ax = plt.subplots(figsize=(10, 3.5), facecolor=COLORS["bg"])
 
@@ -195,7 +201,7 @@ def render_hospital_breakdown_chart(fed_history: list[dict]):
             aucs.append(raw * 100)
 
         color = hosp_colors[idx % len(hosp_colors)]
-        label = short_names[idx] if idx < len(short_names) else hkey
+        label = _CITY_MAP.get(hkey, hkey)  # match by full key, not position
         ax.plot(rounds, aucs, "o-", color=color, linewidth=2, markersize=6, label=label)
         # Annotate last point
         ax.annotate(
@@ -216,10 +222,16 @@ def render_hospital_breakdown_chart(fed_history: list[dict]):
         label=T("global_fedavg"), zorder=5,
     )
 
-    _auc_all = [
-        r["hospitals"].get(h, {}).get("local_auc", 0) * 100
-        for r in fed_history for h in hospital_keys
-    ] + global_aucs
+    import math as _m
+    _auc_all = []
+    for r in fed_history:
+        for h in hospital_keys:
+            v = r["hospitals"].get(h, {}).get("local_auc", None)
+            if v is not None and not (isinstance(v, float) and _m.isnan(v)):
+                _auc_all.append(v * 100)
+    _auc_all += [g for g in global_aucs if not (isinstance(g, float) and _m.isnan(g))]
+    if not _auc_all:
+        _auc_all = [50.0]
     ax.set_ylim(max(0, min(_auc_all) - 4), min(100, max(_auc_all) + 4))
     ax.set_xticks(rounds)
     ax.set_xlabel(T("fed_round"))

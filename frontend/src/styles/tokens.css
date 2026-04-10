@@ -1,0 +1,47 @@
+/* Q-Sentinel Mesh — Blush Clinical Design Tokens */
+/* Translated from dashboard/assets/styles.css */
+
+:root {
+  --bg: #fff8fb;
+  --surface: #fffdfd;
+  --surface-2: #fff3f7;
+  --surface-3: #fde7ef;
+  --border: #ecd9e2;
+  --border-strong: #dfbfcd;
+
+  --text-1: #412b34;
+  --text-2: #6d5360;
+  --text-3: #9c7f8c;
+
+  --accent: #c25b86;
+  --accent-strong: #a8416d;
+  --accent-soft: #f1c7d8;
+  --accent-light: #fdeaf1;
+
+  --success: #4c8f6b;
+  --success-soft: #b7dec6;
+  --success-light: #edfaf3;
+
+  --warning: #bf7a45;
+  --warning-soft: #f5d9bc;
+  --warning-light: #fff8f0;
+
+  --info: #4a7fc1;
+  --info-soft: #c2d9f5;
+  --info-light: #edf4ff;
+
+  --shadow-soft: 0 14px 34px rgba(194, 91, 134, 0.08);
+  --shadow-card: 0 2px 8px rgba(65, 43, 52, 0.06);
+  --shadow-hover: 0 8px 24px rgba(194, 91, 134, 0.14);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 18px;
+
+  /* Chart colors (matching fed_chart.py COLORS dict) */
+  --chart-baseline: #9d7990;
+  --chart-qsentinel: #c25b86;
+  --chart-hospital-a: #4a7fc1;
+  --chart-hospital-b: #4c8f6b;
+  --chart-hospital-c: #bf7a45;
+}
