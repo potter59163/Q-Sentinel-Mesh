@@ -7,7 +7,7 @@ APP_USER="ec2-user"
 ASSET_BUCKET="__ASSET_BUCKET__"
 
 dnf update -y
-dnf install -y git nginx python3.11 python3.11-pip gcc gcc-c++ make tar gzip
+dnf install -y git nginx python3.11 python3.11-pip gcc gcc-c++ make tar gzip libgomp mesa-libGL
 dnf module enable nodejs:20 -y || true
 dnf install -y nodejs
 
