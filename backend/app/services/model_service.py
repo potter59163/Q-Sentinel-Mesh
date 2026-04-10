@@ -41,9 +41,10 @@ class ModelService:
                 from src.models.cnn_encoder import BaselineClassifier
                 model = BaselineClassifier(pretrained=False)
                 weights_path = self._find_weights(["finetuned_ctich.pth", "high_acc_b4.pth"])
-                if weights_path:
-                    state = torch.load(weights_path, map_location=self.device, weights_only=True)
-                    model.load_state_dict(state, strict=False)
+                if not weights_path:
+                    raise FileNotFoundError("Baseline weights not found (finetuned_ctich.pth or high_acc_b4.pth)")
+                state = torch.load(weights_path, map_location=self.device, weights_only=True)
+                model.load_state_dict(state, strict=False)
                 model.eval()
                 model.to(self.device)
                 self.baseline_model = model
@@ -57,9 +58,10 @@ class ModelService:
                 from src.models.hybrid_model import HybridQSentinel
                 hybrid = HybridQSentinel(pretrained=False)
                 weights_path = self._find_weights(["hybrid_qsentinel.pth"])
-                if weights_path:
-                    state = torch.load(weights_path, map_location=self.device, weights_only=True)
-                    hybrid.load_state_dict(state, strict=False)
+                if not weights_path:
+                    raise FileNotFoundError("Hybrid weights not found (hybrid_qsentinel.pth)")
+                state = torch.load(weights_path, map_location=self.device, weights_only=True)
+                hybrid.load_state_dict(state, strict=False)
                 hybrid.eval()
                 hybrid.to(self.device)
                 self.hybrid_model = hybrid

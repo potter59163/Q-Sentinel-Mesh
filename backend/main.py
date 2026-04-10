@@ -12,7 +12,7 @@ from app.core.rate_limit import limiter
 from app.services.model_service import model_service
 
 # Routes
-from app.api.routes import auth, health, metrics, federated, thresholds, ct, predict, pqc
+from app.api.routes import health, metrics, federated, thresholds, ct, predict, pqc
 
 
 @asynccontextmanager
@@ -44,7 +44,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_methods=["GET", "POST"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["Content-Type"],
     allow_credentials=False,
 )
 
@@ -59,7 +59,6 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(health.router)
-app.include_router(auth.router)
 app.include_router(metrics.router)
 app.include_router(federated.router)
 app.include_router(thresholds.router)

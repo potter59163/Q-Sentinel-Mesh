@@ -1,6 +1,5 @@
 import re
-from fastapi import APIRouter, Depends, HTTPException, Request
-from app.core.dependencies import get_current_user
+from fastapi import APIRouter, HTTPException, Request
 from app.core.rate_limit import limiter
 from app.models.ct import PredictRequest, PredictResponse
 from app.services.ct_service import ct_service
@@ -16,7 +15,6 @@ S3_KEY_PATTERN = re.compile(r"^ct-uploads/[0-9a-f\-]{36}/[\w.\-]+$")
 async def predict(
     request: Request,
     body: PredictRequest,
-    _: str = Depends(get_current_user),
 ):
     if not S3_KEY_PATTERN.match(body.s3_key):
         raise HTTPException(status_code=422, detail="Invalid s3_key format")

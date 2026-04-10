@@ -1,11 +1,5 @@
 // Q-Sentinel Mesh — TypeScript interfaces matching all API response shapes
 
-export interface TokenResponse {
-  access_token: string;
-  token_type: "bearer";
-  expires_in: number;
-}
-
 export interface HealthResponse {
   status: "ok";
   model_loaded: boolean;
