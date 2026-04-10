@@ -6,11 +6,10 @@ REPO_URL="https://github.com/potter59163/Q-Sentinel-Mesh.git"
 APP_USER="ec2-user"
 ASSET_BUCKET="__ASSET_BUCKET__"
 
-dnf update -y
-dnf install -y git nginx python3.11 python3.11-pip gcc gcc-c++ make tar gzip libgomp mesa-libGL curl
+dnf install -y git nginx python3.11 python3.11-pip gcc gcc-c++ make tar gzip libgomp mesa-libGL
 dnf remove -y nodejs nodejs-full-i18n npm || true
 curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
-dnf install -y nodejs
+dnf install -y --allowerasing nodejs
 node -v
 npm -v
 
