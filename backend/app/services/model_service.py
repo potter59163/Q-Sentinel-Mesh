@@ -3,8 +3,8 @@ Imports src.xai.gradcam.analyze_volume() directly — no rewrite needed.
 """
 import asyncio
 import base64
+import importlib.util
 import io
-import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -20,6 +20,17 @@ from app.models.ct import PredictResponse
 
 SUBTYPES = ["epidural", "intraparenchymal", "intraventricular", "subarachnoid", "subdural", "any"]
 WEIGHTS_DIR = REPO_ROOT / "weights"
+DEMO_SAMPLES_DIR = REPO_ROOT / "data" / "samples"
+REQUIRED_WEIGHTS = ["finetuned_ctich.pth", "high_acc_b4.pth", "hybrid_qsentinel.pth"]
+REQUIRED_RUNTIME_MODULES = [
+    "torch",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "nibabel",
+    "pydicom",
+    "gast",
+]
 
 
 class ModelService:
@@ -80,6 +91,34 @@ class ModelService:
                 return p
         return None
 
+    def get_readiness(self) -> dict:
+        missing_weights = [name for name in REQUIRED_WEIGHTS if not (WEIGHTS_DIR / name).exists()]
+        missing_modules = [
+            name for name in REQUIRED_RUNTIME_MODULES if importlib.util.find_spec(name) is None
+        ]
+        demo_case_count = len(list(DEMO_SAMPLES_DIR.glob("*.nii"))) if DEMO_SAMPLES_DIR.exists() else 0
+
+        issues = []
+        if missing_weights:
+            issues.append("missing_weights")
+        if missing_modules:
+            issues.append("missing_runtime_modules")
+        if not (self.baseline_loaded or self.hybrid_loaded):
+            issues.append("no_models_loaded")
+
+        ready = len(issues) == 0
+        return {
+            "ready": ready,
+            "status": "ready" if ready else "degraded",
+            "device": self.device,
+            "baseline_loaded": self.baseline_loaded,
+            "hybrid_loaded": self.hybrid_loaded,
+            "missing_weights": missing_weights,
+            "missing_modules": missing_modules,
+            "demo_case_count": demo_case_count,
+            "issues": issues,
+        }
+
     async def analyze(
         self,
         volume: np.ndarray,
@@ -106,9 +145,14 @@ class ModelService:
     ) -> PredictResponse:
         try:
             from src.xai.gradcam import analyze_volume
-            model = self.hybrid_model if (model_type == "hybrid" and self.hybrid_loaded) else self.baseline_model
-            if model is None:
-                return self._mock_response(slice_idx)
+            if model_type == "hybrid":
+                if not self.hybrid_loaded or self.hybrid_model is None:
+                    raise RuntimeError("Hybrid model is unavailable on this server")
+                model = self.hybrid_model
+            else:
+                if not self.baseline_loaded or self.baseline_model is None:
+                    raise RuntimeError("Baseline model is unavailable on this server")
+                model = self.baseline_model
 
             target = None if auto_triage else slice_idx
             result = analyze_volume(
@@ -160,20 +204,7 @@ class ModelService:
             )
         except Exception as e:
             print(f"[ModelService] Inference error: {e}")
-            return self._mock_response(slice_idx)
-
-    def _mock_response(self, slice_idx: int) -> PredictResponse:
-        """Fallback mock when model isn't loaded."""
-        import random
-        probs = {k: round(random.uniform(0.02, 0.15), 3) for k in SUBTYPES}
-        probs["any"] = round(random.uniform(0.1, 0.4), 3)
-        return PredictResponse(
-            probabilities=probs,
-            heatmap_b64="",
-            top_class="any",
-            confidence=probs["any"],
-            slice_used=slice_idx,
-        )
+            raise RuntimeError(str(e))
 
     def _encode_img(self, img) -> str:
         if img is None:

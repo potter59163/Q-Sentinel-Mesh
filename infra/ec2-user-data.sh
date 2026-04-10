@@ -56,6 +56,9 @@ WorkingDirectory=/opt/q-sentinel-mesh/backend
 Environment=PYTHONUNBUFFERED=1
 Environment=AWS_REGION=ap-southeast-7
 Environment=USE_S3=false
+Environment=APP_DIR=/opt/q-sentinel-mesh
+Environment=ASSET_BUCKET=${ASSET_BUCKET}
+ExecStartPre=/bin/bash -lc '/opt/q-sentinel-mesh/scripts/sync_runtime_assets.sh'
 ExecStart=/opt/q-sentinel-mesh/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1
 Restart=always
 RestartSec=5

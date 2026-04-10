@@ -23,11 +23,14 @@ async def predict(
     if volume is None:
         raise HTTPException(status_code=404, detail="CT volume not found. Please upload again.")
 
-    result = await model_service.analyze(
-        volume=volume,
-        slice_idx=body.slice_idx,
-        model_type=body.model_type,
-        threshold=body.threshold or 0.15,
-        auto_triage=body.auto_triage,
-    )
-    return result
+    try:
+        result = await model_service.analyze(
+            volume=volume,
+            slice_idx=body.slice_idx,
+            model_type=body.model_type,
+            threshold=body.threshold or 0.15,
+            auto_triage=body.auto_triage,
+        )
+        return result
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=f"AI inference unavailable: {exc}")

@@ -25,12 +25,12 @@ This repo now has 4 main parts:
 - FastAPI
 - loads baseline and hybrid weights from `weights/`
 - serves:
-  - `/api/auth/*`
   - `/api/ct/*`
   - `/api/predict/*`
   - `/api/federated/*`
   - `/api/pqc/*`
   - `/api/health`
+  - `/api/health/ready`
 
 ### ML / Federated
 
@@ -71,6 +71,7 @@ Open:
 
 - frontend: `http://localhost:3000`
 - backend health: `http://localhost:8000/api/health`
+- backend readiness: `http://localhost:8000/api/health/ready`
 
 ## Production Notes
 
@@ -188,6 +189,13 @@ After boot, verify:
 
 ```bash
 curl http://<ec2-public-ip>/api/health
+curl http://<ec2-public-ip>/api/health/ready
+```
+
+Run post-deploy smoke checks:
+
+```bash
+python scripts/post_deploy_smoke.py --base-url http://<ec2-public-ip>
 ```
 
 ## GitHub
@@ -214,6 +222,8 @@ Backend health:
 
 ```bat
 curl http://localhost:8000/api/health
+curl http://localhost:8000/api/health/ready
+py -3.11 scripts\post_deploy_smoke.py --base-url http://localhost:8000
 ```
 
 ## Hackathon Context
