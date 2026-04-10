@@ -56,7 +56,6 @@ WorkingDirectory=/opt/q-sentinel-mesh/backend
 Environment=PYTHONUNBUFFERED=1
 Environment=AWS_REGION=ap-southeast-7
 Environment=USE_S3=false
-Environment=CORS_ORIGINS=["*"]
 ExecStart=/opt/q-sentinel-mesh/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1
 Restart=always
 RestartSec=5
