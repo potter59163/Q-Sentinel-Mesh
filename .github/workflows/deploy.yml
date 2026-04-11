@@ -16,7 +16,7 @@ env:
   BACKEND_SERVICE: q-sentinel-backend
   FRONTEND_ECR: q-sentinel-frontend
   FRONTEND_SERVICE: q-sentinel-frontend
-  NEXT_PUBLIC_API_URL: http://q-sentinel-alb-1031428004.ap-southeast-7.elb.amazonaws.com
+  NEXT_PUBLIC_API_URL: https://d3grijenetuyp6.cloudfront.net
 
 jobs:
   deploy-backend:
