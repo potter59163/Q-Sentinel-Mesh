@@ -17,6 +17,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from app.models.ct import PredictResponse
+from app.services.runtime_assets import runtime_assets_service
 
 SUBTYPES = ["epidural", "intraparenchymal", "intraventricular", "subarachnoid", "subdural", "any"]
 WEIGHTS_DIR = REPO_ROOT / "weights"
@@ -97,14 +98,19 @@ class ModelService:
             name for name in REQUIRED_RUNTIME_MODULES if importlib.util.find_spec(name) is None
         ]
         demo_case_count = len(list(DEMO_SAMPLES_DIR.glob("*.nii"))) if DEMO_SAMPLES_DIR.exists() else 0
+        runtime_assets = runtime_assets_service.get_status()
 
         issues = []
         if missing_weights:
             issues.append("missing_weights")
         if missing_modules:
             issues.append("missing_runtime_modules")
+        if demo_case_count == 0:
+            issues.append("missing_demo_cases")
         if not (self.baseline_loaded or self.hybrid_loaded):
             issues.append("no_models_loaded")
+        if runtime_assets["errors"]:
+            issues.append("runtime_asset_sync_failed")
 
         ready = len(issues) == 0
         return {
@@ -116,6 +122,7 @@ class ModelService:
             "missing_weights": missing_weights,
             "missing_modules": missing_modules,
             "demo_case_count": demo_case_count,
+            "runtime_assets": runtime_assets,
             "issues": issues,
         }
 

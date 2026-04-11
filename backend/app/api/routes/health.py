@@ -10,7 +10,11 @@ async def health():
     readiness = model_service.get_readiness()
     return {
         "status": "ok",
+        "readiness_status": readiness["status"],
         "model_loaded": readiness["baseline_loaded"] or readiness["hybrid_loaded"],
+        "demo_case_count": readiness["demo_case_count"],
+        "runtime_assets": readiness["runtime_assets"],
+        "issues": readiness["issues"],
         "device": model_service.device,
     }
 

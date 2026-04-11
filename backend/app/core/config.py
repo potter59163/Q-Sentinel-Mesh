@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     AWS_REGION: str = "ap-southeast-7"
     S3_BUCKET: str = ""
     WEIGHTS_S3_PREFIX: str = "weights/"
+    DEMO_SAMPLES_S3_PREFIX: str = "data/samples/"
     RESULTS_S3_PREFIX: str = "results/"
     CT_UPLOAD_S3_PREFIX: str = "ct-uploads/"
 

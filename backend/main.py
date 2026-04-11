@@ -10,6 +10,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.services.model_service import model_service
+from app.services.runtime_assets import runtime_assets_service
 
 # Routes
 from app.api.routes import health, metrics, federated, thresholds, ct, predict, pqc
@@ -18,6 +19,7 @@ from app.api.routes import health, metrics, federated, thresholds, ct, predict, 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load ML models on startup
+    runtime_assets_service.ensure_runtime_assets()
     print("[Startup] Loading ML models...")
     model_service.load_models()
     print("[Startup] Ready.")
