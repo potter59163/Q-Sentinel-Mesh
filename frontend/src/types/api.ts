@@ -1,4 +1,4 @@
-// Q-Sentinel Mesh — TypeScript interfaces matching all API response shapes
+// Q-Sentinel Mesh - TypeScript interfaces matching all API response shapes
 
 export interface HealthResponse {
   status: "ok";

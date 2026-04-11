@@ -76,7 +76,7 @@ export default function CTViewer({
         </div>
       </div>
 
-      <div className="relative bg-black/95 aspect-square min-h-[260px] sm:min-h-[320px]">
+      <div className="relative aspect-square min-h-[260px] bg-black/95 sm:min-h-[320px]">
         {loading ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 px-6">
             <div className="h-28 w-28 animate-pulse rounded-full border" style={{ borderColor: "rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.08)" }} />
@@ -120,7 +120,7 @@ export default function CTViewer({
               className="absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-semibold"
               style={{ background: "rgba(16,16,20,0.72)", color: "white", fontFamily: "var(--font-mono)" }}
             >
-              Slice {sliceIdx + 1}/{sliceCount} · {currentWindow.toUpperCase()}
+              Slice {sliceIdx + 1}/{sliceCount} | {currentWindow.toUpperCase()}
             </div>
             <div className="absolute right-3 top-3 flex flex-wrap gap-2">
               <span className="rounded-full px-3 py-1 text-[11px] font-semibold" style={{ background: "rgba(16,16,20,0.72)", color: "white" }}>

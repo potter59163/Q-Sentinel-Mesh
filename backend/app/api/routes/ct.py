@@ -1,12 +1,14 @@
 import re
 import uuid
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, UploadFile, File, Request
+
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+
 from app.core.rate_limit import limiter
-from app.models.ct import CTUploadResponse, CTWindowRequest, CTWindowResponse, HUStats
+from app.models.ct import CTUploadResponse, CTWindowRequest, CTWindowResponse
 from app.services.ct_service import ct_service
 
-# ct.py is at backend/app/api/routes/ct.py → go up 5 levels to repo root
+# ct.py is at backend/app/api/routes/ct.py -> go up 5 levels to repo root.
 REPO_ROOT = Path(__file__).parent.parent.parent.parent.parent
 
 router = APIRouter(prefix="/api/ct", tags=["ct"])
@@ -59,8 +61,13 @@ async def list_demo_patients(
     samples_dir = REPO_ROOT / "data" / "samples"
     if not samples_dir.is_dir():
         return {"patients": []}
-    patients = sorted(p.stem for p in samples_dir.glob("*.nii"))
-    return {"patients": patients}
+
+    patient_ids = {
+        path.name[:-7] if path.name.endswith(".nii.gz") else path.stem
+        for path in samples_dir.iterdir()
+        if path.is_file() and (path.name.endswith(".nii") or path.name.endswith(".nii.gz"))
+    }
+    return {"patients": sorted(patient_ids)}
 
 
 @router.get("/demo/{patient_id}", response_model=CTUploadResponse)
@@ -69,12 +76,15 @@ async def get_demo_patient(
     patient_id: str,
     request: Request,
 ):
-    nii_path = REPO_ROOT / "data" / "samples" / f"{patient_id}.nii"
-    if not nii_path.is_file():
+    samples_dir = REPO_ROOT / "data" / "samples"
+    nii_path = samples_dir / f"{patient_id}.nii"
+    nii_gz_path = samples_dir / f"{patient_id}.nii.gz"
+    source_path = nii_path if nii_path.is_file() else nii_gz_path
+    if not source_path.is_file():
         raise HTTPException(status_code=404, detail="Demo patient not found")
 
-    content = nii_path.read_bytes()
-    filename = f"{patient_id}.nii"
-    s3_key = f"ct-uploads/{uuid.uuid4()}/demo-{patient_id}.nii"
+    content = source_path.read_bytes()
+    filename = source_path.name
+    s3_key = f"ct-uploads/{uuid.uuid4()}/demo-{filename}"
     meta = ct_service.load_ct(content, filename, s3_key)
     return meta

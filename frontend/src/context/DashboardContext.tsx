@@ -1,6 +1,7 @@
 "use client";
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
-import type { ModelType, CTUploadResponse, PredictResponse } from "@/types/api";
+
+import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import type { CTUploadResponse, ModelType, PredictResponse } from "@/types/api";
 
 interface DashboardContextType {
   modelType: ModelType;
@@ -15,7 +16,7 @@ interface DashboardContextType {
   setAutoTriage: (v: boolean) => void;
   scansAnalyzed: number;
   incrementScans: () => void;
-  // For PDF export — saved after successful AI analysis
+  // For PDF export - saved after successful AI analysis.
   lastResult: PredictResponse | null;
   setLastResult: (v: PredictResponse | null) => void;
   lastImageSrc: string | null;

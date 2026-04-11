@@ -58,6 +58,7 @@ function DiagnosticWorkspace() {
   const ctKey = ctMeta?.s3_key ?? "";
   const computedSliceIdx = ctMeta?.slice_count ? Math.floor((ctMeta.slice_count - 1) / 2) : 0;
   const sliceIdx = ctKey && sliceOverrides[ctKey] !== undefined ? sliceOverrides[ctKey] : computedSliceIdx;
+
   const setSliceIdx = (idx: number) => {
     const key = ctKey || "none";
     setSliceOverrides((prev) => ({ ...prev, [key]: idx }));
@@ -81,6 +82,19 @@ function DiagnosticWorkspace() {
   }, [ctMeta?.s3_key, modelType, reset, setLastHeatmapSrc, setLastImageSrc, setLastResult]);
 
   useEffect(() => {
+    if (result) {
+      setLastResult(result);
+      setLastHeatmapSrc(result.heatmap_b64 ?? null);
+    }
+  }, [result, setLastHeatmapSrc, setLastResult]);
+
+  useEffect(() => {
+    if (result && imageSrc) {
+      setLastImageSrc(imageSrc);
+    }
+  }, [imageSrc, result, setLastImageSrc]);
+
+  useEffect(() => {
     if (inferError) toast.error(inferError);
   }, [inferError]);
 
@@ -89,6 +103,7 @@ function DiagnosticWorkspace() {
       toast.warning("Load a CT scan first.");
       return;
     }
+
     incrementScans();
     const res = await predict({
       s3_key: ctMeta.s3_key,
@@ -97,11 +112,9 @@ function DiagnosticWorkspace() {
       threshold,
       auto_triage: autoTriage,
     });
+
     if (res) {
       setSliceIdx(res.slice_used);
-      setLastResult(res);
-      setLastImageSrc(imageSrc ?? null);
-      setLastHeatmapSrc(res.heatmap_b64 ?? null);
     }
   }
 
@@ -113,14 +126,13 @@ function DiagnosticWorkspace() {
         "Device: CPU",
         autoTriage ? "Auto-triage" : "Manual slice",
         `Threshold ${threshold.toFixed(2)}`,
-        lastLatencyMs !== null ? `Latency ${lastLatencyMs} ms` : "Latency —",
-        lastRequestId ? `Request ${lastRequestId}` : "Request —",
+        lastLatencyMs !== null ? `Latency ${lastLatencyMs} ms` : "Latency -",
+        lastRequestId ? `Request ${lastRequestId}` : "Request -",
       ]
     : [];
 
   return (
-    <>
-      <div className="q-dashboard-stack">
+    <div className="q-dashboard-stack">
       <section className="q-dashboard-intro">
         <div className="q-dashboard-intro-row">
           <div className="q-dashboard-intro-copy">
@@ -379,8 +391,7 @@ function DiagnosticWorkspace() {
           </div>
         </section>
       </div>
-      </div>
-    </>
+    </div>
   );
 }
 

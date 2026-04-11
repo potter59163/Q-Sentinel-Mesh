@@ -57,13 +57,13 @@ export default function Sidebar() {
   const [demoPatients, setDemoPatients] = useState<string[]>([]);
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  // Detect mobile & auto-collapse on small screens
   useEffect(() => {
     function check() {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
       if (mobile) setOpen(false);
     }
+
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -78,6 +78,7 @@ export default function Sidebar() {
   const onDrop = useCallback(async (accepted: File[]) => {
     if (!accepted[0]) return;
     setUploading(true);
+
     try {
       const form = new FormData();
       form.append("file", accepted[0]);
@@ -86,7 +87,7 @@ export default function Sidebar() {
         timeout: 120_000,
       });
       setCtMeta(res.data);
-      toast.success(`CT loaded · ${res.data.slice_count} slices ready`);
+      toast.success(`CT loaded | ${res.data.slice_count} slices ready`);
     } catch (err) {
       toast.error(getApiErrorMessage(err));
     } finally {
@@ -99,7 +100,7 @@ export default function Sidebar() {
     try {
       const res = await api.get<CTUploadResponse>(`/api/ct/demo/${pid}`);
       setCtMeta(res.data);
-      toast.success(`Patient ${pid} loaded · ${res.data.slice_count} slices`);
+      toast.success(`Patient ${pid} loaded | ${res.data.slice_count} slices`);
     } catch {
       toast.error(`Could not load demo patient ${pid}`);
     } finally {
@@ -108,12 +109,17 @@ export default function Sidebar() {
   }
 
   async function handleExportPDF() {
-    if (!lastResult) { toast.warning("Run AI analysis first."); return; }
+    if (!lastResult) {
+      toast.warning("Run AI analysis first.");
+      return;
+    }
+
     setPdfLoading(true);
     try {
       const { generateReportPDF } = await import("@/lib/pdfExport");
       await generateReportPDF({
-        hospital, modelType,
+        hospital,
+        modelType,
         topClass: lastResult.top_class,
         confidence: lastResult.confidence,
         sliceUsed: lastResult.slice_used,
@@ -138,7 +144,6 @@ export default function Sidebar() {
     disabled: uploading,
   });
 
-  // Sidebar CSS class logic
   const sidebarClass = [
     "q-sidebar-v2",
     !open && !isMobile ? "q-sidebar-icon-only" : "",
@@ -149,12 +154,10 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile backdrop */}
       {isMobile && open && (
         <div className="q-sb-backdrop" onClick={() => setOpen(false)} />
       )}
 
-      {/* Mobile floating hamburger button (only when sidebar is hidden) */}
       {isMobile && !open && (
         <button
           className="q-sb-float-btn"
@@ -166,16 +169,13 @@ export default function Sidebar() {
       )}
 
       <aside className={sidebarClass}>
-
-        {/* ── Top row: Brand + Toggle ─────────────────────────────────── */}
-        <div className={`flex items-center mb-3 gap-2 ${isIconOnly ? "flex-col" : "justify-between"}`}>
-          {/* Brand */}
-          <div className={`flex items-center gap-2 min-w-0 ${isIconOnly ? "flex-col" : ""}`}>
-            <span className="text-2xl shrink-0">🧠</span>
+        <div className={`mb-3 flex items-center gap-2 ${isIconOnly ? "flex-col" : "justify-between"}`}>
+          <div className={`flex min-w-0 items-center gap-2 ${isIconOnly ? "flex-col" : ""}`}>
+            <span className="shrink-0 text-2xl">🧠</span>
             {!isIconOnly && (
               <div className="min-w-0">
                 <div
-                  className="text-[0.95rem] font-bold truncate"
+                  className="truncate text-[0.95rem] font-bold"
                   style={{ color: "var(--text-1)", fontFamily: "var(--font-heading-stack)" }}
                 >
                   Q-Sentinel
@@ -190,7 +190,6 @@ export default function Sidebar() {
             )}
           </div>
 
-          {/* Toggle button */}
           <button
             className="q-sb-toggle shrink-0"
             onClick={() => setOpen(!open)}
@@ -200,9 +199,8 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* ONLINE badge */}
         {!isIconOnly && (
-          <div className="flex justify-center mb-1">
+          <div className="mb-1 flex justify-center">
             <span className="q-pill q-pill-success text-[0.7rem]">● ONLINE</span>
           </div>
         )}
@@ -216,12 +214,10 @@ export default function Sidebar() {
           </span>
         )}
 
-        {/* ── All expanded content ────────────────────────────────────── */}
         {!isIconOnly && (
           <>
             <Divider />
 
-            {/* System Status */}
             <SectionLabel>System Status</SectionLabel>
             <StatusRow label="Compute" value="CPU Mode" />
             <StatusRow
@@ -238,7 +234,6 @@ export default function Sidebar() {
 
             <Divider />
 
-            {/* Hospital Node */}
             <SectionLabel>Hospital Node</SectionLabel>
             <select
               value={hospital}
@@ -251,7 +246,6 @@ export default function Sidebar() {
 
             <Divider />
 
-            {/* Demo Cases */}
             <SectionLabel>Patient</SectionLabel>
             {demoPatients.length > 0 && (
               <div className="mb-2">
@@ -263,11 +257,11 @@ export default function Sidebar() {
                     color: "var(--info)",
                   }}
                 >
-                  🧪 CT-ICH dataset · {demoPatients.length} cases
+                  🧪 CT-ICH dataset | {demoPatients.length} cases
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {demoPatients.map((pid) => {
-                    const active = ctMeta?.filename === `${pid}.nii`;
+                    const active = ctMeta?.filename?.startsWith(pid) ?? false;
                     return (
                       <button
                         key={pid}
@@ -290,7 +284,6 @@ export default function Sidebar() {
               </div>
             )}
 
-            {/* CT loaded badge */}
             {ctMeta && (
               <div
                 className="rounded-[0.85rem] border px-2.5 py-2 text-xs"
@@ -301,21 +294,20 @@ export default function Sidebar() {
                   className="mt-0.5 truncate"
                   style={{ color: "var(--text-2)", fontFamily: "var(--font-mono-stack)" }}
                 >
-                  {ctMeta.filename} · {ctMeta.slice_count} slices
+                  {ctMeta.filename} | {ctMeta.slice_count} slices
                 </div>
               </div>
             )}
 
             <Divider />
 
-            {/* AI Model */}
             <SectionLabel>AI Model</SectionLabel>
             {(["baseline", "hybrid"] as const).map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setModelType(m)}
-                className="flex w-full items-center gap-2.5 rounded-[0.85rem] border px-3 py-2.5 text-left transition-all text-sm font-medium"
+                className="mb-[0.4rem] flex w-full items-center gap-2.5 rounded-[0.85rem] border px-3 py-2.5 text-left text-sm font-medium transition-all"
                 style={{
                   background: modelType === m
                     ? "linear-gradient(180deg, rgba(255,240,247,0.98), rgba(255,233,242,0.94))"
@@ -323,7 +315,6 @@ export default function Sidebar() {
                   borderColor: modelType === m ? "var(--accent-soft)" : "var(--border)",
                   color: modelType === m ? "var(--accent)" : "var(--text-2)",
                   boxShadow: modelType === m ? "0 8px 20px rgba(194,91,134,0.10)" : "none",
-                  marginBottom: "0.4rem",
                 }}
               >
                 <span
@@ -348,9 +339,8 @@ export default function Sidebar() {
 
             <Divider />
 
-            {/* Triage Mode */}
             <SectionLabel>Analysis Mode</SectionLabel>
-            <div className="flex gap-2 mb-1">
+            <div className="mb-1 flex gap-2">
               {([true, false] as const).map((v) => (
                 <button
                   key={String(v)}
@@ -370,7 +360,6 @@ export default function Sidebar() {
 
             <Divider />
 
-            {/* Threshold */}
             <SectionLabel>Threshold</SectionLabel>
             <div className="q-sb-row">
               <span>Decision threshold</span>
@@ -394,7 +383,6 @@ export default function Sidebar() {
 
             <Divider />
 
-            {/* Upload */}
             <SectionLabel>Upload CT Scan</SectionLabel>
             <div
               {...getRootProps()}
@@ -405,17 +393,16 @@ export default function Sidebar() {
               <span className="text-xl">📁</span>
               <div className="min-w-0">
                 <div className="text-xs font-semibold" style={{ color: "var(--text-1)" }}>
-                  {uploading ? "Uploading…" : isDragActive ? "Drop CT here" : "NIfTI or DICOM"}
+                  {uploading ? "Uploading..." : isDragActive ? "Drop CT here" : "NIfTI or DICOM"}
                 </div>
                 <div className="text-[0.67rem]" style={{ color: "var(--text-3)" }}>
-                  Drag & drop · 200 MB max
+                  Drag and drop | 200 MB max
                 </div>
               </div>
             </div>
 
             <Divider />
 
-            {/* Export */}
             <SectionLabel>Export</SectionLabel>
             <button
               type="button"
@@ -427,10 +414,9 @@ export default function Sidebar() {
                 cursor: !lastResult || pdfLoading ? "not-allowed" : "pointer",
               }}
             >
-              {pdfLoading ? "Generating…" : "📄 Export PDF Report"}
+              {pdfLoading ? "Generating..." : "📄 Export PDF Report"}
             </button>
 
-            {/* Footer */}
             <div
               className="mt-auto pt-5 text-center text-[0.67rem] leading-5"
               style={{ color: "var(--text-3)" }}
@@ -441,7 +427,6 @@ export default function Sidebar() {
             </div>
           </>
         )}
-
       </aside>
     </>
   );

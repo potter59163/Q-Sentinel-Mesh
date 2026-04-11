@@ -23,6 +23,7 @@ This repo now has 4 main parts:
 ### Backend
 
 - FastAPI
+- syncs runtime assets from S3 on startup when `USE_S3=true`
 - loads baseline and hybrid weights from `weights/`
 - serves:
   - `/api/ct/*`
@@ -31,6 +32,9 @@ This repo now has 4 main parts:
   - `/api/pqc/*`
   - `/api/health`
   - `/api/health/ready`
+- adds request tracing headers:
+  - `x-request-id`
+  - `x-response-time-ms`
 
 ### ML / Federated
 
@@ -73,6 +77,14 @@ Open:
 - backend health: `http://localhost:8000/api/health`
 - backend readiness: `http://localhost:8000/api/health/ready`
 
+Frontend notes:
+
+- local API defaults to `http://localhost:8000`
+- CT upload supports `.nii`, `.nii.gz`, and `.dcm`
+- the dashboard opens a newly loaded CT at the middle slice by default
+- changing CT case or switching model clears stale AI heatmaps/results
+- the AI panel now includes loading, error, and run-status states
+
 ## Production Notes
 
 ### Required runtime assets
@@ -84,7 +96,23 @@ The backend expects these local assets at runtime:
 - `weights/hybrid_qsentinel.pth`
 - optional demo scans in `data/samples/`
 
-These large files are not stored in GitHub. For AWS deployment, upload them to S3 first and let the EC2 bootstrap script sync them locally before the services start.
+These large files are not stored in GitHub.
+
+Runtime sync behavior:
+
+- EC2 path: `infra/ec2-user-data.sh` syncs runtime assets before services start
+- ECS path: backend startup syncs `weights/` and `data/samples/` directly from S3 when:
+  - `USE_S3=true`
+  - `S3_BUCKET` is set
+
+Relevant backend env vars:
+
+```env
+USE_S3=true
+S3_BUCKET=q-sentinel-runtime-<account-id>
+WEIGHTS_S3_PREFIX=weights/
+DEMO_SAMPLES_S3_PREFIX=data/samples/
+```
 
 ### Frontend API configuration
 
@@ -98,6 +126,12 @@ Examples:
 
 - same origin via reverse proxy: leave empty
 - direct backend URL: `NEXT_PUBLIC_API_URL=http://<backend-host>:8000`
+
+In the current AWS setup, the recommended production value is the CloudFront origin:
+
+```env
+NEXT_PUBLIC_API_URL=https://d3grijenetuyp6.cloudfront.net
+```
 
 ## AWS Deployment
 
@@ -138,15 +172,19 @@ That script:
 Best when you want the more cloud-native path.
 
 - CDK stack in `infra/cdk/`
+- frontend hosted behind CloudFront (`*.cloudfront.net` or custom domain)
 - backend image in ECR
 - ECS/Fargate service
-- ALB public endpoint
-- S3 bucket for app assets
+- ALB endpoint (HTTP by default, HTTPS when Route53+ACM context is provided)
+- S3 runtime bucket for uploads, model artifacts, reports, and results
+- Secrets Manager for runtime env values
+- CloudWatch alarms + SNS alert topic
 
 Notes:
 
 - this path needs Docker available during image build
 - OIDC config now targets repo `potter59163/Q-Sentinel-Mesh`
+- Route53/ACM is optional but recommended for production API domain
 
 ## AWS CLI Flow
 
@@ -158,6 +196,18 @@ npm ci
 npx cdk bootstrap aws://335158494927/ap-southeast-7
 npx cdk deploy --require-approval never
 ```
+
+To provision an HTTPS API domain (Route53 + ACM + ALB listener 443), set CDK context before deploy:
+
+```bash
+npx cdk deploy \
+  -c apiDomainName=api.example.com \
+  -c hostedZoneName=example.com \
+  -c hostedZoneId=Z123456789 \
+  -c alarmEmail=ops@example.com
+```
+
+If those contexts are omitted, stack deploys with ALB HTTP endpoint and still outputs `ApiUrl`.
 
 ### EC2 path
 
@@ -224,6 +274,14 @@ Backend health:
 curl http://localhost:8000/api/health
 curl http://localhost:8000/api/health/ready
 py -3.11 scripts\post_deploy_smoke.py --base-url http://localhost:8000
+```
+
+Useful production checks:
+
+```bash
+curl https://d3grijenetuyp6.cloudfront.net/api/health
+curl https://d3grijenetuyp6.cloudfront.net/api/health/ready
+curl https://d3grijenetuyp6.cloudfront.net/api/ct/demo
 ```
 
 ## Hackathon Context

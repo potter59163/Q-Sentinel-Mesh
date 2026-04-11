@@ -21,7 +21,7 @@ export function getApiErrorMessage(err: unknown) {
     status ? `status ${status}` : null,
     requestId ? `req ${requestId}` : null,
   ].filter(Boolean);
-  return parts.join(" · ");
+  return parts.join(" | ");
 }
 
 export async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 400): Promise<T> {

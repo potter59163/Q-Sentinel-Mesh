@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+
+import { useCallback, useRef, useState } from "react";
 import api, { getApiErrorMessage } from "@/lib/api";
 import type { PredictRequest, PredictResponse } from "@/types/api";
 
@@ -9,32 +10,44 @@ export function usePrediction() {
   const [error, setError] = useState<string | null>(null);
   const [lastLatencyMs, setLastLatencyMs] = useState<number | null>(null);
   const [lastRequestId, setLastRequestId] = useState<string | null>(null);
+  const requestTokenRef = useRef(0);
 
-  async function predict(req: PredictRequest): Promise<PredictResponse | null> {
+  const predict = useCallback(async (req: PredictRequest): Promise<PredictResponse | null> => {
+    const token = requestTokenRef.current + 1;
+    requestTokenRef.current = token;
     setLoading(true);
     setError(null);
+
     try {
       const res = await api.post<PredictResponse>("/api/predict", req);
+      if (requestTokenRef.current !== token) return null;
+
       const latency = Number(res.headers?.["x-response-time-ms"]);
       setLastLatencyMs(Number.isFinite(latency) ? latency : null);
       setLastRequestId(res.headers?.["x-request-id"] ?? null);
       setResult(res.data);
       return res.data;
     } catch (e: unknown) {
+      if (requestTokenRef.current !== token) return null;
+
       const msg = getApiErrorMessage(e);
       setError(msg);
       return null;
     } finally {
-      setLoading(false);
+      if (requestTokenRef.current === token) {
+        setLoading(false);
+      }
     }
-  }
+  }, []);
 
-  function reset() {
+  const reset = useCallback(() => {
+    requestTokenRef.current += 1;
     setResult(null);
+    setLoading(false);
     setError(null);
     setLastLatencyMs(null);
     setLastRequestId(null);
-  }
+  }, []);
 
   return { result, loading, error, predict, reset, lastLatencyMs, lastRequestId };
 }

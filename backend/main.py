@@ -2,26 +2,23 @@ from contextlib import asynccontextmanager
 import json
 import time
 import uuid
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
+from app.api.routes import ct, federated, health, metrics, pqc, predict, thresholds
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.services.model_service import model_service
 from app.services.runtime_assets import runtime_assets_service
 
-# Routes
-from app.api.routes import health, metrics, federated, thresholds, ct, predict, pqc
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Load ML models on startup
     runtime_assets_service.ensure_runtime_assets()
     print("[Startup] Loading ML models...")
     model_service.load_models()
@@ -75,12 +72,13 @@ async def request_context_middleware(request: Request, call_next):
     }))
     return response
 
-# ── Rate limiting ─────────────────────────────────────────────────────────────
+
+# Rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-# ── CORS ──────────────────────────────────────────────────────────────────────
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -89,17 +87,18 @@ app.add_middleware(
     allow_credentials=False,
 )
 
-# ── Trusted host (production only) ────────────────────────────────────────────
+# Trusted host (production only)
 # app.add_middleware(TrustedHostMiddleware, allowed_hosts=["api.yourdomain.com"])
 
-# ── Global error handler ──────────────────────────────────────────────────────
+
+# Global error handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     request_id = getattr(request.state, "request_id", None)
     return JSONResponse(status_code=500, content={"detail": str(exc), "request_id": request_id})
 
 
-# ── Routers ───────────────────────────────────────────────────────────────────
+# Routers
 app.include_router(health.router)
 app.include_router(metrics.router)
 app.include_router(federated.router)

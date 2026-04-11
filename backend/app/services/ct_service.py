@@ -1,6 +1,7 @@
 """CT loading, HU normalization, and windowing service.
 Logic ported from dashboard/components/ct_viewer.py and app.py lines 382-390.
 """
+
 import base64
 import io
 import threading
@@ -12,16 +13,16 @@ from PIL import Image
 
 from app.models.ct import CTUploadResponse, CTWindowResponse, HUStats, WindowPreset
 
-# Window presets: (center, width) in HU — from ct_viewer.py line 22-31
+# Window presets: (center, width) in HU - from ct_viewer.py line 22-31
 WINDOW_PRESETS: Dict[str, Tuple[int, int]] = {
-    "brain":    (40,  80),
-    "blood":    (60, 100),
+    "brain": (40, 80),
+    "blood": (60, 100),
     "subdural": (75, 215),
-    "bone":     (400, 1800),
-    "wide":     (40, 380),
+    "bone": (400, 1800),
+    "wide": (40, 380),
 }
 
-# In-memory cache: s3_key → (volume_hu: np.ndarray, timestamp: float)
+# In-memory cache: s3_key -> (volume_hu: np.ndarray, timestamp: float)
 _cache: Dict[str, Tuple[np.ndarray, float]] = {}
 _cache_lock = threading.Lock()
 _TTL = 1800  # 30 minutes
@@ -38,17 +39,14 @@ def _evict_expired():
 def _normalize_hu(volume: np.ndarray) -> np.ndarray:
     """Port of app.py lines 382-390: handle 8/9-bit, normalized, and raw HU."""
     if volume.max() <= 1.5:
-        # Normalized [0,1] float
         return (volume * 2000.0 - 1000.0).astype(np.float32)
-    elif volume.max() <= 255:
-        # 8-bit or 9-bit (pydicom without rescale)
-        return (volume.astype(np.float32) * 8.0 - 1024.0)
-    else:
-        return volume.astype(np.float32)
+    if volume.max() <= 255:
+        return volume.astype(np.float32) * 8.0 - 1024.0
+    return volume.astype(np.float32)
 
 
 def _apply_window(slice_hu: np.ndarray, center: int, width: int) -> np.ndarray:
-    """Apply HU windowing → [0, 255] uint8."""
+    """Apply HU windowing -> [0, 255] uint8."""
     lo = center - width / 2
     hi = center + width / 2
     clipped = np.clip(slice_hu, lo, hi)
@@ -93,8 +91,11 @@ class CTService:
         )
 
     def _load_nifti(self, content: bytes, ext: str) -> np.ndarray:
+        import os
+        import tempfile
+
         import nibabel as nib
-        import tempfile, os
+
         suffix = ".nii.gz" if ext == "nii.gz" else ".nii"
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as f:
             f.write(content)
@@ -102,7 +103,7 @@ class CTService:
         try:
             img = nib.load(tmp_path)
             data = np.array(img.dataobj)
-            # NIfTI: axes are (H, W, D) → reorder to (D, H, W)
+            # NIfTI: axes are (H, W, D) -> reorder to (D, H, W)
             if data.ndim == 3:
                 data = np.transpose(data, (2, 0, 1))
             elif data.ndim == 4:
@@ -112,15 +113,18 @@ class CTService:
             os.unlink(tmp_path)
 
     def _load_dicom(self, content: bytes) -> np.ndarray:
+        import os
+        import tempfile
+
         import pydicom
-        import tempfile, os
+
         with tempfile.NamedTemporaryFile(suffix=".dcm", delete=False) as f:
             f.write(content)
             tmp_path = f.name
         try:
             ds = pydicom.dcmread(tmp_path)
             arr = ds.pixel_array.astype(np.float32)
-            # Single DICOM = single slice → wrap in axis 0
+            # Single DICOM = single slice -> wrap in axis 0
             if arr.ndim == 2:
                 arr = arr[np.newaxis, ...]
             return arr
