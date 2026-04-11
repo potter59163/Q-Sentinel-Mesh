@@ -15,7 +15,11 @@ class Settings(BaseSettings):
     RESULTS_S3_PREFIX: str = "results/"
     CT_UPLOAD_S3_PREFIX: str = "ct-uploads/"
 
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://d3grijenetuyp6.cloudfront.net",
+    ]
     RATE_LIMIT_PER_MINUTE: int = 30
 
     USE_S3: bool = False
