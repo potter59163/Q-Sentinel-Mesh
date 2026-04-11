@@ -67,10 +67,11 @@ def _to_base64_png(arr: np.ndarray) -> str:
 class CTService:
     def load_ct(self, content: bytes, filename: str, s3_key: str) -> CTUploadResponse:
         """Parse NIfTI or DICOM bytes, normalize HU, cache volume."""
-        ext = filename.lower().split(".")[-1]
+        lowered = filename.lower()
+        ext = "nii.gz" if lowered.endswith(".nii.gz") else lowered.split(".")[-1]
 
-        if ext == "nii":
-            volume = self._load_nifti(content)
+        if ext in ("nii", "nii.gz"):
+            volume = self._load_nifti(content, ext)
         elif ext == "dcm":
             volume = self._load_dicom(content)
         else:
@@ -91,10 +92,11 @@ class CTService:
             filename=filename,
         )
 
-    def _load_nifti(self, content: bytes) -> np.ndarray:
+    def _load_nifti(self, content: bytes, ext: str) -> np.ndarray:
         import nibabel as nib
         import tempfile, os
-        with tempfile.NamedTemporaryFile(suffix=".nii", delete=False) as f:
+        suffix = ".nii.gz" if ext == "nii.gz" else ".nii"
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as f:
             f.write(content)
             tmp_path = f.name
         try:

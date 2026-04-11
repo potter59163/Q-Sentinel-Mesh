@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import api from "@/lib/api";
+import api, { getApiErrorMessage, withRetry } from "@/lib/api";
 import { useDashboard } from "@/context/DashboardContext";
 import type { CTUploadResponse } from "@/types/api";
 
@@ -70,7 +70,7 @@ export default function Sidebar() {
   }, []);
 
   useEffect(() => {
-    api.get<{ patients: string[] }>("/api/ct/demo")
+    withRetry(() => api.get<{ patients: string[] }>("/api/ct/demo"), 2, 500)
       .then((r) => setDemoPatients(r.data.patients))
       .catch(() => setDemoPatients(["049"]));
   }, []);
@@ -87,8 +87,8 @@ export default function Sidebar() {
       });
       setCtMeta(res.data);
       toast.success(`CT loaded · ${res.data.slice_count} slices ready`);
-    } catch {
-      toast.error("Upload failed. Please try another CT file.");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err));
     } finally {
       setUploading(false);
     }
@@ -133,7 +133,7 @@ export default function Sidebar() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { "application/octet-stream": [".nii", ".dcm"] },
+    accept: { "application/octet-stream": [".nii", ".nii.gz", ".dcm"] },
     multiple: false,
     disabled: uploading,
   });

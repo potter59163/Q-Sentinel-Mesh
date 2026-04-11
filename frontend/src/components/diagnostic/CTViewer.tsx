@@ -76,10 +76,13 @@ export default function CTViewer({
         </div>
       </div>
 
-      <div className="relative bg-black/95" style={{ minHeight: 320, aspectRatio: "1 / 1" }}>
+      <div className="relative bg-black/95 aspect-square min-h-[260px] sm:min-h-[320px]">
         {loading ? (
-          <div className="absolute inset-0 z-20 flex items-center justify-center">
-            <div className="rounded-full px-4 py-2 text-xs font-semibold" style={{ background: "rgba(255,255,255,0.88)", color: "var(--text-1)" }}>
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 px-6">
+            <div className="h-28 w-28 animate-pulse rounded-full border" style={{ borderColor: "rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.08)" }} />
+            <div className="h-2 w-48 animate-pulse rounded-full" style={{ background: "rgba(255,255,255,0.18)" }} />
+            <div className="h-2 w-32 animate-pulse rounded-full" style={{ background: "rgba(255,255,255,0.12)" }} />
+            <div className="rounded-full px-4 py-2 text-xs font-semibold" style={{ background: "rgba(255,255,255,0.9)", color: "var(--text-1)" }}>
               Loading slice...
             </div>
           </div>

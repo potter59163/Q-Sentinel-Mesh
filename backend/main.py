@@ -1,4 +1,7 @@
 from contextlib import asynccontextmanager
+import json
+import time
+import uuid
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -36,6 +39,42 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+
+@app.middleware("http")
+async def request_context_middleware(request: Request, call_next):
+    request_id = request.headers.get("x-request-id") or str(uuid.uuid4())
+    request.state.request_id = request_id
+    start = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        duration_ms = int((time.perf_counter() - start) * 1000)
+        print(json.dumps({
+            "level": "error",
+            "event": "request_failed",
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.url.path,
+            "duration_ms": duration_ms,
+            "error": str(exc),
+        }))
+        raise
+
+    duration_ms = int((time.perf_counter() - start) * 1000)
+    response.headers["x-request-id"] = request_id
+    response.headers["x-response-time-ms"] = str(duration_ms)
+    response.headers["x-content-type-options"] = "nosniff"
+    print(json.dumps({
+        "level": "info",
+        "event": "request_complete",
+        "request_id": request_id,
+        "method": request.method,
+        "path": request.url.path,
+        "status_code": response.status_code,
+        "duration_ms": duration_ms,
+    }))
+    return response
+
 # ── Rate limiting ─────────────────────────────────────────────────────────────
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -56,7 +95,8 @@ app.add_middleware(
 # ── Global error handler ──────────────────────────────────────────────────────
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    return JSONResponse(status_code=500, content={"detail": str(exc)})
+    request_id = getattr(request.state, "request_id", None)
+    return JSONResponse(status_code=500, content={"detail": str(exc), "request_id": request_id})
 
 
 # ── Routers ───────────────────────────────────────────────────────────────────

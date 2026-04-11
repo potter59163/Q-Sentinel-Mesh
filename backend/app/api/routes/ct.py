@@ -22,9 +22,10 @@ async def upload_ct(
     file: UploadFile = File(...),
 ):
     filename = file.filename or "upload"
-    ext = filename.lower().split(".")[-1]
-    if ext not in ("nii", "dcm"):
-        raise HTTPException(status_code=422, detail="Only .nii and .dcm files are supported")
+    lowered = filename.lower()
+    ext = "nii.gz" if lowered.endswith(".nii.gz") else lowered.split(".")[-1]
+    if ext not in ("nii", "nii.gz", "dcm"):
+        raise HTTPException(status_code=422, detail="Only .nii, .nii.gz, and .dcm files are supported")
 
     content = await file.read()
     if len(content) > MAX_FILE_SIZE:
