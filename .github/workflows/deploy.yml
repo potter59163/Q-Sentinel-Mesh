@@ -11,9 +11,12 @@ permissions:
 
 env:
   AWS_REGION: ap-southeast-7
-  ECR_REPOSITORY: q-sentinel-backend
   ECS_CLUSTER: q-sentinel-cluster
-  ECS_SERVICE: q-sentinel-backend
+  BACKEND_ECR: q-sentinel-backend
+  BACKEND_SERVICE: q-sentinel-backend
+  FRONTEND_ECR: q-sentinel-frontend
+  FRONTEND_SERVICE: q-sentinel-frontend
+  NEXT_PUBLIC_API_URL: http://q-sentinel-alb-1031428004.ap-southeast-7.elb.amazonaws.com
 
 jobs:
   deploy-backend:
@@ -34,33 +37,79 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to ECR
-        id: build-image
+      - name: Build, tag, and push backend image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build \
             -f backend/Dockerfile \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            -t $ECR_REGISTRY/$BACKEND_ECR:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$BACKEND_ECR:latest \
             .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker push $ECR_REGISTRY/$BACKEND_ECR:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$BACKEND_ECR:latest
 
-      - name: Force new ECS deployment
+      - name: Force new ECS deployment (backend)
         run: |
           aws ecs update-service \
             --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.ECS_SERVICE }} \
+            --service ${{ env.BACKEND_SERVICE }} \
             --force-new-deployment \
             --region ${{ env.AWS_REGION }}
 
-      - name: Wait for ECS service to stabilize
+      - name: Wait for backend to stabilize
         run: |
           aws ecs wait services-stable \
             --cluster ${{ env.ECS_CLUSTER }} \
-            --services ${{ env.ECS_SERVICE }} \
+            --services ${{ env.BACKEND_SERVICE }} \
+            --region ${{ env.AWS_REGION }}
+        continue-on-error: true
+
+  deploy-frontend:
+    name: Build & Deploy Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push frontend image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -f frontend/Dockerfile \
+            --build-arg NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }} \
+            -t $ECR_REGISTRY/$FRONTEND_ECR:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$FRONTEND_ECR:latest \
+            frontend/
+          docker push $ECR_REGISTRY/$FRONTEND_ECR:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$FRONTEND_ECR:latest
+
+      - name: Force new ECS deployment (frontend)
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.FRONTEND_SERVICE }} \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for frontend to stabilize
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.FRONTEND_SERVICE }} \
             --region ${{ env.AWS_REGION }}
         continue-on-error: true

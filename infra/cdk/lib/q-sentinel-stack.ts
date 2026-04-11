@@ -14,6 +14,8 @@ import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
 import * as cloudwatchActions from "aws-cdk-lib/aws-cloudwatch-actions";
 import * as sns from "aws-cdk-lib/aws-sns";
 import * as subscriptions from "aws-cdk-lib/aws-sns-subscriptions";
+import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
+import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import { Construct } from "constructs";
 
 export class QSentinelStack extends cdk.Stack {
@@ -406,6 +408,120 @@ export class QSentinelStack extends cdk.Stack {
     dataBucket.grantReadWrite(ciRole);
     alertTopic.grantPublish(ciRole);
 
+    // ── Frontend ECR ──────────────────────────────────────────────────
+    const frontendEcrRepo = new ecr.Repository(this, "FrontendEcr", {
+      repositoryName: "q-sentinel-frontend",
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+      lifecycleRules: [{ maxImageCount: 5, description: "Keep last 5 images" }],
+    });
+    frontendEcrRepo.grantPullPush(executionRole);
+    frontendEcrRepo.grantPullPush(ciRole);
+
+    // ── Frontend Task Definition ──────────────────────────────────────
+    const frontendTaskDef = new ecs.FargateTaskDefinition(this, "FrontendTaskDef", {
+      cpu: 512,
+      memoryLimitMiB: 1024,
+      executionRole,
+      taskRole,
+    });
+
+    const frontendLogGroup = new logs.LogGroup(this, "FrontendLogs", {
+      logGroupName: "/ecs/q-sentinel-frontend",
+      retention: logs.RetentionDays.ONE_MONTH,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+    });
+
+    const apiUrl = shouldUseHttpsDomain
+      ? `https://${apiDomainName}`
+      : `http://${fargateService.loadBalancer.loadBalancerDnsName}`;
+
+    const frontendImage = bootstrapMode
+      ? ecs.ContainerImage.fromRegistry("public.ecr.aws/docker/library/node:20-alpine")
+      : ecs.ContainerImage.fromEcrRepository(frontendEcrRepo, "latest");
+
+    frontendTaskDef.addContainer("frontend", {
+      image: frontendImage,
+      command: bootstrapMode
+        ? ["node", "-e", "require('http').createServer((_,r)=>{r.writeHead(200);r.end('Q-Sentinel Frontend')}).listen(3000)"]
+        : undefined,
+      portMappings: [{ containerPort: 3000 }],
+      environment: {
+        NODE_ENV: "production",
+        NEXT_PUBLIC_API_URL: apiUrl,
+        PORT: "3000",
+        HOSTNAME: "0.0.0.0",
+      },
+      logging: ecs.LogDrivers.awsLogs({
+        streamPrefix: "frontend",
+        logGroup: frontendLogGroup,
+      }),
+      healthCheck: {
+        command: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000', r => process.exit(r.statusCode < 500 ? 0 : 1))\" || exit 1"],
+        interval: cdk.Duration.seconds(30),
+        timeout: cdk.Duration.seconds(10),
+        retries: 3,
+        startPeriod: cdk.Duration.seconds(120),
+      },
+    });
+
+    // ── Frontend Fargate Service + ALB ────────────────────────────────
+    const frontendService = new ecsPatterns.ApplicationLoadBalancedFargateService(
+      this,
+      "FrontendService",
+      {
+        cluster,
+        taskDefinition: frontendTaskDef,
+        desiredCount: 1,
+        publicLoadBalancer: true,
+        listenerPort: 80,
+        targetProtocol: elbv2.ApplicationProtocol.HTTP,
+        healthCheckGracePeriod: cdk.Duration.seconds(180),
+        loadBalancerName: "q-sentinel-frontend-alb",
+        serviceName: "q-sentinel-frontend",
+        circuitBreaker: { enable: true, rollback: false },
+      }
+    );
+
+    frontendService.targetGroup.configureHealthCheck({
+      path: "/",
+      healthyHttpCodes: "200-399",
+      interval: cdk.Duration.seconds(30),
+      healthyThresholdCount: 2,
+      unhealthyThresholdCount: 5,
+    });
+
+    // Allow CI to update frontend service
+    ciRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ["ecs:UpdateService", "ecs:DescribeServices"],
+        resources: [frontendService.service.serviceArn],
+      })
+    );
+
+    // ── CloudFront Distribution ───────────────────────────────────────
+    const distribution = new cloudfront.Distribution(this, "FrontendCdn", {
+      defaultBehavior: {
+        origin: new origins.HttpOrigin(frontendService.loadBalancer.loadBalancerDnsName, {
+          protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+        }),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+      },
+      additionalBehaviors: {
+        "_next/static/*": {
+          origin: new origins.HttpOrigin(frontendService.loadBalancer.loadBalancerDnsName, {
+            protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+          }),
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        },
+      },
+      comment: "Q-Sentinel Frontend CDN",
+      priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
+    });
+
     // ── Outputs ───────────────────────────────────────────────────────
     new cdk.CfnOutput(this, "ApiUrl", {
       value: shouldUseHttpsDomain
@@ -461,6 +577,28 @@ export class QSentinelStack extends cdk.Stack {
       value: alertTopic.topicArn,
       exportName: "QSentinelAlertsTopicArn",
       description: "SNS topic for CloudWatch alarms",
+    });
+
+    new cdk.CfnOutput(this, "FrontendEcrUri", {
+      value: frontendEcrRepo.repositoryUri,
+      exportName: "QSentinelFrontendEcrUri",
+      description: "Frontend ECR URI — used by GitHub Actions",
+    });
+
+    new cdk.CfnOutput(this, "FrontendServiceName", {
+      value: frontendService.service.serviceName,
+      exportName: "QSentinelFrontendServiceName",
+    });
+
+    new cdk.CfnOutput(this, "FrontendAlbDnsName", {
+      value: frontendService.loadBalancer.loadBalancerDnsName,
+      exportName: "QSentinelFrontendAlbDnsName",
+    });
+
+    new cdk.CfnOutput(this, "FrontendUrl", {
+      value: `https://${distribution.distributionDomainName}`,
+      exportName: "QSentinelFrontendUrl",
+      description: "CloudFront URL for the frontend",
     });
   }
 }
