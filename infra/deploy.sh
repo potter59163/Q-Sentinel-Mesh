@@ -3,7 +3,6 @@ set -euo pipefail
 
 ACCOUNT="335158494927"
 REGION="ap-southeast-7"
-BUCKET="q-sentinel-data-${ACCOUNT}"
 
 echo "=== Q-Sentinel Mesh — AWS Deployment ==="
 echo "Account: $ACCOUNT | Region: $REGION"
@@ -19,17 +18,34 @@ npx cdk bootstrap "aws://${ACCOUNT}/${REGION}"
 echo "[2/5] Deploying CDK stack..."
 npx cdk deploy --require-approval never --outputs-file ../../cdk-outputs.json
 
-# Step 3: Upload weights to S3
-echo "[3/5] Uploading model weights to S3..."
+BUCKET=$(python3 - <<'PY'
+import json
+with open("../../cdk-outputs.json", encoding="utf-8") as f:
+    data = json.load(f)
+print(data.get("QSentinelStack", {}).get("BucketName", ""))
+PY
+)
+
+if [ -z "$BUCKET" ]; then
+  echo "ERROR: BucketName output not found in cdk-outputs.json"
+  exit 1
+fi
+
+# Step 3: Upload runtime assets to S3
+echo "[3/5] Uploading runtime assets to S3 bucket ${BUCKET}..."
 cd ../..
 aws s3 cp weights/ "s3://${BUCKET}/weights/" --recursive \
   --storage-class STANDARD_IA \
   --region "$REGION"
+aws s3 cp data/samples/ "s3://${BUCKET}/data/samples/" --recursive \
+  --region "$REGION" || true
 
-# Step 4: Upload results to S3
-echo "[4/5] Uploading results to S3..."
+# Step 4: Upload results and optional artifacts to S3
+echo "[4/5] Uploading results/artifacts to S3..."
 aws s3 cp results/ "s3://${BUCKET}/results/" --recursive \
   --region "$REGION"
+aws s3 cp slide_imgs/ "s3://${BUCKET}/reports/" --recursive \
+  --region "$REGION" || true
 
 # Step 5: Print outputs
 echo "[5/5] Deployment complete!"
@@ -46,7 +62,6 @@ print('')
 print('Next steps:')
 print('1. Add AWS_ROLE_ARN secret to GitHub repo (value above)')
 print('2. Create Amplify app in a supported Amplify region')
-print('   - Connect to GitHub: potter59163/Q-Sentinel-Mesh')
-print('   - Set NEXT_PUBLIC_API_URL =', stack.get('ApiUrl', '<API_URL>'))
-print('3. Push to main branch to trigger CI/CD')
+print('2. Frontend stays on CloudFront; set NEXT_PUBLIC_API_URL there if needed')
+print('3. Push to main branch to trigger backend CI/CD')
 "

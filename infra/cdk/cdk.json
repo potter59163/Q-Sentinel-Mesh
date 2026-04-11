@@ -5,6 +5,11 @@
     "exclude": ["README.md","cdk*.json","**/*.d.ts","**/*.js","tsconfig.json","package*.json","yarn.lock","node_modules","test"]
   },
   "context": {
+    "apiDomainName": "",
+    "hostedZoneName": "",
+    "hostedZoneId": "",
+    "alarmEmail": "",
+    "existingRuntimeBucketName": "",
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,
     "@aws-cdk/aws-ecs:arnFormatIncludesClusterName": true,
