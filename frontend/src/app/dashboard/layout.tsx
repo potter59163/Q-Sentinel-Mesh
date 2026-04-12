@@ -2,6 +2,7 @@ import MetricsStrip from "@/components/layout/MetricsStrip";
 import NavTabs from "@/components/layout/NavTabs";
 import Sidebar from "@/components/layout/Sidebar";
 import { DashboardProvider } from "@/context/DashboardContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function DashboardLayout({
   children,
@@ -50,7 +51,9 @@ export default function DashboardLayout({
           <NavTabs />
 
           {/* ── Page content ───────────────────────────────────────────── */}
-          <div>{children}</div>
+          <ErrorBoundary>
+            <div>{children}</div>
+          </ErrorBoundary>
 
           {/* ── Footer ─────────────────────────────────────────────────── */}
           <footer

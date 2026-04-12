@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import type { CTUploadResponse, ModelType, PredictResponse, RadiologistVerdict } from "@/types/api";
+import { getStoredAuth, type UserRole } from "@/lib/auth";
 
 interface DashboardContextType {
   modelType: ModelType;
@@ -23,6 +24,8 @@ interface DashboardContextType {
   setLastImageSrc: (v: string | null) => void;
   lastHeatmapSrc: string | null;
   setLastHeatmapSrc: (v: string | null) => void;
+  // Current user role
+  userRole: UserRole | null;
   // Radiologist review
   lastSessionId: string | null;
   setLastSessionId: (v: string | null) => void;
@@ -42,6 +45,12 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const [autoTriage, setAutoTriage] = useState(true);
   const [scansAnalyzed, setScansAnalyzed] = useState(0);
   const incrementScans = useCallback(() => setScansAnalyzed((n) => n + 1), []);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  useEffect(() => {
+    const auth = getStoredAuth();
+    if (auth) setUserRole(auth.role as UserRole);
+  }, []);
+
   const [lastResult, setLastResult] = useState<PredictResponse | null>(null);
   const [lastImageSrc, setLastImageSrc] = useState<string | null>(null);
   const [lastHeatmapSrc, setLastHeatmapSrc] = useState<string | null>(null);
@@ -70,6 +79,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         setLastImageSrc,
         lastHeatmapSrc,
         setLastHeatmapSrc,
+        userRole,
         lastSessionId,
         setLastSessionId,
         lastVerdict,

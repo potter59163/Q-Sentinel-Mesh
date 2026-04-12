@@ -10,7 +10,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-from app.api.routes import ct, export, federated, feedback, health, metrics, pqc, predict, thresholds
+from app.api.routes import auth, ct, export, federated, feedback, health, metrics, pqc, predict, thresholds
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.services.model_service import model_service
@@ -61,6 +61,10 @@ async def request_context_middleware(request: Request, call_next):
     response.headers["x-request-id"] = request_id
     response.headers["x-response-time-ms"] = str(duration_ms)
     response.headers["x-content-type-options"] = "nosniff"
+    response.headers["x-frame-options"] = "DENY"
+    response.headers["x-xss-protection"] = "1; mode=block"
+    response.headers["referrer-policy"] = "strict-origin-when-cross-origin"
+    response.headers["strict-transport-security"] = "max-age=31536000; includeSubDomains"
     print(json.dumps({
         "level": "info",
         "event": "request_complete",
@@ -83,7 +87,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_headers=["Content-Type", "Authorization", "x-request-id"],
     allow_credentials=False,
 )
 
@@ -99,6 +103,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # Routers
+app.include_router(auth.router)
 app.include_router(health.router)
 app.include_router(metrics.router)
 app.include_router(federated.router)
