@@ -101,6 +101,50 @@ export interface FedRound {
   global_loss: number;
 }
 
+// Radiologist feedback
+export type RadiologistVerdict = "confirm" | "reject" | "correct";
+
+export interface FeedbackRequest {
+  session_id: string;
+  verdict: RadiologistVerdict;
+  correction?: string;
+  hospital: string;
+  top_class: string;
+  confidence: number;
+  filename?: string;
+}
+
+export interface FeedbackResponse {
+  feedback_id: string;
+  saved: boolean;
+}
+
+export interface FeedbackStats {
+  total: number;
+  confirm: number;
+  reject: number;
+  correct: number;
+  accuracy_rate: number;
+}
+
+// HL7 FHIR R4 export
+export interface HL7ExportRequest {
+  hospital: string;
+  top_class: string;
+  confidence: number;
+  probabilities: Record<string, number>;
+  filename?: string;
+  radiologist_verdict?: RadiologistVerdict;
+  corrected_class?: string;
+  slice_used?: number;
+  model_type?: string;
+}
+
+export interface HL7ExportResponse {
+  fhir_json: Record<string, unknown>;
+  resource_id: string;
+}
+
 // PQC demo
 export interface PQCDemoResponse {
   public_key_bytes: number;

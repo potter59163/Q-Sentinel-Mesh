@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
-import type { CTUploadResponse, ModelType, PredictResponse } from "@/types/api";
+import type { CTUploadResponse, ModelType, PredictResponse, RadiologistVerdict } from "@/types/api";
 
 interface DashboardContextType {
   modelType: ModelType;
@@ -23,6 +23,13 @@ interface DashboardContextType {
   setLastImageSrc: (v: string | null) => void;
   lastHeatmapSrc: string | null;
   setLastHeatmapSrc: (v: string | null) => void;
+  // Radiologist review
+  lastSessionId: string | null;
+  setLastSessionId: (v: string | null) => void;
+  lastVerdict: RadiologistVerdict | null;
+  setLastVerdict: (v: RadiologistVerdict | null) => void;
+  lastCorrectedClass: string | null;
+  setLastCorrectedClass: (v: string | null) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | null>(null);
@@ -38,6 +45,9 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const [lastResult, setLastResult] = useState<PredictResponse | null>(null);
   const [lastImageSrc, setLastImageSrc] = useState<string | null>(null);
   const [lastHeatmapSrc, setLastHeatmapSrc] = useState<string | null>(null);
+  const [lastSessionId, setLastSessionId] = useState<string | null>(null);
+  const [lastVerdict, setLastVerdict] = useState<RadiologistVerdict | null>(null);
+  const [lastCorrectedClass, setLastCorrectedClass] = useState<string | null>(null);
 
   return (
     <DashboardContext.Provider
@@ -60,6 +70,12 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         setLastImageSrc,
         lastHeatmapSrc,
         setLastHeatmapSrc,
+        lastSessionId,
+        setLastSessionId,
+        lastVerdict,
+        setLastVerdict,
+        lastCorrectedClass,
+        setLastCorrectedClass,
       }}
     >
       {children}

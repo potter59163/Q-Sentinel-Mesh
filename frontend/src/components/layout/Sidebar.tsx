@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import api, { getApiErrorMessage, withRetry } from "@/lib/api";
+import type { HL7ExportRequest, HL7ExportResponse } from "@/types/api";
 import { useDashboard } from "@/context/DashboardContext";
 import type { CTUploadResponse } from "@/types/api";
 
@@ -48,6 +49,7 @@ export default function Sidebar() {
     threshold, setThreshold,
     autoTriage, setAutoTriage,
     lastResult, lastImageSrc, lastHeatmapSrc,
+    lastVerdict, lastCorrectedClass,
   } = useDashboard();
 
   const [open, setOpen] = useState(true);
@@ -56,6 +58,7 @@ export default function Sidebar() {
   const [demoLoading, setDemoLoading] = useState(false);
   const [demoPatients, setDemoPatients] = useState<string[]>([]);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [hl7Loading, setHl7Loading] = useState(false);
 
   useEffect(() => {
     function check() {
@@ -105,6 +108,41 @@ export default function Sidebar() {
       toast.error(`Could not load demo patient ${pid}`);
     } finally {
       setDemoLoading(false);
+    }
+  }
+
+  async function handleExportHL7() {
+    if (!lastResult) {
+      toast.warning("Run AI analysis first.");
+      return;
+    }
+    setHl7Loading(true);
+    try {
+      const body: HL7ExportRequest = {
+        hospital,
+        top_class: lastResult.top_class,
+        confidence: lastResult.confidence,
+        probabilities: lastResult.probabilities,
+        filename: ctMeta?.filename,
+        radiologist_verdict: lastVerdict ?? undefined,
+        corrected_class: lastCorrectedClass ?? undefined,
+        slice_used: lastResult.slice_used,
+        model_type: modelType,
+      };
+      const res = await api.post<HL7ExportResponse>("/api/export/hl7", body);
+      const fhirJson = JSON.stringify(res.data.fhir_json, null, 2);
+      const blob = new Blob([fhirJson], { type: "application/fhir+json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `diagnostic-report-${res.data.resource_id.slice(0, 8)}.fhir.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("HL7 FHIR R4 report exported");
+    } catch (err) {
+      toast.error(`HL7 export failed: ${getApiErrorMessage(err)}`);
+    } finally {
+      setHl7Loading(false);
     }
   }
 
@@ -415,6 +453,19 @@ export default function Sidebar() {
               }}
             >
               {pdfLoading ? "Generating..." : "📄 Export PDF Report"}
+            </button>
+            <button
+              type="button"
+              onClick={handleExportHL7}
+              disabled={!lastResult || hl7Loading}
+              className="q-btn-secondary w-full py-2.5 text-xs font-semibold"
+              style={{
+                opacity: !lastResult || hl7Loading ? 0.5 : 1,
+                cursor: !lastResult || hl7Loading ? "not-allowed" : "pointer",
+                marginTop: "0.4rem",
+              }}
+            >
+              {hl7Loading ? "Generating..." : "🏥 Export HL7 FHIR R4"}
             </button>
 
             <div

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import CTViewer from "@/components/diagnostic/CTViewer";
 import ModelComparisonCard from "@/components/diagnostic/ModelComparisonCard";
 import ProbabilityBars from "@/components/diagnostic/ProbabilityBars";
+import RadiologistReview from "@/components/diagnostic/RadiologistReview";
 import { useDashboard } from "@/context/DashboardContext";
 import { usePrediction } from "@/hooks/usePrediction";
 import { useWindowedSlice } from "@/hooks/useWindowedSlice";
@@ -46,9 +47,14 @@ function DiagnosticWorkspace() {
     setLastResult,
     setLastImageSrc,
     setLastHeatmapSrc,
+    lastSessionId,
+    setLastSessionId,
+    setLastVerdict,
+    setLastCorrectedClass,
   } = useDashboard();
 
   const [sliceOverrides, setSliceOverrides] = useState<Record<string, number>>({});
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [window, setWindow] = useState<WindowPreset>("brain");
   const [heatmapOpacity, setHeatmapOpacity] = useState(0.6);
   const [thresholds, setThresholds] = useState<HemorrhageThresholds | null>(null);
@@ -79,7 +85,11 @@ function DiagnosticWorkspace() {
     setLastResult(null);
     setLastImageSrc(null);
     setLastHeatmapSrc(null);
-  }, [ctMeta?.s3_key, modelType, reset, setLastHeatmapSrc, setLastImageSrc, setLastResult]);
+    setSessionId(null);
+    setLastSessionId(null);
+    setLastVerdict(null);
+    setLastCorrectedClass(null);
+  }, [ctMeta?.s3_key, modelType, reset, setLastHeatmapSrc, setLastImageSrc, setLastResult, setLastSessionId, setLastVerdict, setLastCorrectedClass]);
 
   useEffect(() => {
     if (result) {
@@ -115,6 +125,12 @@ function DiagnosticWorkspace() {
 
     if (res) {
       setSliceIdx(res.slice_used);
+      // New session for this prediction result
+      const sid = crypto.randomUUID();
+      setSessionId(sid);
+      setLastSessionId(sid);
+      setLastVerdict(null);
+      setLastCorrectedClass(null);
     }
   }
 
@@ -369,6 +385,20 @@ function DiagnosticWorkspace() {
                 <div className="q-eyebrow mb-3">Detection Probabilities</div>
                 <ProbabilityBars probabilities={result.probabilities} thresholds={thresholds ?? undefined} />
               </div>
+            ) : null}
+
+            {result && sessionId ? (
+              <RadiologistReview
+                sessionId={sessionId}
+                topClass={result.top_class}
+                confidence={result.confidence}
+                hospital={hospital}
+                filename={ctMeta?.filename}
+                onVerdictSubmitted={(v, corrected) => {
+                  setLastVerdict(v);
+                  setLastCorrectedClass(corrected ?? null);
+                }}
+              />
             ) : null}
 
             {result ? (

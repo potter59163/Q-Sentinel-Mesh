@@ -7,6 +7,7 @@ const TABS = [
   { href: "/dashboard",            label: "🧠 Diagnostic View" },
   { href: "/dashboard/federated",  label: "🌐 Federated Intelligence" },
   { href: "/dashboard/security",   label: "🔒 Security Layer" },
+  { href: "/dashboard/pacs",       label: "🏥 PACS Integration" },
 ];
 
 export default function NavTabs() {

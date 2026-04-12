@@ -10,7 +10,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-from app.api.routes import ct, federated, health, metrics, pqc, predict, thresholds
+from app.api.routes import ct, export, federated, feedback, health, metrics, pqc, predict, thresholds
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.services.model_service import model_service
@@ -106,3 +106,5 @@ app.include_router(thresholds.router)
 app.include_router(ct.router)
 app.include_router(predict.router)
 app.include_router(pqc.router)
+app.include_router(feedback.router)
+app.include_router(export.router)
