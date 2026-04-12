@@ -1,11 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState, type CSSProperties } from "react";
-import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import api, { getApiErrorMessage, withRetry } from "@/lib/api";
-import { clearAuth, ROLE_CONFIG, getStoredAuth, type UserRole } from "@/lib/auth";
 import type { HL7ExportRequest, HL7ExportResponse } from "@/types/api";
 import { useDashboard } from "@/context/DashboardContext";
 import type { CTUploadResponse } from "@/types/api";
@@ -44,7 +42,6 @@ function StatusRow({
 }
 
 export default function Sidebar() {
-  const router = useRouter();
   const {
     modelType, setModelType,
     hospital, setHospital,
@@ -57,11 +54,6 @@ export default function Sidebar() {
 
   const [open, setOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  useEffect(() => {
-    const auth = getStoredAuth();
-    if (auth) setUserRole(auth.role as UserRole);
-  }, []);
   const [uploading, setUploading] = useState(false);
   const [demoLoading, setDemoLoading] = useState(false);
   const [demoPatients, setDemoPatients] = useState<string[]>([]);
@@ -475,29 +467,6 @@ export default function Sidebar() {
             >
               {hl7Loading ? "กำลังสร้าง..." : "🏥 ส่งออก HL7 FHIR R4"}
             </button>
-
-            {userRole && (
-              <div className="mt-auto pt-4">
-                <div
-                  className="mb-2 flex items-center gap-2 rounded-[0.85rem] border px-2.5 py-2"
-                  style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}
-                >
-                  <span className="text-base">{ROLE_CONFIG[userRole].icon}</span>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-[0.72rem] font-semibold" style={{ color: "var(--text-1)" }}>
-                      {ROLE_CONFIG[userRole].label}
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => { clearAuth(); router.push("/login"); }}
-                  className="q-btn-secondary w-full py-2 text-xs font-semibold"
-                >
-                  ออกจากระบบ
-                </button>
-              </div>
-            )}
 
             <div
               className="pt-3 text-center text-[0.67rem] leading-5"
