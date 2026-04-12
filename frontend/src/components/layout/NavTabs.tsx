@@ -7,7 +7,6 @@ const ALL_TABS = [
   { href: "/dashboard", label: "🧠 พื้นที่วิเคราะห์" },
   { href: "/dashboard/federated", label: "🌐 Federated Learning" },
   { href: "/dashboard/security", label: "🔒 Security Layer" },
-  { href: "/dashboard/pacs", label: "🏥 PACS Integration" },
 ];
 
 export default function NavTabs() {

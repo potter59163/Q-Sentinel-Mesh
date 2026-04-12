@@ -26,7 +26,7 @@ function SummaryCard({
   valueColor?: string;
 }) {
   return (
-    <article className="q-soft-panel rounded-[1.25rem] px-4 py-4">
+    <article className="q-soft-panel q-summary-card rounded-[1.25rem] px-4 py-4">
       <div className="q-eyebrow mb-1">{label}</div>
       <div className="text-[1.6rem] font-bold leading-none" style={{ color: valueColor ?? "var(--text-1)", fontFamily: "var(--font-mono)" }}>
         {value}
@@ -109,7 +109,7 @@ export default function FederatedPage() {
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard label="Baseline AUC" value={baseline ? `${(baseline * 100).toFixed(1)}%` : "-"} note="ผลอ้างอิงแบบ single-site ก่อนทำ federation" valueColor="var(--chart-baseline)" />
-        <SummaryCard label="Hybrid AUC" value={hybrid ? `${(hybrid * 100).toFixed(1)}%` : "-"} note="ผลของ Q-Sentinel ก่อน aggregate ข้าม site" valueColor="var(--accent)" />
+        <SummaryCard label="Hybrid AUC" value={hybrid ? `${(hybrid * 100).toFixed(1)}%` : "-"} note="ผลของ Q-Sentinel ก่อนรวมผลข้ามโรงพยาบาล" valueColor="var(--accent)" />
         <SummaryCard label="Federated AUC" value={animValue ?? (federated ? `${(federated * 100).toFixed(1)}%` : "-")} note="ผลของ global model หลังการกระจายรอบล่าสุด" valueColor="var(--success)" />
         <SummaryCard label="Net Lift" value={netLift != null ? `+${netLift.toFixed(1)}%` : "-"} note="การยกระดับเมื่อเทียบกับ baseline เดิม" valueColor="var(--info)" />
       </div>

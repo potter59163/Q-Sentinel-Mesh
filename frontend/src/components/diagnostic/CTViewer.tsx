@@ -46,7 +46,7 @@ export default function CTViewer({
           <div>
             <div className="q-eyebrow">ตัวควบคุมการแสดงภาพ</div>
             <div className="mt-1 text-xs leading-5" style={{ color: "var(--text-2)" }}>
-              เลือก window preset ที่เหมาะสมก่อนอ่านสไลซ์และดู heatmap ของ AI
+              เลือก window preset ที่เหมาะสมก่อนดูสไลซ์และ heatmap ของ AI
             </div>
           </div>
           <span className="text-[11px]" style={{ color: "var(--text-3)" }}>
@@ -108,7 +108,7 @@ export default function CTViewer({
               <div className="mb-3 text-5xl opacity-65">🩻</div>
               <div className="text-sm font-semibold text-white">หน้าต่าง CT กำลังรอข้อมูล</div>
               <p className="mt-2 text-xs leading-6 text-white/70">
-                อัปโหลดการศึกษาหรือเลือกเคสตัวอย่างจาก sidebar เพื่อเริ่มอ่านสไลซ์
+                อัปโหลด CT scan หรือเลือกเคสตัวอย่างจากแถบด้านข้าง
               </p>
             </div>
           </div>

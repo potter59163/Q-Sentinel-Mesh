@@ -96,7 +96,7 @@ export default function RadiologistReview({
     >
       <div className="q-eyebrow mb-1">ความเห็นรังสีแพทย์</div>
       <div className="mb-3 text-xs leading-5" style={{ color: "var(--text-2)" }}>
-        ทบทวนผลจาก AI แล้วส่ง verdict ของคุณกลับเข้าระบบ ข้อมูลนี้จะถูกใช้เพื่อพัฒนา federated model ต่อไป
+        ตรวจสอบผลจาก AI แล้วส่งความเห็นของคุณกลับเข้าระบบ เพื่อนำไปปรับปรุงโมเดลอย่างต่อเนื่อง
       </div>
 
       <div

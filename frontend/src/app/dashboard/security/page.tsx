@@ -7,8 +7,8 @@ import type { PQCDemoResponse } from "@/types/api";
 
 const FLOW_STEPS = [
   ["1", "Local training", "แต่ละ hospital node เทรนโมเดลในสถานที่ของตนเอง และเตรียมเฉพาะ model delta สำหรับการแลกเปลี่ยน"],
-  ["2", "Key encapsulation", "ML-KEM-512 สร้าง shared secret โดยใช้ public key ของฝั่ง server"],
-  ["3", "Authenticated encryption", "HKDF-SHA256 สร้าง AES key แล้วเข้ารหัส weight payload ด้วย AES-256-GCM"],
+  ["2", "Key encapsulation", "ML-KEM-512 สร้างรหัสลับร่วมโดยใช้ public key ของฝั่ง server"],
+  ["3", "Authenticated encryption", "HKDF-SHA256 สร้าง AES key แล้วเข้ารหัสชุดน้ำหนักโมเดลด้วย AES-256-GCM"],
   ["4", "Secure aggregation", "server ทำ decapsulate, decrypt, aggregate และเตรียมน้ำหนัก global model ชุดใหม่"],
   ["5", "Encrypted return path", "global weights ชุดอัปเดตจะถูกส่งกลับไปยังแต่ละ hospital node อย่างปลอดภัย"],
 ];
@@ -75,8 +75,8 @@ export default function SecurityPage() {
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         {[
           ["KEM algorithm", "ML-KEM-512", "มาตรฐาน post-quantum key encapsulation ที่พร้อมใช้งานจริง", "var(--accent)"],
-          ["Security level", "128-bit PQ", "ระดับการป้องกันที่เหมาะกับ flow การรับส่งข้อมูลจริง", "var(--text-1)"],
-          ["Privacy posture", "No raw CT", "มีเพียง model update ที่เข้ารหัสแล้วเท่านั้นที่เคลื่อนผ่านเครือข่าย federated", "var(--success)"],
+          ["Security level", "128-bit PQ", "ระดับการป้องกันที่เหมาะกับกระบวนการรับส่งข้อมูลจริง", "var(--text-1)"],
+          ["Privacy posture", "No raw CT", "มีเพียง model update ที่เข้ารหัสแล้วเท่านั้นที่ส่งผ่านเครือข่าย federated", "var(--success)"],
           ["Transport stack", "KEM + AES", "ML-KEM-512, HKDF-SHA256 และ AES-256-GCM ทำงานร่วมกัน", "var(--info)"],
         ].map(([label, value, note, color]) => (
           <article key={label} className="q-soft-panel rounded-[1.25rem] px-4 py-4">
@@ -142,7 +142,7 @@ export default function SecurityPage() {
               className="q-btn-primary w-full px-4 py-3 text-sm"
               style={{ opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}
             >
-              {loading ? "กำลังรัน PQC demo..." : "สร้าง key pair และทดสอบการเข้ารหัส"}
+              {loading ? "กำลังรัน PQC demo..." : "สร้างคู่กุญแจและทดสอบการเข้ารหัส"}
             </button>
 
             {demoResult ? (

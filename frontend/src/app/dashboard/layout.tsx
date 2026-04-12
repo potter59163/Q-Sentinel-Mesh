@@ -50,14 +50,10 @@ export default function DashboardLayout({
           </ErrorBoundary>
 
           <footer
-            className="mt-4 text-center text-xs leading-6"
+            className="mt-4 text-center text-[0.7rem] leading-6"
             style={{ color: "var(--text-3)" }}
           >
-            Q-Sentinel Mesh · พื้นที่คัดกรองด้วย AI · ติดตาม Federated Monitoring แบบ 3 โรงพยาบาล
-            <br />
-            <span style={{ color: "var(--text-2)" }}>
-              อินเทอร์เฟซต้นแบบสำหรับงานวิจัยและการสาธิตเท่านั้น
-            </span>
+            Q-Sentinel Mesh v1.0 · CEDT Hackathon 2026 · อินเทอร์เฟซต้นแบบสำหรับงานวิจัยและการสาธิตเท่านั้น
           </footer>
         </div>
       </div>

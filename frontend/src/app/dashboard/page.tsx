@@ -151,7 +151,7 @@ function DiagnosticWorkspace() {
         <SummaryCard
           label="เคส"
           value={ctMeta ? ctMeta.filename : "รอข้อมูล"}
-          note={ctMeta ? `${ctMeta.slice_count} สไลซ์พร้อมสำหรับการทบทวนแล้ว` : "เลือกเคสตัวอย่างหรืออัปโหลด CT scan จาก sidebar"}
+          note={ctMeta ? `${ctMeta.slice_count} สไลซ์พร้อมใช้งาน` : "เลือกเคสตัวอย่างหรืออัปโหลด CT scan จากแถบด้านข้าง"}
           valueColor={ctMeta ? "var(--accent)" : "var(--text-2)"}
         />
         <SummaryCard
@@ -173,10 +173,10 @@ function DiagnosticWorkspace() {
           <div className="border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
             <div className="q-eyebrow mb-1">ภาพ CT</div>
             <div className="text-base font-semibold" style={{ color: "var(--text-1)" }}>
-              ทบทวนสไลซ์
+              ดูสไลซ์
             </div>
             <p className="mt-1 text-sm leading-6" style={{ color: "var(--text-2)" }}>
-              เลื่อนดูการศึกษา เปลี่ยน window preset และเปิด heatmap ทับภาพหลังจากโมเดลรันเสร็จ
+              เลื่อนดูสไลซ์ เปลี่ยน window preset และเปิด heatmap ทับภาพหลังจาก AI วิเคราะห์เสร็จ
             </p>
           </div>
 
@@ -242,17 +242,24 @@ function DiagnosticWorkspace() {
           </div>
 
           <div className="flex flex-col gap-5 p-5 sm:p-6">
-            <button
-              onClick={handleRunAI}
-              disabled={!ctMeta || inferLoading}
-              className="q-btn-primary w-full py-3.5 text-sm font-bold"
-              style={{
-                cursor: !ctMeta || inferLoading ? "not-allowed" : "pointer",
-                opacity: !ctMeta || inferLoading ? 0.55 : 1,
-              }}
-            >
-              {inferLoading ? "กำลังรันวิเคราะห์..." : "รัน AI วิเคราะห์"}
-            </button>
+            <div title={!ctMeta ? "กรุณาโหลด CT scan จากแถบด้านข้าง ก่อน" : undefined}>
+              <button
+                onClick={handleRunAI}
+                disabled={!ctMeta || inferLoading}
+                className="q-btn-primary w-full py-3.5 text-sm font-bold"
+                style={{
+                  cursor: !ctMeta || inferLoading ? "not-allowed" : "pointer",
+                  opacity: !ctMeta || inferLoading ? 0.45 : 1,
+                }}
+              >
+                {inferLoading ? "กำลังรันวิเคราะห์..." : "รัน AI วิเคราะห์"}
+              </button>
+              {!ctMeta && !inferLoading && (
+                <p className="mt-1.5 text-center text-[0.72rem]" style={{ color: "var(--text-3)" }}>
+                  โหลด CT scan จากแถบด้านข้าง เพื่อเปิดใช้งาน
+                </p>
+              )}
+            </div>
 
             {inferLoading ? (
               <div
@@ -270,8 +277,8 @@ function DiagnosticWorkspace() {
                   </div>
                   <span className="q-pill q-pill-accent">กำลังทำงาน</span>
                 </div>
-                <div className="mt-4 h-2 w-full overflow-hidden rounded-full" style={{ background: "rgba(194,91,134,0.12)" }}>
-                  <div className="h-full w-2/3 animate-pulse rounded-full" style={{ background: "var(--accent)" }} />
+                <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "rgba(194,91,134,0.12)" }}>
+                  <div className="q-progress-indeterminate h-full rounded-full" style={{ background: "var(--accent)" }} />
                 </div>
                 <div className="mt-3 grid gap-1 text-[11px]" style={{ color: "var(--text-3)" }}>
                   <span>1. โหลด volume และ window preset</span>
@@ -296,10 +303,16 @@ function DiagnosticWorkspace() {
             ) : null}
 
             {!ctMeta && !result ? (
-              <div className="rounded-[1.25rem] border border-dashed px-6 py-12 text-center" style={{ background: "var(--surface-2)", borderColor: "var(--border-strong)" }}>
-                <div className="text-sm font-semibold" style={{ color: "var(--text-2)" }}>
-                  โหลด CT scan เพื่อเริ่มการวิเคราะห์
+              <div className="rounded-[1.25rem] border border-dashed px-6 py-14 text-center" style={{ background: "var(--surface-2)", borderColor: "var(--border-strong)" }}>
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ background: "var(--surface-3)" }}>
+                  🫁
                 </div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>
+                  ยังไม่มีข้อมูล CT
+                </div>
+                <p className="mt-1 text-xs leading-5" style={{ color: "var(--text-3)" }}>
+                  เลือกเคสตัวอย่าง (P049–P099) หรืออัปโหลดไฟล์ NIfTI / DICOM จากแถบด้านข้าง
+                </p>
               </div>
             ) : null}
 
@@ -362,7 +375,7 @@ function DiagnosticWorkspace() {
                       ความมั่นใจ {Math.round(result.confidence * 100)}% · สไลซ์ {result.slice_used + 1}
                     </div>
                   </div>
-                  <span className={`q-pill ${detected ? "q-pill-accent" : "q-pill-success"}`}>{detected ? "พบสัญญาณ" : "ไม่พบ"}</span>
+                  <span className={`q-pill ${detected ? "q-pill-accent" : "q-pill-success"}`}>{detected ? "พบเลือดออก" : "ไม่พบเลือดออก"}</span>
                 </div>
               </div>
             ) : null}
