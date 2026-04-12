@@ -10,12 +10,12 @@ from app.core.security import UserRole, create_access_token
 
 router = APIRouter(prefix="/api", tags=["auth"])
 
-VALID_ROLES = {"radiologist", "hospital_operator", "fed_ai_admin", "hospital_it"}
+VALID_ROLES = {"radiologist", "hospital_operator", "fed_ai_admin", "hospital_it", "dev"}
 
 
 class LoginRequest(BaseModel):
     password: str
-    role: Literal["radiologist", "hospital_operator", "fed_ai_admin", "hospital_it"]
+    role: Literal["radiologist", "hospital_operator", "fed_ai_admin", "hospital_it", "dev"]
 
 
 class LoginResponse(BaseModel):

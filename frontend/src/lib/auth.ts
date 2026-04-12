@@ -33,6 +33,14 @@ export const ROLE_CONFIG = {
     defaultPath: "/dashboard/security",
     accent: "#7c3aed",
   },
+  dev: {
+    label: "Developer / Creator",
+    icon: "⚡",
+    description: "Full system access — all modules unlocked",
+    tabs: ["/dashboard", "/dashboard/federated", "/dashboard/security", "/dashboard/pacs"],
+    defaultPath: "/dashboard",
+    accent: "#f59e0b",
+  },
 } as const;
 
 export type UserRole = keyof typeof ROLE_CONFIG;

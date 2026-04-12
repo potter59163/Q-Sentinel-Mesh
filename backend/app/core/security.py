@@ -6,7 +6,7 @@ from jose import JWTError, jwt
 
 from app.core.config import settings
 
-UserRole = Literal["radiologist", "hospital_operator", "fed_ai_admin", "hospital_it"]
+UserRole = Literal["radiologist", "hospital_operator", "fed_ai_admin", "hospital_it", "dev"]
 
 
 def create_access_token(role: UserRole) -> str:

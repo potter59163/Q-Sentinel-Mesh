@@ -6,13 +6,16 @@ import { toast } from "sonner";
 import api from "@/lib/api";
 import { ROLE_CONFIG, setAuth, type UserRole } from "@/lib/auth";
 
-const ROLES = Object.entries(ROLE_CONFIG) as [UserRole, (typeof ROLE_CONFIG)[UserRole]][];
+// Public-facing roles only (dev is hidden easter egg)
+const ROLES = (Object.entries(ROLE_CONFIG) as [UserRole, (typeof ROLE_CONFIG)[UserRole]][])
+  .filter(([k]) => k !== "dev");
 
 const ROLE_BADGE_STYLE: Record<UserRole, React.CSSProperties> = {
   radiologist:       { background: "rgba(194,91,134,0.10)", borderColor: "rgba(194,91,134,0.25)", color: "#c25b86" },
   hospital_operator: { background: "rgba(59,130,246,0.10)",  borderColor: "rgba(59,130,246,0.25)",  color: "#2563eb" },
   fed_ai_admin:      { background: "rgba(76,143,107,0.10)",  borderColor: "rgba(76,143,107,0.25)",  color: "#4c8f6b" },
   hospital_it:       { background: "rgba(124,58,237,0.10)",  borderColor: "rgba(124,58,237,0.25)",  color: "#7c3aed" },
+  dev:               { background: "rgba(245,158,11,0.12)",  borderColor: "rgba(245,158,11,0.30)",  color: "#f59e0b" },
 };
 
 function LoginContent() {
@@ -21,6 +24,18 @@ function LoginContent() {
   const [selected, setSelected] = useState<UserRole | null>(null);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [devUnlocked, setDevUnlocked] = useState(false);
+  const [devClickCount, setDevClickCount] = useState(0);
+
+  function handleDevTap() {
+    const next = devClickCount + 1;
+    setDevClickCount(next);
+    if (next >= 3) {
+      setDevUnlocked(true);
+      setSelected("dev");
+      toast("⚡ Developer mode unlocked", { description: "Full system access granted." });
+    }
+  }
 
   async function handleLogin() {
     if (!selected) { toast.warning("Select your role first."); return; }
@@ -76,7 +91,7 @@ function LoginContent() {
       </div>
 
       <div
-        className="w-full max-w-2xl rounded-[1.75rem] border p-8"
+        className="relative w-full max-w-2xl rounded-[1.75rem] border p-8"
         style={{ background: "var(--surface)", borderColor: "var(--border)", boxShadow: "0 24px 64px rgba(194,91,134,0.08)" }}
       >
         <div className="q-eyebrow mb-1 text-center">Access Control</div>
@@ -198,7 +213,84 @@ function LoginContent() {
         <p className="mt-4 text-center text-[0.72rem]" style={{ color: "var(--text-3)" }}>
           CEDT Hackathon 2026 · Demo environment · Prototype only
         </p>
+
+        {/* Easter egg — hidden dev trigger, bottom-right corner */}
+        <button
+          type="button"
+          onClick={handleDevTap}
+          aria-hidden="true"
+          tabIndex={-1}
+          style={{
+            position: "absolute",
+            bottom: 14,
+            right: 16,
+            width: 18,
+            height: 18,
+            opacity: devUnlocked ? 0.7 : devClickCount > 0 ? 0.25 : 0.08,
+            background: "none",
+            border: "none",
+            cursor: "default",
+            fontSize: 12,
+            transition: "opacity 0.4s",
+            color: "#f59e0b",
+          }}
+        >
+          ⚡
+        </button>
       </div>
+
+      {/* Dev card — slides in after unlock */}
+      {devUnlocked && (
+        <div
+          className="mt-3 w-full max-w-2xl animate-pulse-once"
+          style={{ animation: "fadeSlideIn 0.4s ease both" }}
+        >
+          <button
+            type="button"
+            onClick={() => setSelected("dev")}
+            className="group flex w-full items-center gap-4 rounded-[1.25rem] border px-5 py-4 text-left transition-all"
+            style={{
+              background: selected === "dev"
+                ? "rgba(245,158,11,0.10)"
+                : "rgba(245,158,11,0.04)",
+              borderColor: selected === "dev" ? "#f59e0b" : "rgba(245,158,11,0.25)",
+              boxShadow: selected === "dev" ? "0 0 28px rgba(245,158,11,0.18)" : "none",
+            }}
+          >
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-2xl"
+              style={{ background: "rgba(245,158,11,0.12)" }}
+            >
+              ⚡
+            </span>
+            <div className="flex-1">
+              <div className="text-sm font-bold" style={{ color: "#f59e0b" }}>
+                Developer / Creator
+              </div>
+              <div className="text-xs" style={{ color: "var(--text-3)" }}>
+                Full system access · all modules unlocked · built this
+              </div>
+            </div>
+            <span
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 text-[10px] font-bold"
+              style={{
+                borderColor: selected === "dev" ? "#f59e0b" : "rgba(245,158,11,0.3)",
+                background: selected === "dev" ? "#f59e0b" : "transparent",
+                color: "white",
+              }}
+            >
+              {selected === "dev" ? "✓" : ""}
+            </span>
+          </button>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
