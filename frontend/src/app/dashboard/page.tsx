@@ -147,23 +147,6 @@ function DiagnosticWorkspace() {
 
   return (
     <div className="q-dashboard-stack">
-      <section className="q-dashboard-intro">
-        <div className="q-dashboard-intro-row">
-          <div className="q-dashboard-intro-copy">
-            <div className="q-eyebrow mb-1">พื้นที่วิเคราะห์</div>
-            <div className="q-dashboard-intro-title">ทบทวน CT hemorrhage</div>
-            <p className="q-dashboard-intro-text">
-              ดูสไลซ์ รันโมเดลที่เลือก และอ่าน heatmap พร้อมความน่าจะเป็นของแต่ละ subtype ได้ในหน้าเดียว
-            </p>
-          </div>
-          <div className="q-kicker-row">
-            <span className="q-pill">{hospital}</span>
-            <span className="q-pill q-pill-accent">{modelLabel}</span>
-            <span className={`q-pill ${autoTriage ? "q-pill-success" : ""}`}>{autoTriage ? "Auto-triage" : "สไลซ์ปัจจุบัน"}</span>
-          </div>
-        </div>
-      </section>
-
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
         <SummaryCard
           label="เคส"
@@ -243,13 +226,19 @@ function DiagnosticWorkspace() {
 
         <section className="q-card overflow-hidden">
           <div className="border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
-            <div className="q-eyebrow mb-1">AI Analysis</div>
-            <div className="text-base font-semibold" style={{ color: "var(--text-1)" }}>
-              สรุปผลการตรวจจับ
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="q-eyebrow mb-1">AI Analysis</div>
+                <div className="text-base font-semibold" style={{ color: "var(--text-1)" }}>
+                  สรุปผลการตรวจจับ
+                </div>
+              </div>
+              <div className="flex flex-wrap justify-end gap-1.5 pt-0.5">
+                <span className="q-pill">{hospital}</span>
+                <span className="q-pill q-pill-accent">{modelLabel}</span>
+                <span className={`q-pill ${autoTriage ? "q-pill-success" : ""}`}>{autoTriage ? "Auto-triage" : "สไลซ์ปัจจุบัน"}</span>
+              </div>
             </div>
-            <p className="mt-1 text-sm leading-6" style={{ color: "var(--text-2)" }}>
-              รันโมเดลที่เลือก แล้วอ่านผลลัพธ์ ความมั่นใจ และการกระจายของ subtype ได้จากแผงเดียวกัน
-            </p>
           </div>
 
           <div className="flex flex-col gap-5 p-5 sm:p-6">
