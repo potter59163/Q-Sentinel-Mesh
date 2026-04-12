@@ -1,15 +1,7 @@
 "use client";
 
 import type { HemorrhageProbabilities, HemorrhageThresholds } from "@/types/api";
-
-const SUBTYPE_LABELS: Record<string, string> = {
-  epidural: "Epidural",
-  intraparenchymal: "Intraparenchymal",
-  intraventricular: "Intraventricular",
-  subarachnoid: "Subarachnoid",
-  subdural: "Subdural",
-  any: "Any Hemorrhage",
-};
+import { HEMORRHAGE_LABELS } from "@/lib/hemorrhageLabels";
 
 const COLORS: Record<string, string> = {
   epidural: "#d66d86",
@@ -48,10 +40,10 @@ export default function ProbabilityBars({ probabilities, thresholds }: Props) {
           >
             <div className="min-w-0">
               <div className="truncate text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: positive ? color : "var(--text-2)" }}>
-                {SUBTYPE_LABELS[key]}
+                {HEMORRHAGE_LABELS[key]}
               </div>
               <div className="mt-0.5 text-[11px]" style={{ color: "var(--text-3)" }}>
-                Threshold {Math.round(threshold * 100)}%
+                เกณฑ์ {Math.round(threshold * 100)}%
               </div>
             </div>
 
@@ -81,7 +73,7 @@ export default function ProbabilityBars({ probabilities, thresholds }: Props) {
                     color: positive ? color : "var(--text-3)",
                   }}
                 >
-                  {positive ? "Flagged" : "Below"}
+                  {positive ? "เกินเกณฑ์" : "ต่ำกว่าเกณฑ์"}
                 </span>
               </div>
             </div>

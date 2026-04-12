@@ -36,16 +36,16 @@ export class ErrorBoundary extends Component<Props, State> {
         >
           <div className="mb-3 text-4xl">⚠️</div>
           <div className="text-base font-semibold" style={{ color: "var(--warning)" }}>
-            Something went wrong
+            เกิดข้อผิดพลาดในส่วนนี้
           </div>
           <p className="mt-1 max-w-xs text-sm leading-6" style={{ color: "var(--text-2)" }}>
-            {this.state.error?.message ?? "An unexpected error occurred in this panel."}
+            {this.state.error?.message ?? "มีข้อผิดพลาดที่ไม่คาดคิดในแผงนี้"}
           </p>
           <button
             className="q-btn-secondary mt-4 px-4 py-2 text-sm"
             onClick={() => this.setState({ hasError: false, error: null })}
           >
-            Try again
+            ลองใหม่
           </button>
         </div>
       );

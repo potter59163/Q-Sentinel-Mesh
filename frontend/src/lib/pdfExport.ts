@@ -1,8 +1,8 @@
 /**
  * Q-Sentinel Mesh - PDF Report Export
  * Uses jsPDF for browser-side generation.
- * Mirrors the structure from dashboard/utils/pdf_export.py
  */
+import { HEMORRHAGE_LABELS, formatHemorrhageLabel } from "@/lib/hemorrhageLabels";
 import type { HemorrhageProbabilities } from "@/types/api";
 
 interface ReportData {
@@ -23,15 +23,6 @@ const TEXT2 = "#6d5360";
 const TEXT3 = "#9c7f8c";
 const BORDER = "#ecd9e2";
 const BG = "#fff8fb";
-
-const SUBTYPE_LABELS: Record<string, string> = {
-  any: "Any Hemorrhage",
-  epidural: "Epidural",
-  subdural: "Subdural",
-  subarachnoid: "Subarachnoid",
-  intraparenchymal: "Intraparenchymal",
-  intraventricular: "Intraventricular",
-};
 
 const SUBTYPE_ORDER = ["any", "epidural", "subdural", "subarachnoid", "intraparenchymal", "intraventricular"];
 
@@ -78,35 +69,35 @@ export async function generateReportPDF(data: ReportData): Promise<void> {
   doc.rect(0, 0, pageWidth, 14, "F");
 
   text("Q-Sentinel Mesh", margin, 9.5, { size: 14, color: "#ffffff", bold: true });
-  text("CT Hemorrhage Detection Report", pageWidth - margin, 9.5, { size: 9, color: "#fce8f0", align: "right" });
+  text("รายงานผล CT Hemorrhage", pageWidth - margin, 9.5, { size: 9, color: "#fce8f0", align: "right" });
 
   let y = 22;
   const now = new Date();
-  const dateStr = now.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-  const timeStr = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  const dateStr = now.toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" });
+  const timeStr = now.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" });
 
   rect(margin, y, contentWidth, 22, BG, BORDER);
-  text("Hospital", margin + 4, y + 6, { size: 8, color: TEXT3 });
+  text("โรงพยาบาล", margin + 4, y + 6, { size: 8, color: TEXT3 });
   text(data.hospital, margin + 4, y + 12, { size: 10, bold: true });
-  text("Model", margin + 65, y + 6, { size: 8, color: TEXT3 });
+  text("โมเดล", margin + 65, y + 6, { size: 8, color: TEXT3 });
   text(data.modelType === "hybrid" ? "Q-Sentinel Hybrid" : "CNN Baseline", margin + 65, y + 12, { size: 10, bold: true });
-  text("Generated", margin + 130, y + 6, { size: 8, color: TEXT3 });
+  text("เวลาที่สร้าง", margin + 130, y + 6, { size: 8, color: TEXT3 });
   text(`${dateStr} | ${timeStr}`, margin + 130, y + 12, { size: 9 });
   y += 28;
 
   const detected = data.probabilities.any >= 0.15;
   rect(margin, y, contentWidth, 18, detected ? "#fde7ef" : "#eef9f1", detected ? "#f1c7d8" : "#b7dec6");
   text(
-    detected ? `WARNING: HEMORRHAGE DETECTED: ${data.topClass.toUpperCase()}` : "CLEAR: NO HEMORRHAGE DETECTED",
+    detected ? `คำเตือน: พบความเสี่ยงเลือดออก - ${formatHemorrhageLabel(data.topClass)}` : "ผลสรุป: ไม่พบเลือดออก",
     margin + 4,
     y + 7,
-    { size: 11, bold: true, color: detected ? ACCENT : "#4c8f6b" }
+    { size: 11, bold: true, color: detected ? ACCENT : "#4c8f6b" },
   );
   text(
-    `Confidence: ${(data.confidence * 100).toFixed(1)}% | Slice: ${data.sliceUsed + 1} | ${data.filename ?? "CT Upload"}`,
+    `ความมั่นใจ: ${(data.confidence * 100).toFixed(1)}% | สไลซ์: ${data.sliceUsed + 1} | ${data.filename ?? "ไฟล์ CT"}`,
     margin + 4,
     y + 14,
-    { size: 8, color: TEXT2 }
+    { size: 8, color: TEXT2 },
   );
   y += 24;
 
@@ -114,8 +105,8 @@ export async function generateReportPDF(data: ReportData): Promise<void> {
   const imageWidth = hasHeatmap ? (contentWidth - 4) / 2 : contentWidth;
   const imageHeight = imageWidth * 0.85;
 
-  text("CT Scan - Brain Window", margin, y + 4, { size: 9, color: TEXT3, bold: true });
-  if (hasHeatmap) text("Grad-CAM Heatmap", margin + imageWidth + 6, y + 4, { size: 9, color: TEXT3, bold: true });
+  text("ภาพ CT - Brain Window", margin, y + 4, { size: 9, color: TEXT3, bold: true });
+  if (hasHeatmap) text("AI Heatmap", margin + imageWidth + 6, y + 4, { size: 9, color: TEXT3, bold: true });
   y += 7;
 
   if (data.ctImageSrc && data.ctImageSrc.length > 20) {
@@ -125,11 +116,11 @@ export async function generateReportPDF(data: ReportData): Promise<void> {
       doc.rect(margin, y, imageWidth, imageHeight, "S");
     } catch {
       rect(margin, y, imageWidth, imageHeight, "#f5f5f5", BORDER);
-      text("CT image not available", margin + imageWidth / 2, y + imageHeight / 2, { size: 8, color: TEXT3, align: "center" });
+      text("ไม่พบภาพ CT", margin + imageWidth / 2, y + imageHeight / 2, { size: 8, color: TEXT3, align: "center" });
     }
   } else {
     rect(margin, y, imageWidth, imageHeight, "#f5f5f5", BORDER);
-    text("CT image not available", margin + imageWidth / 2, y + imageHeight / 2, { size: 8, color: TEXT3, align: "center" });
+    text("ไม่พบภาพ CT", margin + imageWidth / 2, y + imageHeight / 2, { size: 8, color: TEXT3, align: "center" });
   }
 
   if (hasHeatmap) {
@@ -140,7 +131,7 @@ export async function generateReportPDF(data: ReportData): Promise<void> {
       doc.rect(heatmapX, y, imageWidth, imageHeight, "S");
     } catch {
       rect(heatmapX, y, imageWidth, imageHeight, "#f5f5f5", BORDER);
-      text("Heatmap not available", heatmapX + imageWidth / 2, y + imageHeight / 2, { size: 8, color: TEXT3, align: "center" });
+      text("ไม่พบ heatmap", heatmapX + imageWidth / 2, y + imageHeight / 2, { size: 8, color: TEXT3, align: "center" });
     }
   }
 
@@ -151,7 +142,7 @@ export async function generateReportPDF(data: ReportData): Promise<void> {
     y = 22;
   }
 
-  text("Detection Probabilities", margin, y, { size: 11, bold: true });
+  text("ความน่าจะเป็นของการตรวจจับ", margin, y, { size: 11, bold: true });
   line(margin, y + 2, pageWidth - margin);
   y += 8;
 
@@ -162,7 +153,7 @@ export async function generateReportPDF(data: ReportData): Promise<void> {
     const barColor = isPos ? ACCENT : "#d0bfc9";
     const barW = (contentWidth - 70) * Math.min(pct / 100, 1);
 
-    text(SUBTYPE_LABELS[key] ?? key, margin, y + 4.5, { size: 9, color: isPos ? ACCENT : TEXT2, bold: isPos });
+    text(HEMORRHAGE_LABELS[key] ?? key, margin, y + 4.5, { size: 9, color: isPos ? ACCENT : TEXT2, bold: isPos });
 
     rect(margin + 52, y, contentWidth - 70, 5, "#fff3f7", BORDER);
     if (barW > 0) {
@@ -171,13 +162,13 @@ export async function generateReportPDF(data: ReportData): Promise<void> {
     }
 
     text(`${pct.toFixed(1)}%`, pageWidth - margin - 2, y + 4.5, { size: 9, color: isPos ? ACCENT : TEXT3, bold: isPos, align: "right" });
-    text(isPos ? "POSITIVE" : "-", pageWidth - margin - 18, y + 4.5, { size: 7, color: isPos ? ACCENT : TEXT3, align: "right" });
+    text(isPos ? "พบสัญญาณ" : "-", pageWidth - margin - 18, y + 4.5, { size: 7, color: isPos ? ACCENT : TEXT3, align: "right" });
     y += 9;
   }
 
   const footerY = pageHeight - 12;
   line(margin, footerY - 4, pageWidth - margin, "#dfbfcd");
-  text("Q-Sentinel Mesh | CEDT Hackathon 2026 | Prototype - Not for Clinical Use", pageWidth / 2, footerY, {
+  text("Q-Sentinel Mesh | CEDT Hackathon 2026 | ต้นแบบสำหรับการสาธิต ไม่ใช่เครื่องมือวินิจฉัยทางคลินิก", pageWidth / 2, footerY, {
     size: 7,
     color: TEXT3,
     align: "center",

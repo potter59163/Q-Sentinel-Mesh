@@ -39,21 +39,21 @@ export default function MetricsStrip() {
   return (
     <section className="q-metric-grid">
       <MetricCard
-        label="Active Nodes"
+        label="โหนดที่ใช้งาน"
         value="3"
-        note="Federation Online"
+        note="Federated network ออนไลน์"
         valueColor="var(--text-1)"
       />
       <MetricCard
         label="Global AUC"
         value="87.6%"
-        note="High-Acc trained"
+        note="ผลล่าสุดของโมเดลรวม"
         valueColor="var(--accent)"
       />
       <MetricCard
-        label="Scans Analyzed"
+        label="เคสที่วิเคราะห์"
         value={String(scansAnalyzed)}
-        note="This session"
+        note="ในรอบการใช้งานนี้"
       />
     </section>
   );

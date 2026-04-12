@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import { formatHemorrhageLabel } from "@/lib/hemorrhageLabels";
 import type { FeedbackRequest, RadiologistVerdict } from "@/types/api";
 
 const HEMORRHAGE_TYPES = [
@@ -53,10 +54,10 @@ export default function RadiologistReview({
     try {
       await api.post<{ feedback_id: string; saved: boolean }>("/api/feedback", body);
       setSubmitted(true);
-      toast.success("Radiologist feedback saved");
+      toast.success("บันทึกความเห็นรังสีแพทย์แล้ว");
       onVerdictSubmitted?.(v, v === "correct" ? correctedClass : undefined);
     } catch {
-      toast.error("Could not save feedback — please retry.");
+      toast.error("บันทึกความเห็นไม่สำเร็จ กรุณาลองอีกครั้ง");
       setVerdict(null);
     } finally {
       setLoading(false);
@@ -65,9 +66,9 @@ export default function RadiologistReview({
 
   if (submitted) {
     const labels: Record<RadiologistVerdict, { icon: string; text: string; color: string }> = {
-      confirm: { icon: "✅", text: "AI result confirmed", color: "var(--success)" },
-      reject: { icon: "❌", text: "AI result rejected", color: "var(--warning)" },
-      correct: { icon: "✏️", text: `Corrected to: ${correctedClass}`, color: "var(--accent)" },
+      confirm: { icon: "✅", text: "ยืนยันผลของ AI", color: "var(--success)" },
+      reject: { icon: "❌", text: "ไม่เห็นด้วยกับผลของ AI", color: "var(--warning)" },
+      correct: { icon: "✏️", text: `แก้ผลเป็น: ${formatHemorrhageLabel(correctedClass)}`, color: "var(--accent)" },
     };
     const meta = labels[verdict!];
 
@@ -76,13 +77,13 @@ export default function RadiologistReview({
         className="rounded-[1rem] border px-4 py-3 text-sm"
         style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}
       >
-        <div className="q-eyebrow mb-2">Radiologist Review</div>
+        <div className="q-eyebrow mb-2">ความเห็นรังสีแพทย์</div>
         <div className="flex items-center gap-2 font-semibold" style={{ color: meta.color }}>
           <span>{meta.icon}</span>
           <span>{meta.text}</span>
         </div>
         <div className="mt-1 text-xs" style={{ color: "var(--text-3)" }}>
-          Feedback saved · contributes to federated model improvement
+          บันทึกแล้ว · ใช้เป็นข้อมูลย้อนกลับเพื่อพัฒนา federated model
         </div>
       </div>
     );
@@ -93,30 +94,28 @@ export default function RadiologistReview({
       className="rounded-[1rem] border px-4 py-4"
       style={{ background: "var(--surface-2)", borderColor: "var(--border-strong)" }}
     >
-      <div className="q-eyebrow mb-1">Radiologist Review</div>
+      <div className="q-eyebrow mb-1">ความเห็นรังสีแพทย์</div>
       <div className="mb-3 text-xs leading-5" style={{ color: "var(--text-2)" }}>
-        Review the AI prediction and submit your verdict. Feedback is used to improve the federated model.
+        ทบทวนผลจาก AI แล้วส่ง verdict ของคุณกลับเข้าระบบ ข้อมูลนี้จะถูกใช้เพื่อพัฒนา federated model ต่อไป
       </div>
 
-      {/* AI summary */}
       <div
         className="mb-3 rounded-[0.75rem] border px-3 py-2 text-xs"
         style={{ background: "var(--surface)", borderColor: "var(--border)" }}
       >
-        <span style={{ color: "var(--text-3)" }}>AI predicted: </span>
+        <span style={{ color: "var(--text-3)" }}>AI ประเมินว่า: </span>
         <span className="font-semibold" style={{ color: "var(--accent)" }}>
-          {topClass}
+          {formatHemorrhageLabel(topClass)}
         </span>
-        <span style={{ color: "var(--text-3)" }}> ({Math.round(confidence * 100)}% confidence)</span>
+        <span style={{ color: "var(--text-3)" }}> ({Math.round(confidence * 100)}% ความมั่นใจ)</span>
       </div>
 
-      {/* Verdict buttons */}
       <div className="mb-3 grid grid-cols-3 gap-2">
         {(
           [
-            { v: "confirm" as const, icon: "✅", label: "Confirm", color: "var(--success)" },
-            { v: "reject" as const, icon: "❌", label: "Reject", color: "var(--warning)" },
-            { v: "correct" as const, icon: "✏️", label: "Correct", color: "var(--accent)" },
+            { v: "confirm" as const, icon: "✅", label: "ยืนยัน", color: "var(--success)" },
+            { v: "reject" as const, icon: "❌", label: "ไม่เห็นด้วย", color: "var(--warning)" },
+            { v: "correct" as const, icon: "✏️", label: "แก้ผล", color: "var(--accent)" },
           ] as const
         ).map(({ v, icon, label, color }) => (
           <button
@@ -144,7 +143,6 @@ export default function RadiologistReview({
         ))}
       </div>
 
-      {/* Correction picker */}
       {verdict === "correct" && (
         <div className="flex flex-col gap-2">
           <select
@@ -155,10 +153,10 @@ export default function RadiologistReview({
           >
             {HEMORRHAGE_TYPES.map((t) => (
               <option key={t} value={t}>
-                {t.charAt(0).toUpperCase() + t.slice(1)}
+                {formatHemorrhageLabel(t)}
               </option>
             ))}
-            <option value="no_hemorrhage">No hemorrhage</option>
+            <option value="no_hemorrhage">ไม่พบเลือดออก</option>
           </select>
           <button
             type="button"
@@ -167,7 +165,7 @@ export default function RadiologistReview({
             className="q-btn-primary w-full py-2 text-xs font-bold"
             style={{ opacity: loading ? 0.6 : 1 }}
           >
-            {loading ? "Saving..." : "Submit Correction"}
+            {loading ? "กำลังบันทึก..." : "บันทึกการแก้ผล"}
           </button>
         </div>
       )}

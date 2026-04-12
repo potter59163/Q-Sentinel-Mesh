@@ -10,6 +10,7 @@ import { useDashboard } from "@/context/DashboardContext";
 import { usePrediction } from "@/hooks/usePrediction";
 import { useWindowedSlice } from "@/hooks/useWindowedSlice";
 import api, { withRetry } from "@/lib/api";
+import { formatHemorrhageLabel } from "@/lib/hemorrhageLabels";
 import type { HemorrhageThresholds, WindowPreset } from "@/types/api";
 
 function SummaryCard({
@@ -47,7 +48,6 @@ function DiagnosticWorkspace() {
     setLastResult,
     setLastImageSrc,
     setLastHeatmapSrc,
-    lastSessionId,
     setLastSessionId,
     setLastVerdict,
     setLastCorrectedClass,
@@ -85,7 +85,6 @@ function DiagnosticWorkspace() {
     setLastResult(null);
     setLastImageSrc(null);
     setLastHeatmapSrc(null);
-    setSessionId(null);
     setLastSessionId(null);
     setLastVerdict(null);
     setLastCorrectedClass(null);
@@ -110,7 +109,7 @@ function DiagnosticWorkspace() {
 
   async function handleRunAI() {
     if (!ctMeta?.s3_key) {
-      toast.warning("Load a CT scan first.");
+      toast.warning("กรุณาโหลด CT scan ก่อน");
       return;
     }
 
@@ -125,7 +124,6 @@ function DiagnosticWorkspace() {
 
     if (res) {
       setSliceIdx(res.slice_used);
-      // New session for this prediction result
       const sid = crypto.randomUUID();
       setSessionId(sid);
       setLastSessionId(sid);
@@ -138,9 +136,9 @@ function DiagnosticWorkspace() {
   const modelLabel = modelType === "hybrid" ? "Q-Sentinel Hybrid" : "CNN Baseline";
   const statusMeta = result
     ? [
-        modelType === "hybrid" ? "Hybrid model" : "Baseline model",
-        "Device: CPU",
-        autoTriage ? "Auto-triage" : "Manual slice",
+        modelType === "hybrid" ? "โมเดล Hybrid" : "โมเดล Baseline",
+        "อุปกรณ์: CPU",
+        autoTriage ? "โหมด: Auto-triage" : "โหมด: เลือกสไลซ์เอง",
         `Threshold ${threshold.toFixed(2)}`,
         lastLatencyMs !== null ? `Latency ${lastLatencyMs} ms` : "Latency -",
         lastRequestId ? `Request ${lastRequestId}` : "Request -",
@@ -152,37 +150,37 @@ function DiagnosticWorkspace() {
       <section className="q-dashboard-intro">
         <div className="q-dashboard-intro-row">
           <div className="q-dashboard-intro-copy">
-            <div className="q-eyebrow mb-1">Diagnostic Workspace</div>
-            <div className="q-dashboard-intro-title">CT hemorrhage review</div>
+            <div className="q-eyebrow mb-1">พื้นที่วิเคราะห์</div>
+            <div className="q-dashboard-intro-title">ทบทวน CT hemorrhage</div>
             <p className="q-dashboard-intro-text">
-              Inspect slices, trigger the active model, and review explanation overlays and subtype probabilities in one place.
+              ดูสไลซ์ รันโมเดลที่เลือก และอ่าน heatmap พร้อมความน่าจะเป็นของแต่ละ subtype ได้ในหน้าเดียว
             </p>
           </div>
           <div className="q-kicker-row">
             <span className="q-pill">{hospital}</span>
             <span className="q-pill q-pill-accent">{modelLabel}</span>
-            <span className={`q-pill ${autoTriage ? "q-pill-success" : ""}`}>{autoTriage ? "Auto-triage" : "Current slice"}</span>
+            <span className={`q-pill ${autoTriage ? "q-pill-success" : ""}`}>{autoTriage ? "Auto-triage" : "สไลซ์ปัจจุบัน"}</span>
           </div>
         </div>
       </section>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
         <SummaryCard
-          label="Case"
-          value={ctMeta ? ctMeta.filename : "Waiting"}
-          note={ctMeta ? `${ctMeta.slice_count} slices loaded and ready for review.` : "Load a demo case or upload a CT scan from the sidebar."}
+          label="เคส"
+          value={ctMeta ? ctMeta.filename : "รอข้อมูล"}
+          note={ctMeta ? `${ctMeta.slice_count} สไลซ์พร้อมสำหรับการทบทวนแล้ว` : "เลือกเคสตัวอย่างหรืออัปโหลด CT scan จาก sidebar"}
           valueColor={ctMeta ? "var(--accent)" : "var(--text-2)"}
         />
         <SummaryCard
-          label="Decision Threshold"
+          label="เกณฑ์ตัดสิน"
           value={threshold.toFixed(2)}
-          note="Lower thresholds catch subtler findings but may increase false positives."
+          note="ยิ่ง threshold ต่ำ ระบบจะจับรอยโรคละเอียดขึ้น แต่โอกาส false positive ก็อาจเพิ่มขึ้น"
           valueColor="var(--accent)"
         />
         <SummaryCard
-          label="Latest Result"
+          label="ผลล่าสุด"
           value={result ? `${Math.round(result.confidence * 100)}%` : "-"}
-          note={result ? `Top class: ${result.top_class}` : "Run AI analysis to populate the latest confidence score."}
+          note={result ? `คลาสเด่น: ${formatHemorrhageLabel(result.top_class)}` : "รัน AI เพื่อแสดงคะแนนความมั่นใจล่าสุด"}
           valueColor={result ? (detected ? "var(--accent)" : "var(--success)") : "var(--text-2)"}
         />
       </div>
@@ -190,12 +188,12 @@ function DiagnosticWorkspace() {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <section className="q-card overflow-hidden">
           <div className="border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
-            <div className="q-eyebrow mb-1">CT Viewer</div>
+            <div className="q-eyebrow mb-1">ภาพ CT</div>
             <div className="text-base font-semibold" style={{ color: "var(--text-1)" }}>
-              Slice inspection
+              ทบทวนสไลซ์
             </div>
             <p className="mt-1 text-sm leading-6" style={{ color: "var(--text-2)" }}>
-              Move through the study, switch window presets, and overlay the heatmap once the model has run.
+              เลื่อนดูการศึกษา เปลี่ยน window preset และเปิด heatmap ทับภาพหลังจากโมเดลรันเสร็จ
             </p>
           </div>
 
@@ -224,7 +222,7 @@ function DiagnosticWorkspace() {
             {result?.heatmap_b64 ? (
               <div className="mt-3 flex items-center gap-3">
                 <span className="shrink-0 text-xs" style={{ color: "var(--text-3)" }}>
-                  Heatmap opacity
+                  ความทึบของ heatmap
                 </span>
                 <input
                   type="range"
@@ -247,10 +245,10 @@ function DiagnosticWorkspace() {
           <div className="border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
             <div className="q-eyebrow mb-1">AI Analysis</div>
             <div className="text-base font-semibold" style={{ color: "var(--text-1)" }}>
-              Detection summary
+              สรุปผลการตรวจจับ
             </div>
             <p className="mt-1 text-sm leading-6" style={{ color: "var(--text-2)" }}>
-              Run the active model and read the output, confidence, and subtype distribution from the same panel.
+              รันโมเดลที่เลือก แล้วอ่านผลลัพธ์ ความมั่นใจ และการกระจายของ subtype ได้จากแผงเดียวกัน
             </p>
           </div>
 
@@ -264,7 +262,7 @@ function DiagnosticWorkspace() {
                 opacity: !ctMeta || inferLoading ? 0.55 : 1,
               }}
             >
-              {inferLoading ? "Running analysis..." : "Run AI Analysis"}
+              {inferLoading ? "กำลังรันวิเคราะห์..." : "รัน AI วิเคราะห์"}
             </button>
 
             {inferLoading ? (
@@ -275,21 +273,21 @@ function DiagnosticWorkspace() {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>
-                      Running AI Analysis
+                      กำลังรัน AI Analysis
                     </div>
                     <div className="mt-1 text-xs" style={{ color: "var(--text-2)" }}>
-                      Preparing volume, evaluating slices, and generating the heatmap.
+                      กำลังเตรียม volume ประเมินสไลซ์ และสร้าง heatmap
                     </div>
                   </div>
-                  <span className="q-pill q-pill-accent">Live</span>
+                  <span className="q-pill q-pill-accent">กำลังทำงาน</span>
                 </div>
                 <div className="mt-4 h-2 w-full overflow-hidden rounded-full" style={{ background: "rgba(194,91,134,0.12)" }}>
                   <div className="h-full w-2/3 animate-pulse rounded-full" style={{ background: "var(--accent)" }} />
                 </div>
                 <div className="mt-3 grid gap-1 text-[11px]" style={{ color: "var(--text-3)" }}>
-                  <span>1. Load volume and window preset</span>
-                  <span>2. Run model inference on active slice</span>
-                  <span>3. Compose heatmap overlay</span>
+                  <span>1. โหลด volume และ window preset</span>
+                  <span>2. รัน inference บนสไลซ์ปัจจุบัน</span>
+                  <span>3. สร้าง heatmap overlay</span>
                 </div>
               </div>
             ) : null}
@@ -300,7 +298,7 @@ function DiagnosticWorkspace() {
                 style={{ background: "var(--surface-warning)", borderColor: "var(--warning-soft)" }}
               >
                 <div className="text-sm font-semibold" style={{ color: "var(--warning)" }}>
-                  Analysis failed
+                  การวิเคราะห์ไม่สำเร็จ
                 </div>
                 <div className="mt-1 text-xs leading-5" style={{ color: "var(--text-2)" }}>
                   {inferError}
@@ -311,7 +309,7 @@ function DiagnosticWorkspace() {
             {!ctMeta && !result ? (
               <div className="rounded-[1.25rem] border border-dashed px-6 py-12 text-center" style={{ background: "var(--surface-2)", borderColor: "var(--border-strong)" }}>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-2)" }}>
-                  Load a CT scan to begin
+                  โหลด CT scan เพื่อเริ่มการวิเคราะห์
                 </div>
               </div>
             ) : null}
@@ -350,10 +348,10 @@ function DiagnosticWorkspace() {
                   </svg>
                 </div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>
-                  AI Heatmap Ready
+                  AI Heatmap พร้อมใช้งาน
                 </div>
                 <p className="mt-1 text-xs leading-6" style={{ color: "var(--text-2)" }}>
-                  Click Run AI Analysis to detect hemorrhage and generate the explainability map.
+                  กดรัน AI วิเคราะห์ เพื่อประเมินเลือดออกและสร้าง heatmap อธิบายผล
                 </p>
               </div>
             ) : null}
@@ -369,20 +367,20 @@ function DiagnosticWorkspace() {
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <div className="text-sm font-bold" style={{ color: detected ? "var(--accent)" : "var(--success)" }}>
-                      {detected ? result.top_class.toUpperCase() : "No hemorrhage"}
+                      {detected ? formatHemorrhageLabel(result.top_class) : "ไม่พบเลือดออก"}
                     </div>
                     <div className="mt-0.5 text-xs" style={{ color: "var(--text-2)" }}>
-                      Confidence {Math.round(result.confidence * 100)}% - Slice {result.slice_used + 1}
+                      ความมั่นใจ {Math.round(result.confidence * 100)}% · สไลซ์ {result.slice_used + 1}
                     </div>
                   </div>
-                  <span className={`q-pill ${detected ? "q-pill-accent" : "q-pill-success"}`}>{detected ? "Detected" : "Clear"}</span>
+                  <span className={`q-pill ${detected ? "q-pill-accent" : "q-pill-success"}`}>{detected ? "พบสัญญาณ" : "ไม่พบ"}</span>
                 </div>
               </div>
             ) : null}
 
             {result ? (
               <div className="rounded-[1rem] border px-4 py-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-                <div className="q-eyebrow mb-3">Detection Probabilities</div>
+                <div className="q-eyebrow mb-3">ความน่าจะเป็นของการตรวจจับ</div>
                 <ProbabilityBars probabilities={result.probabilities} thresholds={thresholds ?? undefined} />
               </div>
             ) : null}
@@ -406,7 +404,7 @@ function DiagnosticWorkspace() {
                 className="rounded-[1rem] border px-4 py-3"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}
               >
-                <div className="q-eyebrow mb-2">Run Status</div>
+                <div className="q-eyebrow mb-2">สถานะการรัน</div>
                 <div className="grid gap-1 text-[11px]" style={{ color: "var(--text-2)" }}>
                   {statusMeta.map((line) => (
                     <div key={line}>{line}</div>

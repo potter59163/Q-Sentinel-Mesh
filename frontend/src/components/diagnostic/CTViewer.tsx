@@ -44,9 +44,9 @@ export default function CTViewer({
       >
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <div className="q-eyebrow">Viewer Controls</div>
+            <div className="q-eyebrow">ตัวควบคุมการแสดงภาพ</div>
             <div className="mt-1 text-xs leading-5" style={{ color: "var(--text-2)" }}>
-              Choose a clinical window preset before reviewing the active slice and heatmap overlay.
+              เลือก window preset ที่เหมาะสมก่อนอ่านสไลซ์และดู heatmap ของ AI
             </div>
           </div>
           <span className="text-[11px]" style={{ color: "var(--text-3)" }}>
@@ -83,7 +83,7 @@ export default function CTViewer({
             <div className="h-2 w-48 animate-pulse rounded-full" style={{ background: "rgba(255,255,255,0.18)" }} />
             <div className="h-2 w-32 animate-pulse rounded-full" style={{ background: "rgba(255,255,255,0.12)" }} />
             <div className="rounded-full px-4 py-2 text-xs font-semibold" style={{ background: "rgba(255,255,255,0.9)", color: "var(--text-1)" }}>
-              Loading slice...
+              กำลังโหลดสไลซ์...
             </div>
           </div>
         ) : null}
@@ -106,9 +106,9 @@ export default function CTViewer({
           <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
             <div>
               <div className="mb-3 text-5xl opacity-65">🩻</div>
-              <div className="text-sm font-semibold text-white">CT viewer waiting for input</div>
+              <div className="text-sm font-semibold text-white">หน้าต่าง CT กำลังรอข้อมูล</div>
               <p className="mt-2 text-xs leading-6 text-white/70">
-                Upload a study or load a demo case from the sidebar to begin slice review.
+                อัปโหลดการศึกษาหรือเลือกเคสตัวอย่างจาก sidebar เพื่อเริ่มอ่านสไลซ์
               </p>
             </div>
           </div>
@@ -124,7 +124,7 @@ export default function CTViewer({
             </div>
             <div className="absolute right-3 top-3 flex flex-wrap gap-2">
               <span className="rounded-full px-3 py-1 text-[11px] font-semibold" style={{ background: "rgba(16,16,20,0.72)", color: "white" }}>
-                CT Layer
+                ภาพ CT
               </span>
               {heatmapSrc ? (
                 <span className="rounded-full px-3 py-1 text-[11px] font-semibold" style={{ background: "rgba(194,91,134,0.88)", color: "white" }}>
@@ -145,7 +145,7 @@ export default function CTViewer({
           }}
         >
           <div className="mb-2 flex items-center justify-between text-xs">
-            <span style={{ color: "var(--text-2)" }}>Slice navigation</span>
+            <span style={{ color: "var(--text-2)" }}>เลื่อนดูสไลซ์</span>
             <span className="q-value" style={{ color: "var(--accent)" }}>
               {sliceIdx + 1}/{sliceCount}
             </span>
@@ -160,9 +160,9 @@ export default function CTViewer({
             style={{ accentColor: "var(--accent)" }}
           />
           <div className="mt-2 flex justify-between text-[11px]" style={{ color: "var(--text-3)" }}>
-            <span>First slice</span>
-            <span>Review progression</span>
-            <span>Last slice</span>
+            <span>ต้นภาพ</span>
+            <span>ตำแหน่งปัจจุบัน</span>
+            <span>ปลายภาพ</span>
           </div>
         </div>
       ) : null}

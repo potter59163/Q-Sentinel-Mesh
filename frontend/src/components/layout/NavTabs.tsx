@@ -2,24 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getAllowedTabs, getStoredAuth, type UserRole } from "@/lib/auth";
 
 const ALL_TABS = [
-  { href: "/dashboard",           label: "🧠 Diagnostic View" },
-  { href: "/dashboard/federated", label: "🌐 Federated Intelligence" },
-  { href: "/dashboard/security",  label: "🔒 Security Layer" },
-  { href: "/dashboard/pacs",      label: "🏥 PACS Integration" },
+  { href: "/dashboard", label: "🧠 พื้นที่วิเคราะห์" },
+  { href: "/dashboard/federated", label: "🌐 Federated Learning" },
+  { href: "/dashboard/security", label: "🔒 Security Layer" },
+  { href: "/dashboard/pacs", label: "🏥 PACS Integration" },
 ];
 
 export default function NavTabs() {
   const pathname = usePathname();
-  const [allowedTabs, setAllowedTabs] = useState<string[]>(ALL_TABS.map((t) => t.href));
-
-  useEffect(() => {
+  const [allowedTabs] = useState<string[]>(() => {
     const auth = getStoredAuth();
-    if (auth) setAllowedTabs(getAllowedTabs(auth.role as UserRole));
-  }, []);
+    return auth ? getAllowedTabs(auth.role as UserRole) : ALL_TABS.map((t) => t.href);
+  });
 
   const visibleTabs = ALL_TABS.filter((t) => allowedTabs.includes(t.href));
 

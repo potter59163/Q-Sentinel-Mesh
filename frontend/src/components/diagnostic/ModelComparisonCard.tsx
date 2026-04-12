@@ -12,15 +12,15 @@ export default function ModelComparisonCard({ baselineProbs, hybridProbs, quantu
   const baselineAny = Math.round((baselineProbs.any ?? 0) * 100);
   const hybridAny = Math.round((hybridProbs.any ?? 0) * 100);
   const gain = quantumGain ?? hybridAny - baselineAny;
-  const leader = hybridAny >= baselineAny ? "✨ Hybrid lead" : "🧪 Baseline lead";
+  const leader = hybridAny >= baselineAny ? "✨ Hybrid เด่นกว่า" : "🧪 Baseline เด่นกว่า";
 
   return (
     <div className="rounded-[1.5rem] p-5" style={{ background: "var(--surface)", border: "1.5px solid var(--border)" }}>
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <div className="q-eyebrow">Model Comparison</div>
+          <div className="q-eyebrow">เปรียบเทียบโมเดล</div>
           <div className="mt-1 text-sm font-semibold" style={{ color: "var(--text-1)" }}>
-            Hybrid and baseline confidence on the current case
+            เทียบความมั่นใจของ hybrid และ baseline ในเคสปัจจุบัน
           </div>
         </div>
         <span className="q-pill q-pill-accent">{leader}</span>
@@ -35,7 +35,7 @@ export default function ModelComparisonCard({ baselineProbs, hybridProbs, quantu
             {baselineAny}%
           </div>
           <div className="mt-2 text-xs" style={{ color: "var(--text-3)" }}>
-            Reference confidence
+            ความมั่นใจอ้างอิง
           </div>
         </div>
 
@@ -47,7 +47,7 @@ export default function ModelComparisonCard({ baselineProbs, hybridProbs, quantu
             {hybridAny}%
           </div>
           <div className="mt-2 text-xs" style={{ color: "var(--text-2)" }}>
-            Active production model
+            โมเดลหลักที่กำลังใช้งาน
           </div>
         </div>
 
@@ -60,7 +60,7 @@ export default function ModelComparisonCard({ baselineProbs, hybridProbs, quantu
             {gain.toFixed(1)}%
           </div>
           <div className="mt-2 text-xs" style={{ color: "var(--text-2)" }}>
-            Lift versus baseline
+            ต่างจาก baseline
           </div>
         </div>
       </div>

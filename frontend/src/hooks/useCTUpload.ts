@@ -20,7 +20,7 @@ export function useCTUpload() {
       });
       setCtMeta(res.data);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Upload failed";
+      const msg = e instanceof Error ? e.message : "อัปโหลดไม่สำเร็จ";
       setError(msg);
     } finally {
       setUploading(false);

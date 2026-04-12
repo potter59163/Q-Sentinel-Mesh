@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import type { CTUploadResponse, ModelType, PredictResponse, RadiologistVerdict } from "@/types/api";
 import { getStoredAuth, type UserRole } from "@/lib/auth";
 
@@ -45,11 +45,10 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const [autoTriage, setAutoTriage] = useState(true);
   const [scansAnalyzed, setScansAnalyzed] = useState(0);
   const incrementScans = useCallback(() => setScansAnalyzed((n) => n + 1), []);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  useEffect(() => {
+  const [userRole] = useState<UserRole | null>(() => {
     const auth = getStoredAuth();
-    if (auth) setUserRole(auth.role as UserRole);
-  }, []);
+    return auth ? (auth.role as UserRole) : null;
+  });
 
   const [lastResult, setLastResult] = useState<PredictResponse | null>(null);
   const [lastImageSrc, setLastImageSrc] = useState<string | null>(null);

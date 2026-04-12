@@ -8,13 +8,12 @@ from app.core.rate_limit import limiter
 from app.models.ct import CTUploadResponse, CTWindowRequest, CTWindowResponse
 from app.services.ct_service import ct_service
 
-# ct.py is at backend/app/api/routes/ct.py -> go up 5 levels to repo root.
 REPO_ROOT = Path(__file__).parent.parent.parent.parent.parent
 
 router = APIRouter(prefix="/api/ct", tags=["ct"])
 
 S3_KEY_PATTERN = re.compile(r"^ct-uploads/[0-9a-f\-]{36}/[\w.\-]+$")
-MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 MB
+MAX_FILE_SIZE = 200 * 1024 * 1024
 
 
 @router.post("/upload", response_model=CTUploadResponse)
@@ -27,11 +26,11 @@ async def upload_ct(
     lowered = filename.lower()
     ext = "nii.gz" if lowered.endswith(".nii.gz") else lowered.split(".")[-1]
     if ext not in ("nii", "nii.gz", "dcm"):
-        raise HTTPException(status_code=422, detail="Only .nii, .nii.gz, and .dcm files are supported")
+        raise HTTPException(status_code=422, detail="รองรับเฉพาะไฟล์ .nii, .nii.gz และ .dcm เท่านั้น")
 
     content = await file.read()
     if len(content) > MAX_FILE_SIZE:
-        raise HTTPException(status_code=413, detail="File too large (max 200 MB)")
+        raise HTTPException(status_code=413, detail="ไฟล์มีขนาดใหญ่เกินกำหนด (สูงสุด 200 MB)")
 
     s3_key = f"ct-uploads/{uuid.uuid4()}/{filename}"
     meta = ct_service.load_ct(content, filename, s3_key)
@@ -45,11 +44,11 @@ async def window_slice(
     body: CTWindowRequest,
 ):
     if not S3_KEY_PATTERN.match(body.s3_key):
-        raise HTTPException(status_code=422, detail="Invalid s3_key format")
+        raise HTTPException(status_code=422, detail="รูปแบบ s3_key ไม่ถูกต้อง")
 
     result = ct_service.get_windowed_slice(body.s3_key, body.slice_idx, body.window)
     if result is None:
-        raise HTTPException(status_code=404, detail="CT volume not found. Please upload again.")
+        raise HTTPException(status_code=404, detail="ไม่พบ CT volume นี้ กรุณาอัปโหลดใหม่อีกครั้ง")
     return result
 
 
@@ -81,7 +80,7 @@ async def get_demo_patient(
     nii_gz_path = samples_dir / f"{patient_id}.nii.gz"
     source_path = nii_path if nii_path.is_file() else nii_gz_path
     if not source_path.is_file():
-        raise HTTPException(status_code=404, detail="Demo patient not found")
+        raise HTTPException(status_code=404, detail="ไม่พบเคสตัวอย่างที่เลือก")
 
     content = source_path.read_bytes()
     filename = source_path.name

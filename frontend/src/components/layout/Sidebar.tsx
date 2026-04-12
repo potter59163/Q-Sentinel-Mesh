@@ -98,7 +98,7 @@ export default function Sidebar() {
         timeout: 120_000,
       });
       setCtMeta(res.data);
-      toast.success(`CT loaded | ${res.data.slice_count} slices ready`);
+      toast.success(`โหลด CT แล้ว · พร้อมอ่าน ${res.data.slice_count} สไลซ์`);
     } catch (err) {
       toast.error(getApiErrorMessage(err));
     } finally {
@@ -111,9 +111,9 @@ export default function Sidebar() {
     try {
       const res = await api.get<CTUploadResponse>(`/api/ct/demo/${pid}`);
       setCtMeta(res.data);
-      toast.success(`Patient ${pid} loaded | ${res.data.slice_count} slices`);
+      toast.success(`โหลดผู้ป่วย ${pid} แล้ว · ${res.data.slice_count} สไลซ์`);
     } catch {
-      toast.error(`Could not load demo patient ${pid}`);
+      toast.error(`ไม่สามารถโหลดเคสตัวอย่าง ${pid} ได้`);
     } finally {
       setDemoLoading(false);
     }
@@ -121,7 +121,7 @@ export default function Sidebar() {
 
   async function handleExportHL7() {
     if (!lastResult) {
-      toast.warning("Run AI analysis first.");
+      toast.warning("กรุณารัน AI ก่อนส่งออก");
       return;
     }
     setHl7Loading(true);
@@ -146,9 +146,9 @@ export default function Sidebar() {
       a.download = `diagnostic-report-${res.data.resource_id.slice(0, 8)}.fhir.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("HL7 FHIR R4 report exported");
+      toast.success("ส่งออก HL7 FHIR R4 แล้ว");
     } catch (err) {
-      toast.error(`HL7 export failed: ${getApiErrorMessage(err)}`);
+      toast.error(`ส่งออก HL7 ไม่สำเร็จ: ${getApiErrorMessage(err)}`);
     } finally {
       setHl7Loading(false);
     }
@@ -156,7 +156,7 @@ export default function Sidebar() {
 
   async function handleExportPDF() {
     if (!lastResult) {
-      toast.warning("Run AI analysis first.");
+      toast.warning("กรุณารัน AI ก่อนส่งออก");
       return;
     }
 
@@ -174,10 +174,10 @@ export default function Sidebar() {
         heatmapSrc: lastHeatmapSrc ?? undefined,
         filename: ctMeta?.filename,
       });
-      toast.success("PDF report exported");
+      toast.success("ส่งออกรายงาน PDF แล้ว");
     } catch (err) {
       console.error("PDF export error:", err);
-      toast.error(`PDF failed: ${err instanceof Error ? err.message : String(err)}`);
+      toast.error(`ส่งออก PDF ไม่สำเร็จ: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setPdfLoading(false);
     }
@@ -208,7 +208,7 @@ export default function Sidebar() {
         <button
           className="q-sb-float-btn"
           onClick={() => setOpen(true)}
-          aria-label="Open sidebar"
+          aria-label="เปิดแถบด้านข้าง"
         >
           ☰
         </button>
@@ -239,7 +239,7 @@ export default function Sidebar() {
           <button
             className="q-sb-toggle shrink-0"
             onClick={() => setOpen(!open)}
-            aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
+            aria-label={open ? "ย่อแถบด้านข้าง" : "ขยายแถบด้านข้าง"}
           >
             {open ? "‹" : "›"}
           </button>
@@ -247,14 +247,14 @@ export default function Sidebar() {
 
         {!isIconOnly && (
           <div className="mb-1 flex justify-center">
-            <span className="q-pill q-pill-success text-[0.7rem]">● ONLINE</span>
+            <span className="q-pill q-pill-success text-[0.7rem]">● ออนไลน์</span>
           </div>
         )}
         {isIconOnly && (
           <span
             className="text-[0.6rem] font-bold"
             style={{ color: "var(--success)" }}
-            title="Online"
+            title="ออนไลน์"
           >
             ●
           </span>
@@ -264,14 +264,14 @@ export default function Sidebar() {
           <>
             <Divider />
 
-            <SectionLabel>System Status</SectionLabel>
+            <SectionLabel>สถานะระบบ</SectionLabel>
             <StatusRow label="Compute" value="CPU Mode" />
             <StatusRow
               label="AI Model"
               value="CT-ICH (AUC 96%)"
               valueStyle={{ color: "var(--success)", fontSize: "0.72rem" }}
             />
-            <StatusRow label="Federation" value="3 nodes" />
+            <StatusRow label="Federation" value="3 โหนด" />
             <StatusRow
               label="PQC"
               value="ML-KEM-512"
@@ -280,7 +280,7 @@ export default function Sidebar() {
 
             <Divider />
 
-            <SectionLabel>Hospital Node</SectionLabel>
+            <SectionLabel>โหนดโรงพยาบาล</SectionLabel>
             <select
               value={hospital}
               onChange={(e) => setHospital(e.target.value)}
@@ -292,7 +292,7 @@ export default function Sidebar() {
 
             <Divider />
 
-            <SectionLabel>Patient</SectionLabel>
+            <SectionLabel>ผู้ป่วย</SectionLabel>
             {demoPatients.length > 0 && (
               <div className="mb-2">
                 <div
@@ -303,7 +303,7 @@ export default function Sidebar() {
                     color: "var(--info)",
                   }}
                 >
-                  🧪 CT-ICH dataset | {demoPatients.length} cases
+                  🧪 CT-ICH dataset | {demoPatients.length} เคส
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {demoPatients.map((pid) => {
@@ -335,19 +335,19 @@ export default function Sidebar() {
                 className="rounded-[0.85rem] border px-2.5 py-2 text-xs"
                 style={{ background: "var(--success-light)", borderColor: "var(--success-soft)" }}
               >
-                <div className="font-semibold" style={{ color: "var(--success)" }}>✅ CT loaded</div>
+                <div className="font-semibold" style={{ color: "var(--success)" }}>✅ โหลด CT แล้ว</div>
                 <div
                   className="mt-0.5 truncate"
                   style={{ color: "var(--text-2)", fontFamily: "var(--font-mono-stack)" }}
                 >
-                  {ctMeta.filename} | {ctMeta.slice_count} slices
+                  {ctMeta.filename} | {ctMeta.slice_count} สไลซ์
                 </div>
               </div>
             )}
 
             <Divider />
 
-            <SectionLabel>AI Model</SectionLabel>
+            <SectionLabel>โมเดล AI</SectionLabel>
             {(["baseline", "hybrid"] as const).map((m) => (
               <button
                 key={m}
@@ -377,7 +377,7 @@ export default function Sidebar() {
                     {m === "hybrid" ? "Q-Sentinel Hybrid" : "CNN Baseline"}
                   </div>
                   <div className="text-[0.7rem]" style={{ color: "var(--text-3)" }}>
-                    {m === "hybrid" ? "Quantum-enhanced" : "Reference model"}
+                    {m === "hybrid" ? "เสริมด้วย VQC" : "โมเดลอ้างอิง"}
                   </div>
                 </div>
               </button>
@@ -385,7 +385,7 @@ export default function Sidebar() {
 
             <Divider />
 
-            <SectionLabel>Analysis Mode</SectionLabel>
+            <SectionLabel>โหมดวิเคราะห์</SectionLabel>
             <div className="mb-1 flex gap-2">
               {([true, false] as const).map((v) => (
                 <button
@@ -399,7 +399,7 @@ export default function Sidebar() {
                     color: autoTriage === v ? "var(--accent)" : "var(--text-3)",
                   }}
                 >
-                  {v ? "🚑 Auto" : "🎯 Manual"}
+                  {v ? "🚑 อัตโนมัติ" : "🎯 กำหนดเอง"}
                 </button>
               ))}
             </div>
@@ -408,7 +408,7 @@ export default function Sidebar() {
 
             <SectionLabel>Threshold</SectionLabel>
             <div className="q-sb-row">
-              <span>Decision threshold</span>
+              <span>เกณฑ์ตัดสิน</span>
               <span className="q-sb-value" style={{ color: "var(--accent)" }}>
                 {threshold.toFixed(2)}
               </span>
@@ -423,13 +423,13 @@ export default function Sidebar() {
               style={{ accentColor: "var(--accent)" }}
             />
             <div className="mt-0.5 flex justify-between text-[0.65rem]" style={{ color: "var(--text-3)" }}>
-              <span>Sensitive</span>
-              <span>Specific</span>
+              <span>ไว</span>
+              <span>เฉพาะเจาะจง</span>
             </div>
 
             <Divider />
 
-            <SectionLabel>Upload CT Scan</SectionLabel>
+            <SectionLabel>อัปโหลด CT Scan</SectionLabel>
             <div
               {...getRootProps()}
               className="q-upload-row"
@@ -439,17 +439,17 @@ export default function Sidebar() {
               <span className="text-xl">📁</span>
               <div className="min-w-0">
                 <div className="text-xs font-semibold" style={{ color: "var(--text-1)" }}>
-                  {uploading ? "Uploading..." : isDragActive ? "Drop CT here" : "NIfTI or DICOM"}
+                  {uploading ? "กำลังอัปโหลด..." : isDragActive ? "วางไฟล์ CT ที่นี่" : "NIfTI หรือ DICOM"}
                 </div>
                 <div className="text-[0.67rem]" style={{ color: "var(--text-3)" }}>
-                  Drag and drop | 200 MB max
+                  ลากและวางได้ | สูงสุด 200 MB
                 </div>
               </div>
             </div>
 
             <Divider />
 
-            <SectionLabel>Export</SectionLabel>
+            <SectionLabel>ส่งออก</SectionLabel>
             <button
               type="button"
               onClick={handleExportPDF}
@@ -460,7 +460,7 @@ export default function Sidebar() {
                 cursor: !lastResult || pdfLoading ? "not-allowed" : "pointer",
               }}
             >
-              {pdfLoading ? "Generating..." : "📄 Export PDF Report"}
+              {pdfLoading ? "กำลังสร้าง..." : "📄 ส่งออกรายงาน PDF"}
             </button>
             <button
               type="button"
@@ -473,10 +473,9 @@ export default function Sidebar() {
                 marginTop: "0.4rem",
               }}
             >
-              {hl7Loading ? "Generating..." : "🏥 Export HL7 FHIR R4"}
+              {hl7Loading ? "กำลังสร้าง..." : "🏥 ส่งออก HL7 FHIR R4"}
             </button>
 
-            {/* Role badge + logout */}
             {userRole && (
               <div className="mt-auto pt-4">
                 <div
@@ -495,7 +494,7 @@ export default function Sidebar() {
                   onClick={() => { clearAuth(); router.push("/login"); }}
                   className="q-btn-secondary w-full py-2 text-xs font-semibold"
                 >
-                  Sign Out
+                  ออกจากระบบ
                 </button>
               </div>
             )}

@@ -29,10 +29,10 @@ export default function FederatedRoundsChart({ rounds }: Props) {
       <div className="mb-4">
         <div className="q-eyebrow">Training Trace</div>
         <div className="mt-1 text-sm font-semibold" style={{ color: "var(--text-1)" }}>
-          Global AUC and loss throughout aggregation rounds
+          Global AUC และ loss ตลอดรอบการ aggregate
         </div>
         <div className="mt-1 text-xs" style={{ color: "var(--text-3)" }}>
-          Use this view to confirm that the global model improves as hospitals contribute updates.
+          ใช้มุมมองนี้เพื่อตรวจว่ากลุ่มโมเดลรวมดีขึ้นตามการส่งอัปเดตจากแต่ละโรงพยาบาล
         </div>
       </div>
 

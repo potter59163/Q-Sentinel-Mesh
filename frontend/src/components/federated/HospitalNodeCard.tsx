@@ -49,7 +49,7 @@ export default function HospitalNodeCard({ name, rounds }: Props) {
           </div>
           <div className="mt-1 flex flex-wrap gap-1.5">
             <span className="rounded-full px-2 py-0.5 text-xs" style={{ background: "var(--success-light)", color: "var(--success)" }}>
-              ✅ Online
+              ✅ ออนไลน์
             </span>
             {pqc ? (
               <span className="rounded-full px-2 py-0.5 text-xs" style={{ background: "var(--surface-info)", color: "var(--info)" }}>
@@ -69,13 +69,13 @@ export default function HospitalNodeCard({ name, rounds }: Props) {
         {auc}%
       </div>
       <div className="text-center text-xs" style={{ color: "var(--text-3)" }}>
-        Local AUC (Round {latest?.round ?? "—"})
+        Local AUC (รอบ {latest?.round ?? "—"})
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-[1rem] p-3 text-center" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
           <div className="text-xs" style={{ color: "var(--text-3)" }}>
-            Training Cases
+            เคสฝึก
           </div>
           <div className="text-lg font-bold font-mono" style={{ color: "var(--text-1)", fontFamily: "var(--font-mono)" }}>
             {examples}
@@ -83,7 +83,7 @@ export default function HospitalNodeCard({ name, rounds }: Props) {
         </div>
         <div className="rounded-[1rem] p-3 text-center" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
           <div className="text-xs" style={{ color: "var(--text-3)" }}>
-            PQC Rounds
+            รอบ PQC
           </div>
           <div className="text-lg font-bold font-mono" style={{ color: "var(--text-1)", fontFamily: "var(--font-mono)" }}>
             {latest?.pqc_rounds ?? "—"}

@@ -1,5 +1,7 @@
 import re
+
 from fastapi import APIRouter, HTTPException, Request
+
 from app.core.rate_limit import limiter
 from app.models.ct import PredictRequest, PredictResponse
 from app.services.ct_service import ct_service
@@ -17,11 +19,11 @@ async def predict(
     body: PredictRequest,
 ):
     if not S3_KEY_PATTERN.match(body.s3_key):
-        raise HTTPException(status_code=422, detail="Invalid s3_key format")
+        raise HTTPException(status_code=422, detail="รูปแบบ s3_key ไม่ถูกต้อง")
 
     volume = ct_service.get_volume(body.s3_key)
     if volume is None:
-        raise HTTPException(status_code=404, detail="CT volume not found. Please upload again.")
+        raise HTTPException(status_code=404, detail="ไม่พบ CT volume นี้ กรุณาอัปโหลดใหม่อีกครั้ง")
 
     try:
         result = await model_service.analyze(
@@ -33,4 +35,4 @@ async def predict(
         )
         return result
     except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=f"AI inference unavailable: {exc}")
+        raise HTTPException(status_code=503, detail=f"AI inference ยังไม่พร้อมใช้งาน: {exc}")

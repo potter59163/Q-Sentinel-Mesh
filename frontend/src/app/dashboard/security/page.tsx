@@ -6,11 +6,11 @@ import api from "@/lib/api";
 import type { PQCDemoResponse } from "@/types/api";
 
 const FLOW_STEPS = [
-  ["1", "Local training", "Hospital nodes train on-site and prepare only model deltas for exchange."],
-  ["2", "Key encapsulation", "ML-KEM-512 creates a shared secret using the server public key."],
-  ["3", "Authenticated encryption", "HKDF-SHA256 derives an AES key and seals the weight payload with AES-256-GCM."],
-  ["4", "Secure aggregation", "The server decapsulates, decrypts, aggregates, and prepares the new global weights."],
-  ["5", "Encrypted return path", "Updated global weights are securely redistributed back to each hospital node."],
+  ["1", "Local training", "แต่ละ hospital node เทรนโมเดลในสถานที่ของตนเอง และเตรียมเฉพาะ model delta สำหรับการแลกเปลี่ยน"],
+  ["2", "Key encapsulation", "ML-KEM-512 สร้าง shared secret โดยใช้ public key ของฝั่ง server"],
+  ["3", "Authenticated encryption", "HKDF-SHA256 สร้าง AES key แล้วเข้ารหัส weight payload ด้วย AES-256-GCM"],
+  ["4", "Secure aggregation", "server ทำ decapsulate, decrypt, aggregate และเตรียมน้ำหนัก global model ชุดใหม่"],
+  ["5", "Encrypted return path", "global weights ชุดอัปเดตจะถูกส่งกลับไปยังแต่ละ hospital node อย่างปลอดภัย"],
 ];
 
 const SPECS = [
@@ -62,9 +62,9 @@ export default function SecurityPage() {
     try {
       const res = await api.post<PQCDemoResponse>("/api/pqc/demo");
       setDemoResult(res.data);
-      toast.success(res.data.success ? "PQC demo completed successfully" : "PQC demo failed");
+      toast.success(res.data.success ? "รัน PQC demo สำเร็จ" : "PQC demo ไม่สำเร็จ");
     } catch {
-      toast.error("Unable to complete the PQC demo");
+      toast.error("ไม่สามารถรัน PQC demo ได้");
     } finally {
       setLoading(false);
     }
@@ -74,10 +74,10 @@ export default function SecurityPage() {
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         {[
-          ["KEM algorithm", "ML-KEM-512", "NIST-standardized post-quantum key encapsulation.", "var(--accent)"],
-          ["Security level", "128-bit PQ", "Practical protection for production-style transport flows.", "var(--text-1)"],
-          ["Privacy posture", "No raw CT", "Only encrypted model updates move across the federated network.", "var(--success)"],
-          ["Transport stack", "KEM + AES", "ML-KEM-512, HKDF-SHA256, and AES-256-GCM working together.", "var(--info)"],
+          ["KEM algorithm", "ML-KEM-512", "มาตรฐาน post-quantum key encapsulation ที่พร้อมใช้งานจริง", "var(--accent)"],
+          ["Security level", "128-bit PQ", "ระดับการป้องกันที่เหมาะกับ flow การรับส่งข้อมูลจริง", "var(--text-1)"],
+          ["Privacy posture", "No raw CT", "มีเพียง model update ที่เข้ารหัสแล้วเท่านั้นที่เคลื่อนผ่านเครือข่าย federated", "var(--success)"],
+          ["Transport stack", "KEM + AES", "ML-KEM-512, HKDF-SHA256 และ AES-256-GCM ทำงานร่วมกัน", "var(--info)"],
         ].map(([label, value, note, color]) => (
           <article key={label} className="q-soft-panel rounded-[1.25rem] px-4 py-4">
             <div className="q-eyebrow mb-1">{label}</div>
@@ -92,7 +92,7 @@ export default function SecurityPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)]">
-        <Panel eyebrow="Protocol Walkthrough" title="Encrypted Transmission Flow">
+        <Panel eyebrow="Protocol Walkthrough" title="ลำดับการส่งข้อมูลแบบเข้ารหัส">
           <div className="flex flex-col">
             {FLOW_STEPS.map(([num, title, desc], index) => (
               <div
@@ -125,7 +125,7 @@ export default function SecurityPage() {
         </Panel>
 
         <div className="flex flex-col gap-4">
-          <Panel eyebrow="Implementation View" title="Specifications">
+          <Panel eyebrow="Implementation View" title="ข้อมูลสำคัญของระบบ">
             {SPECS.map(([label, value, color]) => (
               <div key={label} className="q-stat-row">
                 <span style={{ color: "var(--text-3)" }}>{label}</span>
@@ -134,7 +134,7 @@ export default function SecurityPage() {
             ))}
           </Panel>
 
-          <Panel eyebrow="Live PQC Demo" title="Generate and Verify">
+          <Panel eyebrow="Live PQC Demo" title="สร้างและตรวจสอบการเข้ารหัส">
             <button
               type="button"
               onClick={runPQCDemo}
@@ -142,7 +142,7 @@ export default function SecurityPage() {
               className="q-btn-primary w-full px-4 py-3 text-sm"
               style={{ opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}
             >
-              {loading ? "Running PQC demo..." : "Generate key pair and test encryption"}
+              {loading ? "กำลังรัน PQC demo..." : "สร้าง key pair และทดสอบการเข้ารหัส"}
             </button>
 
             {demoResult ? (
@@ -154,7 +154,7 @@ export default function SecurityPage() {
                 }}
               >
                 <div className="mb-3 text-sm font-semibold" style={{ color: demoResult.success ? "var(--success)" : "var(--accent)" }}>
-                  {demoResult.success ? "Verification successful" : "Verification failed"}
+                  {demoResult.success ? "ตรวจสอบสำเร็จ" : "ตรวจสอบไม่สำเร็จ"}
                   {demoResult.backend ? <span style={{ color: "var(--text-3)" }}> - {demoResult.backend}</span> : null}
                 </div>
                 {demoResult.success ? (
@@ -164,12 +164,12 @@ export default function SecurityPage() {
                     <SpecRow label="KEM ciphertext" value={`${demoResult.kem_ciphertext_bytes} bytes`} />
                     <SpecRow label="AES ciphertext" value={`${demoResult.aes_ciphertext_bytes} bytes`} />
                     <div className="my-2 border-t" style={{ borderColor: "var(--border)" }} />
-                    <SpecRow label="Key generation" value={`${demoResult.keygen_ms.toFixed(1)} ms`} />
-                    <SpecRow label="Encrypt" value={`${demoResult.encrypt_ms.toFixed(1)} ms`} />
-                    <SpecRow label="Decrypt" value={`${demoResult.decrypt_ms.toFixed(1)} ms`} />
+                    <SpecRow label="สร้างกุญแจ" value={`${demoResult.keygen_ms.toFixed(1)} ms`} />
+                    <SpecRow label="เข้ารหัส" value={`${demoResult.encrypt_ms.toFixed(1)} ms`} />
+                    <SpecRow label="ถอดรหัส" value={`${demoResult.decrypt_ms.toFixed(1)} ms`} />
                   </div>
                 ) : (
-                  <div style={{ color: "var(--text-2)" }}>{demoResult.error ?? "Unknown PQC error"}</div>
+                  <div style={{ color: "var(--text-2)" }}>{demoResult.error ?? "เกิดข้อผิดพลาดใน PQC"}</div>
                 )}
               </div>
             ) : null}
@@ -182,11 +182,11 @@ export default function SecurityPage() {
           Why it matters
         </div>
         <h3 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
-          Healthcare AI needs a security story that lasts
+          Healthcare AI ต้องมีเรื่องเล่าด้านความปลอดภัยที่ใช้ได้ในระยะยาว
         </h3>
         <p className="mt-2 text-sm leading-7" style={{ color: "var(--text-2)" }}>
-          Long-lived medical data and model IP should not depend only on cryptography that may be broken by future quantum computers.
-          Standardizing on ML-KEM-512 now gives hospital collaboration a stronger trust and privacy narrative.
+          ข้อมูลทางการแพทย์และ model IP มีอายุยาวนาน จึงไม่ควรพึ่งเฉพาะ cryptography ที่อาจถูกทำลายได้ในอนาคตเมื่อ quantum computing ก้าวหน้า
+          การเริ่มใช้ ML-KEM-512 ตั้งแต่ตอนนี้ช่วยให้ความร่วมมือระหว่างโรงพยาบาลมีทั้งความน่าเชื่อถือและเรื่องเล่าด้าน privacy ที่แข็งแรงขึ้น
         </p>
       </section>
     </div>

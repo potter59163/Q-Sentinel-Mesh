@@ -1,7 +1,5 @@
 "use client";
 
-// PACS Integration Roadmap — People + Process + Technology strategy
-
 const ROADMAP_PHASES = [
   {
     phase: "Phase 1",
@@ -9,11 +7,11 @@ const ROADMAP_PHASES = [
     status: "live" as const,
     timeline: "Q2 2026",
     items: [
-      "DiagnosticReport resource with LOINC / SNOMED coding",
-      "AI confidence score as FHIR extension",
-      "Radiologist verdict embedded in report",
-      "PQC-encryption flag for audit trail",
-      "One-click export from dashboard (JSON download)",
+      "สร้าง DiagnosticReport พร้อม LOINC / SNOMED coding",
+      "ส่งคะแนนความมั่นใจของ AI เป็น FHIR extension",
+      "ฝัง verdict ของรังสีแพทย์ไว้ในรายงาน",
+      "ติดธง PQC-encryption เพื่อใช้ใน audit trail",
+      "ส่งออกจาก dashboard ได้ในคลิกเดียว (JSON download)",
     ],
     icon: "📋",
   },
@@ -23,11 +21,11 @@ const ROADMAP_PHASES = [
     status: "planned" as const,
     timeline: "Q3 2026",
     items: [
-      "Structured Report (SR) generated alongside FHIR",
-      "Push to hospital PACS via DICOMweb STOW-RS",
-      "Heatmap overlay stored as DICOM Secondary Capture",
-      "Worklist integration (MWL) for auto-population",
-      "Tested with Orthanc (open-source PACS)",
+      "สร้าง Structured Report (SR) ควบคู่กับ FHIR",
+      "ส่งกลับเข้า PACS ผ่าน DICOMweb STOW-RS",
+      "เก็บ heatmap overlay เป็น DICOM Secondary Capture",
+      "เชื่อม Worklist (MWL) สำหรับเติมข้อมูลอัตโนมัติ",
+      "ทดสอบร่วมกับ Orthanc (open-source PACS)",
     ],
     icon: "🖥",
   },
@@ -37,11 +35,11 @@ const ROADMAP_PHASES = [
     status: "planned" as const,
     timeline: "Q4 2026",
     items: [
-      "HL7 v2.x ADT feed for patient demographic sync",
-      "CDA (Clinical Document Architecture) report push to HIS",
-      "Order-placer → fulfiller workflow (ORM/ORU messaging)",
-      "IHE RAD-28 (RWF) for radiologist workflow queue",
-      "Thai hospital HIS compatibility: HosXP, HIMS, InHospital",
+      "รับ HL7 v2.x ADT feed เพื่อ sync ข้อมูลผู้ป่วย",
+      "ส่งรายงาน CDA (Clinical Document Architecture) กลับเข้า HIS",
+      "รองรับ order-placer → fulfiller workflow (ORM/ORU messaging)",
+      "รองรับ IHE RAD-28 (RWF) สำหรับคิวงานรังสีแพทย์",
+      "รองรับ Thai hospital HIS เช่น HosXP, HIMS, InHospital",
     ],
     icon: "🔄",
   },
@@ -51,67 +49,67 @@ const ROADMAP_PHASES = [
     status: "planned" as const,
     timeline: "Q1 2027",
     items: [
-      "Patient consent management (FHIR Consent resource)",
-      "De-identification pipeline for federated training data",
-      "Audit log export (FHIR AuditEvent) for PDPA DPA reporting",
-      "Role-based access control tied to hospital node identity",
-      "Data retention policy enforcement (S3 lifecycle rules)",
+      "จัดการ patient consent ผ่าน FHIR Consent resource",
+      "ทำ de-identification pipeline สำหรับข้อมูลเทรนแบบ federated",
+      "ส่งออก audit log เป็น FHIR AuditEvent สำหรับ PDPA reporting",
+      "ทำ role-based access control ผูกกับตัวตนของแต่ละ hospital node",
+      "บังคับใช้นโยบาย data retention ผ่าน S3 lifecycle rules",
     ],
     icon: "🔒",
   },
 ];
 
 const SYSTEM_MATRIX = [
-  ["Hospital System", "Protocol", "Status", "Notes"],
-  ["Orthanc (Open Source)", "DICOMweb / HL7 FHIR", "Tested", "Reference integration"],
-  ["HosXP (Thai)", "HL7 v2.x", "Planned Q3", "Most common Thai HIS"],
-  ["HIMS / InHospital", "HL7 FHIR R4", "Planned Q3", "Government hospital stack"],
-  ["Sectra PACS", "DICOM + HL7", "Planned Q4", "University hospital"],
-  ["Epic (large centres)", "SMART on FHIR", "Roadmap", "Private hospital group"],
+  ["ระบบโรงพยาบาล", "โปรโตคอล", "สถานะ", "หมายเหตุ"],
+  ["Orthanc (Open Source)", "DICOMweb / HL7 FHIR", "ทดสอบแล้ว", "ระบบอ้างอิงสำหรับ integration"],
+  ["HosXP (Thai)", "HL7 v2.x", "ตามแผน Q3", "HIS ที่พบได้บ่อยในไทย"],
+  ["HIMS / InHospital", "HL7 FHIR R4", "ตามแผน Q3", "สแตกของโรงพยาบาลภาครัฐ"],
+  ["Sectra PACS", "DICOM + HL7", "ตามแผน Q4", "โรงพยาบาลมหาวิทยาลัย"],
+  ["Epic (large centres)", "SMART on FHIR", "อยู่ใน roadmap", "เครือโรงพยาบาลเอกชน"],
 ];
 
 const PEOPLE_ITEMS = [
   {
-    title: "Radiologist in the Loop",
+    title: "รังสีแพทย์ในลูป",
     icon: "👨‍⚕️",
     points: [
-      "Confirm / Reject / Correct AI verdict with one click",
-      "All verdicts stored and fed back to federated training",
-      "Accuracy rate tracked in Feedback Stats",
-      "Prevents automation bias — radiologist remains accountable",
+      "กดยืนยัน ไม่เห็นด้วย หรือแก้ผลของ AI ได้ในคลิกเดียว",
+      "ทุกความเห็นถูกเก็บและป้อนกลับสู่ federated training",
+      "ติดตาม accuracy rate ได้จากสถิติ feedback",
+      "ลด automation bias โดยให้รังสีแพทย์ยังเป็นผู้รับผิดชอบหลัก",
     ],
   },
   {
-    title: "Training & Change Management",
+    title: "การอบรมและการเปลี่ยนผ่าน",
     icon: "📚",
     points: [
-      "On-site training session for radiology staff",
-      "\"AI as second reader\" framing, not replacement",
-      "Clear escalation path: low confidence → senior radiologist",
-      "Monthly accuracy review meetings with hospital IT",
+      "มี session อบรมหน้างานสำหรับทีมรังสี",
+      "สื่อสารว่า AI เป็น second reader ไม่ใช่ตัวแทนแพทย์",
+      "มีเส้นทางส่งต่อชัดเจนเมื่อคะแนนความมั่นใจต่ำ",
+      "ทบทวน accuracy รายเดือนร่วมกับทีม IT โรงพยาบาล",
     ],
   },
 ];
 
 const PROCESS_ITEMS = [
   {
-    title: "Clinical Workflow Integration",
+    title: "การเชื่อมเข้ากับ Clinical Workflow",
     icon: "🔁",
     points: [
-      "AI triage runs in background while radiologist loads worklist",
-      "High-confidence positives flagged at top of queue (auto-triage)",
-      "FHIR report auto-attached to study in PACS on confirm",
-      "Negative scans still reviewed — AI supplements, not replaces",
+      "AI triage ทำงานเบื้องหลังระหว่างที่รังสีแพทย์เปิด worklist",
+      "เคส positive ที่คะแนนความมั่นใจสูงถูกดันขึ้นต้นคิว",
+      "FHIR report ถูกแนบกลับไปยังการศึกษาใน PACS เมื่อมีการยืนยันผล",
+      "เคส negative ยังต้องมีการทบทวนเสมอ AI เป็นผู้ช่วย ไม่ใช่ผู้แทน",
     ],
   },
   {
     title: "Governance & Audit",
     icon: "📊",
     points: [
-      "Every AI prediction + radiologist verdict logged (immutable)",
-      "Monthly aggregate accuracy report exported as FHIR Bundle",
-      "PDPA Data Processing Agreement signed with each hospital",
-      "Medical device registration pathway (TFDA class II)",
+      "ทุก prediction และ verdict ถูกบันทึกแบบ immutable",
+      "ส่งออกรายงาน accuracy รายเดือนเป็น FHIR Bundle ได้",
+      "มี Data Processing Agreement ตาม PDPA กับแต่ละโรงพยาบาล",
+      "วางแนวทางขึ้นทะเบียนเครื่องมือแพทย์กับ TFDA class II",
     ],
   },
 ];
@@ -126,7 +124,7 @@ function StatusBadge({ status }: { status: "live" | "planned" }) {
           : { background: "var(--surface-2)", color: "var(--text-3)", border: "1px solid var(--border)" }
       }
     >
-      {status === "live" ? "● Live" : "○ Planned"}
+      {status === "live" ? "● ใช้งานแล้ว" : "○ ตามแผน"}
     </span>
   );
 }
@@ -163,31 +161,29 @@ function Panel({
 export default function PacsPage() {
   return (
     <div className="q-dashboard-stack">
-      {/* Intro */}
       <section className="q-dashboard-intro">
         <div className="q-dashboard-intro-row">
           <div className="q-dashboard-intro-copy">
-            <div className="q-eyebrow mb-1">Hospital Integration Roadmap</div>
+            <div className="q-eyebrow mb-1">เส้นทางเชื่อมต่อกับโรงพยาบาล</div>
             <div className="q-dashboard-intro-title">PACS · HIS · HL7 FHIR</div>
             <p className="q-dashboard-intro-text">
-              Q-Sentinel Mesh is designed to slot into existing hospital workflows — not replace them.
-              This tab outlines the People, Process, and Technology strategy for real-world clinical deployment.
+              Q-Sentinel Mesh ถูกออกแบบให้แทรกตัวใน workflow เดิมของโรงพยาบาล ไม่ใช่เข้าไปแทนที่ระบบหลัก
+              หน้านี้สรุปแนวทางด้าน People, Process และ Technology สำหรับการใช้งานจริง
             </p>
           </div>
           <div className="q-kicker-row">
-            <span className="q-pill q-pill-success">HL7 FHIR R4 · Live</span>
-            <span className="q-pill">DICOM SR · Planned</span>
-            <span className="q-pill q-pill-accent">PDPA Aligned</span>
+            <span className="q-pill q-pill-success">HL7 FHIR R4 · ใช้งานแล้ว</span>
+            <span className="q-pill">DICOM SR · ตามแผน</span>
+            <span className="q-pill q-pill-accent">สอดคล้อง PDPA</span>
           </div>
         </div>
       </section>
 
-      {/* People + Process */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Panel
           eyebrow="People"
           title="Human-in-the-Loop"
-          description="Clinical AI succeeds when doctors trust it. These mechanisms keep radiologists in control."
+          description="Clinical AI จะถูกใช้งานได้จริงก็ต่อเมื่อแพทย์เชื่อใจและยังคงควบคุมการตัดสินใจได้"
         >
           <div className="flex flex-col gap-4">
             {PEOPLE_ITEMS.map((item) => (
@@ -214,7 +210,7 @@ export default function PacsPage() {
         <Panel
           eyebrow="Process"
           title="Clinical Workflow & Governance"
-          description="Standards-based integration ensures AI findings reach the right people at the right time."
+          description="การเชื่อมต่อแบบอิงมาตรฐานช่วยให้ผลจาก AI ไปถึงคนที่ควรเห็นในเวลาที่เหมาะสม"
         >
           <div className="flex flex-col gap-4">
             {PROCESS_ITEMS.map((item) => (
@@ -239,11 +235,10 @@ export default function PacsPage() {
         </Panel>
       </div>
 
-      {/* Technology — Integration Roadmap phases */}
       <Panel
         eyebrow="Technology"
-        title="Integration Roadmap"
-        description="A phased approach to full PACS / HIS integration, starting with standards-based FHIR export already live in this build."
+        title="Roadmap การเชื่อมต่อ"
+        description="วางแผนเชื่อม PACS / HIS แบบเป็นระยะ เริ่มจาก FHIR export ที่ใช้งานได้แล้วใน build นี้"
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {ROADMAP_PHASES.map((phase) => (
@@ -280,11 +275,10 @@ export default function PacsPage() {
         </div>
       </Panel>
 
-      {/* System compatibility matrix */}
       <Panel
         eyebrow="Technology"
-        title="Hospital System Compatibility Matrix"
-        description="Target systems for Thai hospital deployment — covering public, university, and private networks."
+        title="ตารางความเข้ากันได้ของระบบ"
+        description="ระบบเป้าหมายสำหรับการใช้งานในโรงพยาบาลไทย ทั้งภาครัฐ มหาวิทยาลัย และเอกชน"
       >
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -309,7 +303,7 @@ export default function PacsPage() {
                       key={j}
                       className="py-2.5 pr-4"
                       style={{
-                        color: j === 0 ? "var(--text-1)" : j === 2 && cell === "Tested" ? "var(--success)" : "var(--text-2)",
+                        color: j === 0 ? "var(--text-1)" : j === 2 && cell === "ทดสอบแล้ว" ? "var(--success)" : "var(--text-2)",
                         fontWeight: j === 0 ? 600 : 400,
                       }}
                     >
@@ -323,28 +317,27 @@ export default function PacsPage() {
         </div>
       </Panel>
 
-      {/* Architecture note */}
       <Panel
         eyebrow="Technology"
-        title="Current Architecture"
-        description="How Q-Sentinel Mesh sits alongside existing hospital infrastructure."
+        title="สถาปัตยกรรมปัจจุบัน"
+        description="Q-Sentinel Mesh วางตัวควบคู่กับโครงสร้างระบบเดิมของโรงพยาบาลอย่างไร"
       >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[
             {
-              title: "CT Acquisition",
+              title: "การรับภาพ CT",
               icon: "📡",
-              desc: "CT scanner → DICOM → hospital PACS (unchanged). Q-Sentinel reads a copy — never touches the primary PACS.",
+              desc: "CT scanner → DICOM → hospital PACS ยังคงทำงานเหมือนเดิม Q-Sentinel อ่านจากสำเนาเท่านั้น ไม่แตะ primary PACS",
             },
             {
-              title: "AI Processing",
+              title: "การประมวลผล AI",
               icon: "🧠",
-              desc: "DICOM / NIfTI uploaded to Q-Sentinel. EfficientNet-B4 + VQC runs inference on-site or in Thai-region AWS Fargate.",
+              desc: "DICOM / NIfTI ถูกส่งเข้า Q-Sentinel แล้วรัน EfficientNet-B4 + VQC แบบ on-site หรือบน AWS Fargate ใน region ไทย",
             },
             {
-              title: "Report Delivery",
+              title: "การส่งรายงาน",
               icon: "📋",
-              desc: "FHIR R4 DiagnosticReport (live) or DICOM SR (Phase 2) pushed back to PACS / HIS with radiologist verdict attached.",
+              desc: "ส่ง FHIR R4 DiagnosticReport กลับเข้า PACS / HIS ได้แล้ว และมีแผนต่อยอด DICOM SR ใน Phase 2",
             },
           ].map((card) => (
             <div
@@ -366,8 +359,8 @@ export default function PacsPage() {
           className="mt-4 rounded-[0.85rem] border px-4 py-3 text-xs leading-6"
           style={{ background: "var(--surface-info)", borderColor: "var(--info-soft)", color: "var(--text-2)" }}
         >
-          <span className="font-semibold" style={{ color: "var(--info)" }}>Design principle: </span>
-          Q-Sentinel operates as a read-only AI assistant. It never modifies the primary PACS, never stores raw patient images beyond the session, and all federated model updates are encrypted with ML-KEM-512 (NIST FIPS 203) before leaving the hospital network.
+          <span className="font-semibold" style={{ color: "var(--info)" }}>หลักการออกแบบ: </span>
+          Q-Sentinel ทำหน้าที่เป็น read-only AI assistant ไม่แก้ไข primary PACS ไม่เก็บภาพดิบของผู้ป่วยเกินกว่า session และ model update ทุกชุดจะถูกเข้ารหัสด้วย ML-KEM-512 (NIST FIPS 203) ก่อนออกจากเครือข่ายโรงพยาบาล
         </div>
       </Panel>
     </div>

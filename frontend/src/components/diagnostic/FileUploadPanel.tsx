@@ -35,10 +35,10 @@ export default function FileUploadPanel({ onFile, uploading, ctMeta }: Props) {
         <input {...getInputProps()} />
         <div className="text-2xl mb-2">📂</div>
         <div className="text-sm font-medium" style={{ color: "var(--text-1)" }}>
-          {uploading ? "กำลังอัพโหลด..." : isDragActive ? "วางไฟล์ที่นี่" : "อัพโหลด CT Scan"}
+          {uploading ? "กำลังอัปโหลด..." : isDragActive ? "วางไฟล์ที่นี่" : "อัปโหลด CT scan"}
         </div>
         <div className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
-          รองรับ NIfTI (.nii) และ DICOM (.dcm)
+          รองรับ NIfTI (.nii, .nii.gz) และ DICOM (.dcm)
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export default function FileUploadPanel({ onFile, uploading, ctMeta }: Props) {
           </div>
           <div style={{ color: "var(--text-2)" }}>{ctMeta.filename}</div>
           <div className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
-            {ctMeta.slice_count} slices · {ctMeta.shape.join(" × ")} px
+            {ctMeta.slice_count} สไลซ์ · {ctMeta.shape.join(" × ")} px
           </div>
         </div>
       )}

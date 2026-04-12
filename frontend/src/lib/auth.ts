@@ -1,26 +1,26 @@
-// Auth utilities — JWT decode (client-side), cookie management, role config
+// Auth utilities - JWT decode (client-side), cookie management, role config
 
 export const ROLE_CONFIG = {
   radiologist: {
-    label: "Radiologist",
+    label: "รังสีแพทย์",
     icon: "🩺",
-    description: "CT scan review and AI-assisted hemorrhage detection",
+    description: "อ่าน CT scan และใช้ AI ช่วยประเมินภาวะเลือดออกในสมอง",
     tabs: ["/dashboard", "/dashboard/federated"],
     defaultPath: "/dashboard",
     accent: "#c25b86",
   },
   hospital_operator: {
-    label: "Hospital Operator",
+    label: "ผู้ดูแลการปฏิบัติงานโรงพยาบาล",
     icon: "🏥",
-    description: "Patient workflow management and operational oversight",
+    description: "ดูแล flow ผู้ป่วยและภาพรวมการใช้งานในระดับหน้างาน",
     tabs: ["/dashboard", "/dashboard/federated", "/dashboard/pacs"],
     defaultPath: "/dashboard",
     accent: "#3b82f6",
   },
   fed_ai_admin: {
-    label: "Federated AI Admin",
+    label: "ผู้ดูแล Federated AI",
     icon: "🧠",
-    description: "Federated learning rounds, model updates, and AI governance",
+    description: "ติดตามรอบการเทรน การอัปเดตโมเดล และการกำกับดูแล AI",
     tabs: ["/dashboard/federated", "/dashboard/security", "/dashboard/pacs"],
     defaultPath: "/dashboard/federated",
     accent: "#4c8f6b",
@@ -28,15 +28,15 @@ export const ROLE_CONFIG = {
   hospital_it: {
     label: "Hospital IT / Security Admin",
     icon: "🔒",
-    description: "PACS integration, PQC security, and infrastructure management",
+    description: "ดูแล PACS integration, ความปลอดภัยแบบ PQC และโครงสร้างระบบ",
     tabs: ["/dashboard/security", "/dashboard/pacs"],
     defaultPath: "/dashboard/security",
     accent: "#7c3aed",
   },
   dev: {
-    label: "Developer / Creator",
+    label: "ผู้พัฒนา / ผู้สร้างระบบ",
     icon: "⚡",
-    description: "Full system access — all modules unlocked",
+    description: "เข้าถึงได้ทุกส่วนของระบบพร้อมเครื่องมือทั้งหมด",
     tabs: ["/dashboard", "/dashboard/federated", "/dashboard/security", "/dashboard/pacs"],
     defaultPath: "/dashboard",
     accent: "#f59e0b",
@@ -63,7 +63,7 @@ export function decodeJwtPayload(token: string): AuthPayload | null {
       atob(raw)
         .split("")
         .map((c) => "%" + c.charCodeAt(0).toString(16).padStart(2, "0"))
-        .join("")
+        .join(""),
     );
     const payload = JSON.parse(json);
     if (!payload.role || !payload.exp) return null;

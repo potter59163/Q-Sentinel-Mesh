@@ -14,8 +14,6 @@ export default function DashboardLayout({
       <div className="q-app-shell">
         <Sidebar />
         <div className="q-app-main">
-
-          {/* ── Hero card ──────────────────────────────────────────────── */}
           <div className="q-hero-card q-fade-top">
             <div className="q-hero-watermark" aria-hidden>QSM</div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -27,43 +25,38 @@ export default function DashboardLayout({
                   🧠 Q-Sentinel Mesh
                 </h1>
                 <p className="mt-0.5 text-sm" style={{ color: "var(--text-2)" }}>
-                  Quantum-Federated Stroke Diagnostic Intelligence Network
+                  เครือข่ายอัจฉริยะสำหรับคัดกรอง stroke แบบ Quantum-Federated
                 </p>
                 <div className="mt-2.5 flex flex-wrap gap-1.5">
                   <span className="q-pill">⚡ EfficientNet-B4</span>
                   <span className="q-pill">⬡ VQC 4-qubit</span>
                   <span className="q-pill">🔒 ML-KEM-512</span>
-                  <span className="q-pill">🏥 3 Hospital Nodes</span>
+                  <span className="q-pill">🏥 3 โหนดโรงพยาบาล</span>
                 </div>
               </div>
               <div className="hidden shrink-0 flex-col items-end gap-1.5 sm:flex">
-                <span className="q-pill q-pill-success">● ONLINE</span>
+                <span className="q-pill q-pill-success">● ออนไลน์</span>
                 <span className="q-pill">PQC · NIST FIPS 203</span>
-                <span className="q-pill q-pill-accent">⬡ QUANTUM-ENHANCED</span>
+                <span className="q-pill q-pill-accent">⬡ เสริมพลังด้วยควอนตัม</span>
               </div>
             </div>
           </div>
 
-          {/* ── Metrics ────────────────────────────────────────────────── */}
           <MetricsStrip />
-
-          {/* ── Nav tabs ───────────────────────────────────────────────── */}
           <NavTabs />
 
-          {/* ── Page content ───────────────────────────────────────────── */}
           <ErrorBoundary>
             <div>{children}</div>
           </ErrorBoundary>
 
-          {/* ── Footer ─────────────────────────────────────────────────── */}
           <footer
             className="mt-4 text-center text-xs leading-6"
             style={{ color: "var(--text-3)" }}
           >
-            Q-Sentinel Mesh · Quantum-enhanced triage workspace · 3-hospital federated monitoring
+            Q-Sentinel Mesh · พื้นที่คัดกรองด้วย AI · ติดตาม Federated Monitoring แบบ 3 โรงพยาบาล
             <br />
             <span style={{ color: "var(--text-2)" }}>
-              Prototype interface for research and demonstration only
+              อินเทอร์เฟซต้นแบบสำหรับงานวิจัยและการสาธิตเท่านั้น
             </span>
           </footer>
         </div>

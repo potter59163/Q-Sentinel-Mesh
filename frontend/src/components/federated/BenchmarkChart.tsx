@@ -30,10 +30,10 @@ export default function BenchmarkChart({ data }: Props) {
         <div>
           <div className="q-eyebrow">Benchmark</div>
           <div className="mt-1 text-sm font-semibold" style={{ color: "var(--text-1)" }}>
-            Federated benchmark by participating node count
+            เทียบผลตามจำนวนโหนดที่เข้าร่วม
           </div>
           <div className="mt-0.5 text-xs" style={{ color: "var(--text-3)" }}>
-            AUC progression comparing the baseline against the hybrid stack
+            การเปลี่ยนแปลงของ AUC ระหว่าง baseline และ hybrid stack
           </div>
         </div>
         <div

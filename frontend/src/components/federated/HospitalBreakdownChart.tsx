@@ -26,9 +26,9 @@ export default function HospitalBreakdownChart({ rounds }: Props) {
   return (
     <div className="rounded-[1.5rem] border p-5" style={{ height: 288, background: "var(--surface)", borderColor: "var(--border)" }}>
       <div className="mb-4">
-        <div className="q-eyebrow">Per-Hospital Performance</div>
+        <div className="q-eyebrow">ผลลัพธ์รายโรงพยาบาล</div>
         <div className="mt-1 text-sm font-semibold" style={{ color: "var(--text-1)" }}>
-          Local AUC progression across participating sites
+          Local AUC ของแต่ละ site ตลอดรอบการเทรน
         </div>
       </div>
 

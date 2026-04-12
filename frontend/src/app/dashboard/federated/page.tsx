@@ -108,36 +108,33 @@ export default function FederatedPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <SummaryCard label="Baseline AUC" value={baseline ? `${(baseline * 100).toFixed(1)}%` : "-"} note="Single-site reference performance before federation." valueColor="var(--chart-baseline)" />
-        <SummaryCard label="Hybrid AUC" value={hybrid ? `${(hybrid * 100).toFixed(1)}%` : "-"} note="Hybrid Q-Sentinel performance before aggregation." valueColor="var(--accent)" />
-        <SummaryCard label="Federated AUC" value={animValue ?? (federated ? `${(federated * 100).toFixed(1)}%` : "-")} note="Current global model after distributed rounds." valueColor="var(--success)" />
-        <SummaryCard label="Net Lift" value={netLift != null ? `+${netLift.toFixed(1)}%` : "-"} note="Observed gain relative to the isolated baseline." valueColor="var(--info)" />
+        <SummaryCard label="Baseline AUC" value={baseline ? `${(baseline * 100).toFixed(1)}%` : "-"} note="ผลอ้างอิงแบบ single-site ก่อนทำ federation" valueColor="var(--chart-baseline)" />
+        <SummaryCard label="Hybrid AUC" value={hybrid ? `${(hybrid * 100).toFixed(1)}%` : "-"} note="ผลของ Q-Sentinel ก่อน aggregate ข้าม site" valueColor="var(--accent)" />
+        <SummaryCard label="Federated AUC" value={animValue ?? (federated ? `${(federated * 100).toFixed(1)}%` : "-")} note="ผลของ global model หลังการกระจายรอบล่าสุด" valueColor="var(--success)" />
+        <SummaryCard label="Net Lift" value={netLift != null ? `+${netLift.toFixed(1)}%` : "-"} note="การยกระดับเมื่อเทียบกับ baseline เดิม" valueColor="var(--info)" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
-        <Panel
-          eyebrow="Performance Story"
-          title="Benchmark Comparison"
-        >
+        <Panel eyebrow="Performance Story" title="ภาพรวมผลลัพธ์">
           {benchmarkLoading ? (
             <div className="py-12 text-center text-sm" style={{ color: "var(--text-3)" }}>
-              Loading benchmark data...
+              กำลังโหลด benchmark data...
             </div>
           ) : benchmark ? (
             <BenchmarkChart data={benchmark} />
           ) : (
             <div className="py-12 text-center text-sm" style={{ color: "var(--text-3)" }}>
-              Benchmark data is unavailable.
+              ยังไม่มี benchmark data
             </div>
           )}
         </Panel>
 
-        <Panel eyebrow="Quick Read" title="Key Results">
+        <Panel eyebrow="Quick Read" title="ประเด็นสำคัญ">
           <div>
             <div className="q-stat-row"><span style={{ color: "var(--text-3)" }}>Topology</span><span className="q-value">3 hospitals</span></div>
             <div className="q-stat-row"><span style={{ color: "var(--text-3)" }}>Algorithm</span><span className="q-value" style={{ color: "var(--accent)" }}>FedAvg</span></div>
-            <div className="q-stat-row"><span style={{ color: "var(--text-3)" }}>First round AUC</span><span className="q-value">{firstRound ? `${(firstRound.global_auc * 100).toFixed(1)}%` : "-"}</span></div>
-            <div className="q-stat-row"><span style={{ color: "var(--text-3)" }}>Latest round AUC</span><span className="q-value" style={{ color: "var(--success)" }}>{lastRound ? `${(lastRound.global_auc * 100).toFixed(1)}%` : "-"}</span></div>
+            <div className="q-stat-row"><span style={{ color: "var(--text-3)" }}>AUC รอบแรก</span><span className="q-value">{firstRound ? `${(firstRound.global_auc * 100).toFixed(1)}%` : "-"}</span></div>
+            <div className="q-stat-row"><span style={{ color: "var(--text-3)" }}>AUC รอบล่าสุด</span><span className="q-value" style={{ color: "var(--success)" }}>{lastRound ? `${(lastRound.global_auc * 100).toFixed(1)}%` : "-"}</span></div>
             <div className="q-stat-row"><span style={{ color: "var(--text-3)" }}>Privacy posture</span><span className="q-value" style={{ color: "var(--success)" }}>Preserved</span></div>
           </div>
 
@@ -147,27 +144,27 @@ export default function FederatedPage() {
             className="q-btn-primary mt-4 w-full px-4 py-3 text-sm"
             style={{ opacity: !baseline || !federated ? 0.55 : 1, cursor: !baseline || !federated ? "not-allowed" : "pointer" }}
           >
-            Animate training lift
+            แสดงการยกระดับระหว่างการเทรน
           </button>
         </Panel>
       </div>
 
-      <Panel eyebrow="Training Trace" title="Round-by-round Progression">
+      <Panel eyebrow="Training Trace" title="ความคืบหน้าแต่ละรอบ">
         {roundsLoading ? (
           <div className="py-12 text-center text-sm" style={{ color: "var(--text-3)" }}>
-            Loading training rounds...
+            กำลังโหลดรอบการเทรน...
           </div>
         ) : rounds.length ? (
           <>
             <FederatedRoundsChart rounds={rounds} />
             <div className="mt-5">
-              <div className="q-eyebrow mb-3">Per-hospital contribution</div>
+              <div className="q-eyebrow mb-3">ผลงานของแต่ละโรงพยาบาล</div>
               <HospitalBreakdownChart rounds={rounds} />
             </div>
           </>
         ) : (
           <div className="py-12 text-center text-sm" style={{ color: "var(--text-3)" }}>
-            No federated rounds have been recorded yet.
+            ยังไม่มีข้อมูลรอบ federated ในระบบ
           </div>
         )}
       </Panel>
@@ -175,12 +172,12 @@ export default function FederatedPage() {
       <section>
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <div className="q-eyebrow mb-1">Network Health</div>
+            <div className="q-eyebrow mb-1">สถานะเครือข่าย</div>
             <h3 className="text-lg font-semibold" style={{ color: "var(--text-1)" }}>
-              Hospital Nodes
+              โหนดโรงพยาบาล
             </h3>
           </div>
-          <span className="q-pill">Encrypted model updates only</span>
+          <span className="q-pill">ส่งเฉพาะ model update ที่เข้ารหัสแล้ว</span>
         </div>
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
           {HOSPITAL_NAMES.map((name) => (
